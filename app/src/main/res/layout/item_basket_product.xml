@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:layout_margin="6dp"
+    android:elevation="2dp"
+    android:padding="8dp"
+    android:radius="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvBasketProductName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Product Name"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/tvBasketProductQuantity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="x1"
+                android:textSize="16sp"
+                android:layout_marginEnd="16dp"
+                android:textColor="#666" />
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/tvBasketProductPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="€0.00"
+            android:textSize="16sp"
+            android:textColor="#5D5FEF" />
+
+        <TextView
+            android:id="@+id/tvBasketQuantityField"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="1"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp" />
+
+        <ImageView
+            android:id="@+id/ivCartMinus"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_minus"
+            android:contentDescription="@drawable/ic_minus" />
+
+        <ImageView
+            android:id="@+id/ivCartPlus"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_plus"
+            android:layout_marginStart="12dp"
+            android:contentDescription="@drawable/ic_plus" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
+
