@@ -57,5 +57,15 @@ The project includes several key modules:
 
 ---
 
-## Project Structure
+## Academic Context
 
+Developed as part of a **Computer Science course at the Athens University of Economics and Business (AUEB)**.
+
+The project focuses on applying distributed systems concepts within a mobile application environment.
+
+---
+
+## Author
+
+**Sotiris Kylintireas**  
+Computer Science Student – Athens University of Economics and Business
