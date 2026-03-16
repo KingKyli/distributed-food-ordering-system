@@ -1,31 +1,61 @@
 # Distributed Food Ordering System
 
-A distributed restaurant ordering system developed in Java as part of a university project.
+A distributed restaurant ordering system developed in **Java and Android** as part of a university software engineering project.
+
+The application simulates a food ordering platform where users can browse restaurants, manage their basket, and place orders while the system handles communication between different components using distributed system principles.
+
+---
 
 ## Overview
-This project simulates a food ordering platform with communication between different system components.
+
+This project demonstrates the implementation of a **client–server based food ordering system**.  
+The Android application acts as the client interface, communicating with backend components responsible for handling restaurant data, product management, and order processing.
+
+The goal of the project was to explore **distributed systems concepts**, application architecture, and mobile development.
+
+---
 
 ## Features
-- Restaurant browsing
-- Product and basket management
-- Order handling
-- Distributed communication logic
 
-## Technologies
-- Java
-- Android
-- Gradle
-- Client-server communication
-- Distributed systems concepts
+- Restaurant browsing and navigation
+- Product listing and filtering
+- Basket management system
+- Order handling workflow
+- Partner / restaurant management interface
+- Communication between application components
+
+---
 
 ## Architecture
-The system follows a client-server architecture where the mobile application communicates with backend components to retrieve restaurant data and manage orders.
+
+The system follows a **client–server architecture**:
+
+- The **Android application** acts as the client.
+- Backend components handle **data retrieval, order processing, and communication**.
+- The system demonstrates concepts commonly used in **distributed systems**, such as modular components and communication between services.
+
+---
 
 ## Example Components
-- Product & Store data models
-- Basket management system
-- Partner management console
-- Client-server communication layer
 
-## Academic Context
-Developed as part of a Computer Science course at Athens University of Economics and Business (AUEB).
+The project includes several key modules:
+
+- **Product & Store Models** – represent restaurants and menu items  
+- **Basket System** – manages user selections and order preparation  
+- **Partner Management Console** – tools for restaurant partners  
+- **Client-Server Communication Layer** – handles interaction between application components  
+
+---
+
+## Technologies Used
+
+- **Java**
+- **Android**
+- **Gradle**
+- **Client-Server Communication**
+- **Distributed Systems Concepts**
+
+---
+
+## Project Structure
+
