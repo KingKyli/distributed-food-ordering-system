@@ -1,12 +1,16 @@
 package com.example.restaurantapp;
 
 public class ServerConnection {
-    private static MasterCommunicator communicator;
+    private static volatile MasterCommunicator communicator;
+    private static final Object lock = new Object();
 
     public static void init(String ip, int port) {
-        if (communicator == null) {
-            communicator = new MasterCommunicator(ip, port);
-            communicator.connect(); // You now call connect() here
+        synchronized (lock) {
+            if (communicator == null) {
+                MasterCommunicator newComm = new MasterCommunicator(ip, port);
+                newComm.connect();
+                communicator = newComm;
+            }
         }
     }
 
@@ -15,9 +19,11 @@ public class ServerConnection {
     }
 
     public static void close() {
-        if (communicator != null) {
-            communicator.close();
-            communicator = null;
+        synchronized (lock) {
+            if (communicator != null) {
+                communicator.close();
+                communicator = null;
+            }
         }
     }
 }

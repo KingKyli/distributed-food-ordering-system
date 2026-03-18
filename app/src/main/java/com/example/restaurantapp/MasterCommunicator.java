@@ -26,8 +26,8 @@ public class MasterCommunicator {
     public void connect() {
         Log.d("MasterCommunicator", "connect() called");
         try {
-            this.socket = new Socket(masterIp, masterPort);
-            //this.socket.connect(new InetSocketAddress(masterIp, masterPort), 20000); // 2 seconds timeout
+            this.socket = new Socket();
+            this.socket.connect(new InetSocketAddress(masterIp, masterPort), 5000); // 5 second timeout
             this.out = new PrintWriter(socket.getOutputStream(), true);
             this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out.println("CLIENT_HELLO");
@@ -50,6 +50,10 @@ public class MasterCommunicator {
     }
 
     private synchronized String sendRequestAndGetResponse(String request) {
+        if (out == null || in == null) {
+            Log.e("MasterCommunicator", "Not connected to server");
+            return null;
+        }
         try {
             out.println(request);
             out.flush();

@@ -1,11 +1,12 @@
 // src/main/java/com/example/restaurantapp/Basket.java
 package com.example.restaurantapp;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Basket {
-    private static Basket instance;
+    private static volatile Basket instance;
     private final Map<Product, Integer> items = new HashMap<>();
 
     private Basket() {}
@@ -15,20 +16,23 @@ public class Basket {
         return storeName;
     }
 
-
     public static Basket getInstance() {
         if (instance == null) {
-            instance = new Basket();
+            synchronized (Basket.class) {
+                if (instance == null) {
+                    instance = new Basket();
+                }
+            }
         }
         return instance;
     }
 
-    public void addProduct(Product product) {
+    public synchronized void addProduct(Product product) {
         int count = items.getOrDefault(product, 0);
         items.put(product, count + 1);
     }
 
-    public boolean addProduct(Product product, String storeName) {
+    public synchronized boolean addProduct(Product product, String storeName) {
         if (items.isEmpty()) {
             this.storeName = storeName;
         }
@@ -41,8 +45,7 @@ public class Basket {
         return true;
     }
 
-    // In Basket.java
-    public void removeProduct(Product product) {
+    public synchronized void removeProduct(Product product) {
         if (!items.containsKey(product)) return;
         int count = items.get(product);
         if (count > 1) {
@@ -55,11 +58,11 @@ public class Basket {
         }
     }
 
-    public Map<Product, Integer> getItems() {
-        return items;
+    public synchronized Map<Product, Integer> getItems() {
+        return Collections.unmodifiableMap(new HashMap<>(items));
     }
 
-    public void clear() {
+    public synchronized void clear() {
         items.clear();
         storeName = null;
     }

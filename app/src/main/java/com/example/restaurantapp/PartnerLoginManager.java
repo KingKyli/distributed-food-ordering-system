@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PartnerLoginManager {
-    private static PartnerLoginManager instance;
+    private static volatile PartnerLoginManager instance;
     private final Map<String, String> storePasswords = new HashMap<>();
     private MasterCommunicator communicator;
     private SharedPreferences sharedPreferences;
@@ -20,7 +20,11 @@ public class PartnerLoginManager {
 
     public static PartnerLoginManager getInstance() {
         if (instance == null) {
-            instance = new PartnerLoginManager();
+            synchronized (PartnerLoginManager.class) {
+                if (instance == null) {
+                    instance = new PartnerLoginManager();
+                }
+            }
         }
         return instance;
     }
