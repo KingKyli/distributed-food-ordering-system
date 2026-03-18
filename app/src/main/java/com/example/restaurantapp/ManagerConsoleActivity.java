@@ -76,7 +76,8 @@ public class ManagerConsoleActivity extends AppCompatActivity {
         }
         if (storeName == null) return;
         new Thread(() -> {
-            MasterCommunicator comm = ServerConnection.getInstance();
+            MasterCommunicator comm = ConnectionUtils.requireConnected(this);
+            if (comm == null) return;
             // Στείλε ΚΕΝΕΣ τιμές για να πάρεις ΟΛΑ τα καταστήματα
             String result = comm.sendSearchRequest("", "", "", "", "");
             runOnUiThread(() -> {

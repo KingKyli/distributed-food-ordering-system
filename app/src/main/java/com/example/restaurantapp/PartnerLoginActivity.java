@@ -29,15 +29,36 @@ public class PartnerLoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         tvStatus = findViewById(R.id.tvStatus);
 
+        btnLogin.setEnabled(false);
+        showStatus("Loading stores...", 0xFF666666);
+
+        MasterCommunicator comm = ConnectionUtils.requireConnected(this);
+        if (comm == null) {
+            return;
+        }
+
         // ΑΛΛΑΓΗ: Στείλε κενές τιμές για να πάρεις όλα τα καταστήματα
         new Thread(() -> {
-            MasterCommunicator comm = ServerConnection.getInstance();
             try {
                 String result = comm.sendSearchRequest("", "", "", "", "");
+                if (result == null || result.trim().isEmpty()) {
+                    runOnUiThread(() -> {
+                        showStatus("Failed to load stores", 0xFFFF0000);
+                        btnLogin.setEnabled(false);
+                    });
+                    return;
+                }
                 List<Store> parsedList = MainActivity.parseStores(result);
-                runOnUiThread(() -> stores = parsedList);
+                runOnUiThread(() -> {
+                    stores = parsedList;
+                    btnLogin.setEnabled(true);
+                    tvStatus.setVisibility(View.GONE);
+                });
             } catch (Exception e) {
-                runOnUiThread(() -> showStatus("Failed to load stores", 0xFFFF0000));
+                runOnUiThread(() -> {
+                    showStatus("Failed to load stores", 0xFFFF0000);
+                    btnLogin.setEnabled(false);
+                });
             }
         }).start();
 
@@ -52,6 +73,10 @@ public class PartnerLoginActivity extends AppCompatActivity {
         etPassword.addTextChangedListener(watcher);
 
         btnLogin.setOnClickListener(view -> {
+            if (stores == null) {
+                showStatus("Stores are still loading", 0xFFFF0000);
+                return;
+            }
             String username = etUsername.getText().toString().trim();
             String password = etPassword.getText().toString();
 

@@ -22,8 +22,16 @@ public class MasterCommunicator {
         this.masterIp = masterIp;
         this.masterPort = masterPort;
     }
-    // In MasterCommunicator.java
-    public void connect() {
+
+    public boolean isConnected() {
+        return socket != null
+                && socket.isConnected()
+                && !socket.isClosed()
+                && out != null
+                && in != null;
+    }
+
+    public boolean connect() {
         Log.d("MasterCommunicator", "connect() called");
         try {
             this.socket = new Socket();
@@ -33,9 +41,11 @@ public class MasterCommunicator {
             out.println("CLIENT_HELLO");
             out.flush();
             Log.d("MasterCommunicator", "Connected to server at " + masterIp + ":" + masterPort);
+            return true;
         } catch (IOException e) {
             Log.e("MasterCommunicator", "Error: Could not connect to Master at " + e.getMessage());
-            throw new RuntimeException(e);
+            close();
+            return false;
         }
     }
 
@@ -50,7 +60,7 @@ public class MasterCommunicator {
     }
 
     private synchronized String sendRequestAndGetResponse(String request) {
-        if (out == null || in == null) {
+        if (!isConnected()) {
             Log.e("MasterCommunicator", "Not connected to server");
             return null;
         }

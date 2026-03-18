@@ -89,7 +89,8 @@ public class EditProductActivity extends AppCompatActivity {
         if (currentStore == null) return;
         String storeName = currentStore.getStoreName();
         new Thread(() -> {
-            MasterCommunicator comm = ServerConnection.getInstance();
+            MasterCommunicator comm = ConnectionUtils.requireConnected(this);
+            if (comm == null) return;
             // Στείλε ΚΕΝΕΣ τιμές για να πάρεις ΟΛΑ τα καταστήματα
             String result = comm.sendSearchRequest("", "", "", "", "");
             runOnUiThread(() -> {
@@ -234,7 +235,8 @@ public class EditProductActivity extends AppCompatActivity {
                                         String productName = toRemove.getProductName();
                                         if (storeName != null && productName != null) {
                                             new Thread(() -> {
-                                                MasterCommunicator comm = ServerConnection.getInstance();
+                                                MasterCommunicator comm = ConnectionUtils.requireConnected(EditProductActivity.this);
+                                                if (comm == null) return;
                                                 boolean success = comm.sendRemoveProductRequest(storeName, productName);
                                                 runOnUiThread(() -> {
                                                     if (success) {

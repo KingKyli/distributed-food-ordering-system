@@ -3,6 +3,8 @@ package com.example.restaurantapp;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import java.util.Objects;
+
 class Product {
     private String productName;
     private String productType;
@@ -11,8 +13,6 @@ class Product {
     private boolean isActive;
     private int unitsSold;
     private double revenueFromThisProduct;
-
-    private boolean active;
 
     // Constructor
     public Product(String productName, String productType, int availableAmount, double price) {
@@ -60,7 +60,14 @@ class Product {
         int amount = obj.optInt("AvailableAmount", 0);
         double price = obj.getDouble("Price");
 
-        return new Product(name, type, amount, price);
+        Product p = new Product(name, type, amount, price);
+        // Optional fields (may not exist in server responses)
+        if (obj.has("IsActive")) {
+            p.setActive(obj.optBoolean("IsActive", true));
+        } else if (obj.has("Active")) {
+            p.setActive(obj.optBoolean("Active", true));
+        }
+        return p;
     }
 
 
@@ -72,6 +79,20 @@ class Product {
         json.put("AvailableAmount", this.availableAmount);
         json.put("Price", this.price);
         return json;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Objects.equals(productName, product.productName)
+                && Objects.equals(productType, product.productType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(productName, productType);
     }
 
 

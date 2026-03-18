@@ -33,7 +33,8 @@ public class BasketActivity extends AppCompatActivity {
 
     private void performBuy() {
         new Thread(() -> {
-            MasterCommunicator comm = ServerConnection.getInstance();
+            MasterCommunicator comm = ConnectionUtils.requireConnected(this);
+            if (comm == null) return;
             final boolean[] allOk = {true};
             String storeName = Basket.getInstance().getStoreName();
             for (Map.Entry<Product, Integer> entry : Basket.getInstance().getItems().entrySet()) {

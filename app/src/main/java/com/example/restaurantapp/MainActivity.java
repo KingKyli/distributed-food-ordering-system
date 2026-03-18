@@ -44,37 +44,57 @@ public class MainActivity extends BaseActivity {
 
         rvRestaurants = findViewById(R.id.rvRestaurants);
         tvNoFilters = findViewById(R.id.tvNoFilters);
-        // Java
         SharedPreferences prefs = getSharedPreferences("filters_prefs", MODE_PRIVATE);
 
         Intent intent = getIntent();
-        String cuisine = intent.hasExtra("FILTER_CUISINE") ?
-                intent.getStringExtra("FILTER_CUISINE") : prefs.getString("cuisine", "");
-        int distance = intent.hasExtra("FILTER_DISTANCE") ?
-                intent.getIntExtra("FILTER_DISTANCE", 0) : prefs.getInt("distance", 0);
-        String latitude = intent.hasExtra("FILTER_LATITUDE") ?
-                intent.getStringExtra("FILTER_LATITUDE") : prefs.getString("latitude", "");
-        String longitude = intent.hasExtra("FILTER_LONGITUDE") ?
-                intent.getStringExtra("FILTER_LONGITUDE") : prefs.getString("longitude", "");
-        int stars = intent.hasExtra("FILTER_STARS") ?
-                intent.getIntExtra("FILTER_STARS", 0) : prefs.getInt("stars", 0);
-        String price = intent.hasExtra("FILTER_PRICE") ?
-                intent.getStringExtra("FILTER_PRICE") : "";
-        boolean openNow = intent.hasExtra("FILTER_OPEN_NOW") ?
-                intent.getBooleanExtra("FILTER_OPEN_NOW", false) : prefs.getBoolean("openNow", false);
+        String cuisine = intent.hasExtra("FILTER_CUISINE")
+            ? intent.getStringExtra("FILTER_CUISINE")
+            : prefs.getString("cuisine", "");
+        int distance = intent.hasExtra("FILTER_DISTANCE")
+            ? intent.getIntExtra("FILTER_DISTANCE", 0)
+            : prefs.getInt("distance", 0);
+        String latitude = intent.hasExtra("FILTER_LATITUDE")
+            ? intent.getStringExtra("FILTER_LATITUDE")
+            : prefs.getString("latitude", "");
+        String longitude = intent.hasExtra("FILTER_LONGITUDE")
+            ? intent.getStringExtra("FILTER_LONGITUDE")
+            : prefs.getString("longitude", "");
+        int stars = intent.hasExtra("FILTER_STARS")
+            ? intent.getIntExtra("FILTER_STARS", 0)
+            : prefs.getInt("stars", 0);
+        String price = intent.hasExtra("FILTER_PRICE")
+            ? intent.getStringExtra("FILTER_PRICE")
+            : prefs.getString("priceText", "");
+        boolean openNow = intent.hasExtra("FILTER_OPEN_NOW")
+            ? intent.getBooleanExtra("FILTER_OPEN_NOW", false)
+            : prefs.getBoolean("openNow", false);
 
-        // Use these variables for your search request
+        if (openNow) {
+            Toast.makeText(this, "Open Now filter is not supported by the current data", Toast.LENGTH_SHORT).show();
+        }
+
+        MasterCommunicator comm = ConnectionUtils.requireConnected(this);
+        if (comm == null) {
+            return;
+        }
+
         String starsStr = String.valueOf(stars);
         new Thread(() -> {
-            MasterCommunicator comm = ServerConnection.getInstance();
             try {
                 String result = comm.sendSearchRequest(latitude, longitude, cuisine, starsStr, price);
                 android.util.Log.d("MainActivity", "Server response: " + result);
+                if (result == null || result.trim().isEmpty()) {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Server returned no data", Toast.LENGTH_SHORT).show());
+                    return;
+                }
+
                 List<Store> parsedList = parseStores(result);
 
+                List<Store> filtered = applyClientSideFilters(parsedList, latitude, longitude, distance);
+
                 runOnUiThread(() -> {
-                    storeList = parsedList;
-                    android.util.Log.d("MainActivity", "Parsed list size: " + parsedList.size());
+                    storeList = filtered;
+                    android.util.Log.d("MainActivity", "Parsed list size: " + filtered.size());
                     showRestaurants();
                 });
 
@@ -106,26 +126,62 @@ public class MainActivity extends BaseActivity {
         });
 
 
-        boolean filtersSet = checkIfFiltersExist();
+        boolean filtersSet = checkIfFiltersExist(prefs);
 
 
     }
 
-    private boolean checkIfFiltersExist() {
+    private boolean checkIfFiltersExist(SharedPreferences prefs) {
         Intent intent = getIntent();
-        String cuisine = intent.getStringExtra("FILTER_CUISINE");
-        String latitude = intent.getStringExtra("FILTER_LATITUDE");
-        String longitude = intent.getStringExtra("FILTER_LONGITUDE");
-        int stars = intent.getIntExtra("FILTER_STARS", 0);
-        String price = intent.getStringExtra("FILTER_PRICE");
-        boolean openNow = intent.getBooleanExtra("FILTER_OPEN_NOW", false);
+        String cuisine = intent.hasExtra("FILTER_CUISINE") ? intent.getStringExtra("FILTER_CUISINE") : prefs.getString("cuisine", "");
+        String latitude = intent.hasExtra("FILTER_LATITUDE") ? intent.getStringExtra("FILTER_LATITUDE") : prefs.getString("latitude", "");
+        String longitude = intent.hasExtra("FILTER_LONGITUDE") ? intent.getStringExtra("FILTER_LONGITUDE") : prefs.getString("longitude", "");
+        int stars = intent.hasExtra("FILTER_STARS") ? intent.getIntExtra("FILTER_STARS", 0) : prefs.getInt("stars", 0);
+        String price = intent.hasExtra("FILTER_PRICE") ? intent.getStringExtra("FILTER_PRICE") : prefs.getString("priceText", "");
+        boolean openNow = intent.hasExtra("FILTER_OPEN_NOW") ? intent.getBooleanExtra("FILTER_OPEN_NOW", false) : prefs.getBoolean("openNow", false);
+        int distance = intent.hasExtra("FILTER_DISTANCE") ? intent.getIntExtra("FILTER_DISTANCE", 0) : prefs.getInt("distance", 0);
 
         return ((cuisine != null && !cuisine.isEmpty())
                 || (latitude != null && !latitude.isEmpty())
                 || (longitude != null && !longitude.isEmpty())
                 || stars > 0
+                || distance > 0
                 || (price != null && !price.isEmpty())
                 || openNow);
+    }
+
+    private static List<Store> applyClientSideFilters(List<Store> stores, String latitude, String longitude, int distanceKm) {
+        if (stores == null) return new ArrayList<>();
+        if (distanceKm <= 0) return stores;
+
+        double userLat;
+        double userLon;
+        try {
+            userLat = Double.parseDouble(latitude);
+            userLon = Double.parseDouble(longitude);
+        } catch (Exception e) {
+            return stores;
+        }
+
+        List<Store> filtered = new ArrayList<>();
+        for (Store s : stores) {
+            if (s == null || s.getStoreLat() == null || s.getStoreLon() == null) continue;
+            double d = distanceKm(userLat, userLon, s.getStoreLat(), s.getStoreLon());
+            if (d <= distanceKm) filtered.add(s);
+        }
+        return filtered;
+    }
+
+    // Haversine distance
+    private static double distanceKm(double lat1, double lon1, double lat2, double lon2) {
+        final double R = 6371.0;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 
     public static List<Store> parseStores(String jsonString) throws JSONException {

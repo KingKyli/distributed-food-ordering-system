@@ -85,7 +85,8 @@ public class ProductEditActivity extends AppCompatActivity {
                 // Send update to server
                 if (finalStoreName != null && finalProduct != null) {
                     String productName = finalProduct.getProductName();
-                    MasterCommunicator comm = ServerConnection.getInstance();
+                    MasterCommunicator comm = ConnectionUtils.requireConnected(ProductEditActivity.this);
+                    if (comm == null) return;
                     new Thread(() -> {
                         boolean success = comm.sendUpdateProductRequest(finalStoreName, productName, price, quantity);
                         runOnUiThread(() -> {

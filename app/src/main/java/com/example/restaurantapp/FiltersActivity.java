@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.*;
 import java.util.Arrays;
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,6 +19,15 @@ public class FiltersActivity extends BaseActivity {
     private RadioGroup radioPrice;
     private CheckBox checkboxOpenNow;
     private static final String PREFS_FILTERS = "filters_prefs";
+
+    private static final String KEY_CUISINE = "cuisine";
+    private static final String KEY_DISTANCE = "distance";
+    private static final String KEY_LATITUDE = "latitude";
+    private static final String KEY_LONGITUDE = "longitude";
+    private static final String KEY_STARS = "stars";
+    private static final String KEY_PRICE_ID = "priceId";
+    private static final String KEY_PRICE_TEXT = "priceText";
+    private static final String KEY_OPEN_NOW = "openNow";
 
 
 
@@ -42,8 +52,9 @@ public class FiltersActivity extends BaseActivity {
         radioPrice = findViewById(R.id.radio_price);
         checkboxOpenNow = findViewById(R.id.checkbox_open_now);
 
-        // Set values for the stars spinner (1 to 5)
-        ArrayAdapter<Integer> starAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, Arrays.asList(1, 2, 3, 4, 5));
+        // Stars: include "Any" (0) to avoid forcing a filter
+        List<String> starsOptions = Arrays.asList("Any", "1", "2", "3", "4", "5");
+        ArrayAdapter<String> starAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, starsOptions);
         starAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerStars.setAdapter(starAdapter);
 
@@ -68,21 +79,27 @@ public class FiltersActivity extends BaseActivity {
         });
 
         // Restore filters from SharedPreferences
-        String savedCuisine = prefs.getString("cuisine", "Any");
+        String savedCuisine = prefs.getString(KEY_CUISINE, "Any");
         if (savedCuisine != null) {
             int cuisinePos = adapter.getPosition(savedCuisine.isEmpty() ? "Any" : savedCuisine);
             if (cuisinePos >= 0) spinnerCuisine.setSelection(cuisinePos);
         }
-        seekBarDistance.setProgress(prefs.getInt("distance", 0));
-        distanceValue.setText(prefs.getInt("distance", 0) + " km");
-        editLatitude.setText(prefs.getString("latitude", ""));
-        editLongitude.setText(prefs.getString("longitude", ""));
-        spinnerStars.setSelection(prefs.getInt("stars", 0));
-        int priceIndex = prefs.getInt("price", -1);
-        if (priceIndex != -1 && priceIndex < radioPrice.getChildCount()) {
-            radioPrice.check(radioPrice.getChildAt(priceIndex).getId());
+        int savedDistance = prefs.getInt(KEY_DISTANCE, 0);
+        seekBarDistance.setProgress(savedDistance);
+        distanceValue.setText(savedDistance + " km");
+        editLatitude.setText(prefs.getString(KEY_LATITUDE, ""));
+        editLongitude.setText(prefs.getString(KEY_LONGITUDE, ""));
+
+        int savedStars = prefs.getInt(KEY_STARS, 0);
+        if (savedStars >= 0 && savedStars <= 5) {
+            spinnerStars.setSelection(savedStars);
         }
-        checkboxOpenNow.setChecked(prefs.getBoolean("openNow", false));
+
+        int savedPriceId = prefs.getInt(KEY_PRICE_ID, -1);
+        if (savedPriceId != -1) {
+            radioPrice.check(savedPriceId);
+        }
+        checkboxOpenNow.setChecked(prefs.getBoolean(KEY_OPEN_NOW, false));
 
         // Collect filter data and start MainActivity with extras
         Button applyButton = findViewById(R.id.button_apply_filters);
@@ -97,13 +114,14 @@ public class FiltersActivity extends BaseActivity {
 
             int stars = 0;
             Object selectedStar = spinnerStars.getSelectedItem();
-            if (selectedStar instanceof Integer) {
-                stars = (Integer) selectedStar;
-            } else if (selectedStar != null) {
-                try {
-                    stars = Integer.parseInt(selectedStar.toString());
-                } catch (NumberFormatException e) {
-                    stars = 0;
+            if (selectedStar != null) {
+                String s = selectedStar.toString();
+                if (!"Any".equalsIgnoreCase(s)) {
+                    try {
+                        stars = Integer.parseInt(s);
+                    } catch (NumberFormatException ignored) {
+                        stars = 0;
+                    }
                 }
             }
 
@@ -125,13 +143,14 @@ public class FiltersActivity extends BaseActivity {
             intent.putExtra("FILTER_OPEN_NOW", openNow);
 
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putString("cuisine", cuisine);
-            editor.putInt("distance", distance);
-            editor.putString("latitude", latitude);
-            editor.putString("longitude", longitude);
-            editor.putInt("stars", spinnerStars.getSelectedItemPosition());
-            editor.putInt("price", radioPrice.indexOfChild(findViewById(priceId)));
-            editor.putBoolean("openNow", openNow);
+            editor.putString(KEY_CUISINE, cuisine);
+            editor.putInt(KEY_DISTANCE, distance);
+            editor.putString(KEY_LATITUDE, latitude);
+            editor.putString(KEY_LONGITUDE, longitude);
+            editor.putInt(KEY_STARS, stars);
+            editor.putInt(KEY_PRICE_ID, priceId);
+            editor.putString(KEY_PRICE_TEXT, price);
+            editor.putBoolean(KEY_OPEN_NOW, openNow);
             editor.apply();
 
             startActivity(intent);

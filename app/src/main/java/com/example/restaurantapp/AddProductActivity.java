@@ -58,7 +58,8 @@ public class AddProductActivity extends AppCompatActivity {
                     Product newProduct = new Product(name, type, quantity, price);
 
                     if (storeName != null) {
-                        MasterCommunicator comm = ServerConnection.getInstance();
+                        MasterCommunicator comm = ConnectionUtils.requireConnected(AddProductActivity.this);
+                        if (comm == null) return;
                         Thread t = new Thread(new Runnable() {
                             @Override
                             public void run() {

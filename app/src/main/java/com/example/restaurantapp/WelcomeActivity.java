@@ -32,17 +32,19 @@ public class WelcomeActivity extends AppCompatActivity {
 
         new Thread(() -> {
             try {
-                ServerConnection.init(ip, port);
+                boolean ok = ServerConnection.init(ip, port);
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "Connected to server", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                    if (ok) {
+                        Toast.makeText(this, "Connected to server", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(this, "Connection failed: server not reachable", Toast.LENGTH_LONG).show();
+                    }
                 });
             } catch (Exception e) {
-                runOnUiThread(() ->
-                        Toast.makeText(this, "Connection failed: " + e.getMessage(), Toast.LENGTH_LONG).show()
-                );
+                runOnUiThread(() -> Toast.makeText(this, "Connection failed", Toast.LENGTH_LONG).show());
             }
         }).start();
     }
