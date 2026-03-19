@@ -96,12 +96,20 @@
             android:id="@+id/btn_save_server"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="8dp"
             android:backgroundTint="#D32F2F"
             android:text="Save Server Settings"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_server_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textSize="13sp"
+            android:visibility="gone" />
 
         <View
             android:layout_width="match_parent"

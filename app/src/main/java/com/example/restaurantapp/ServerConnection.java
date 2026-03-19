@@ -82,6 +82,14 @@ public class ServerConnection {
         return lastError;
     }
 
+    public static synchronized String getLastSuccessfulIp() {
+        return lastSuccessfulIp;
+    }
+
+    public static synchronized int getLastSuccessfulPort() {
+        return lastSuccessfulPort;
+    }
+
     public static synchronized void close() {
         Log.d(TAG, "close() called");
         if (communicator != null) {

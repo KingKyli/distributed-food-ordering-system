@@ -79,7 +79,17 @@ public class Basket {
     }
 
     public synchronized List<BasketItem> getItems() {
-        return new ArrayList<>(items.values());
+        List<BasketItem> snapshot = new ArrayList<>(items.size());
+        for (BasketItem item : items.values()) {
+            snapshot.add(new BasketItem(
+                    item.getStoreName(),
+                    item.getProductName(),
+                    item.getProductType(),
+                    item.getQuantity(),
+                    item.getUnitPrice()
+            ));
+        }
+        return snapshot;
     }
 
     public synchronized boolean isEmpty() {
