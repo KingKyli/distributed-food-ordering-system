@@ -124,8 +124,7 @@
                 android:background="@drawable/icon_button_edit_background"
                 android:contentDescription="@string/product_edit_content_description"
                 android:padding="11dp"
-                android:src="@drawable/ic_edit"
-                app:tint="@color/text_on_primary" />
+                android:src="@drawable/ic_edit" />
 
             <ImageButton
                 android:id="@+id/btnDelete"
@@ -135,8 +134,7 @@
                 android:background="@drawable/icon_button_danger_background"
                 android:contentDescription="@string/product_delete_content_description"
                 android:padding="11dp"
-                android:src="@drawable/ic_delete"
-                app:tint="@color/text_on_primary" />
+                android:src="@drawable/ic_delete" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

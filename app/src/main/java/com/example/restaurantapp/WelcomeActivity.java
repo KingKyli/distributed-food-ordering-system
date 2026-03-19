@@ -90,15 +90,6 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void openNext(Class<?> destination) {
-        if (destination == PartnerLoginActivity.class && PartnerSessionStore.hasActiveSession(this)) {
-            Intent managerIntent = new Intent(WelcomeActivity.this, ManagerConsoleActivity.class);
-            String savedStoreJson = PartnerSessionStore.getStoreJson(this);
-            if (savedStoreJson != null) {
-                managerIntent.putExtra("store_json", savedStoreJson);
-            }
-            startActivity(managerIntent);
-            return;
-        }
 
         if (!ServerConnection.isReady()) {
             updateConnectionUi(false, "Please connect to the server before continuing.", false, true);

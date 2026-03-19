@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ public class ManagerConsoleActivity extends AppCompatActivity {
 
         MaterialCardView btnAddProduct = findViewById(R.id.btnAddProduct);
         MaterialCardView btnEditProduct = findViewById(R.id.btnEditProduct);
+        MaterialButton btnSwitchStore = findViewById(R.id.btnSwitchStore);
 
         // Bind views
         tvTotalProducts = findViewById(R.id.tvTotalProducts);
@@ -70,6 +72,15 @@ public class ManagerConsoleActivity extends AppCompatActivity {
             Intent intent = new Intent(ManagerConsoleActivity.this, EditProductActivity.class);
             intent.putExtra("store_json", currentStoreJson);
             startActivity(intent);
+        });
+
+        btnSwitchStore.setOnClickListener(v -> {
+            PartnerSessionStore.clear(this);
+            Intent intent = new Intent(ManagerConsoleActivity.this, PartnerLoginActivity.class);
+            intent.putExtra("FORCE_LOGIN", true);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
         });
 
     }

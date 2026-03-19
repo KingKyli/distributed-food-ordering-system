@@ -43,6 +43,18 @@
                     android:textColor="#FFF2F2"
                     android:textSize="15sp"
                     android:textStyle="bold" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSwitchStore"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="14dp"
+                    android:text="Switch store"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    app:cornerRadius="10dp"
+                    app:strokeColor="#AAFFFFFF" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

@@ -8,6 +8,9 @@ import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +24,10 @@ public class PartnerLoginActivity extends AppCompatActivity {
     private ProgressBar progressStores;
     private TextView tvStatus;
     private TextView tvPasswordHint;
+    private MaterialCardView cardActiveSession;
+    private TextView tvActiveSessionStoreName;
+    private MaterialButton btnContinueSession;
+    private MaterialButton btnSwitchStore;
     private List<Store> stores;
     private String requestedAccessCodeStoreName;
     private volatile boolean activityActive;
@@ -30,11 +37,6 @@ public class PartnerLoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (PartnerSessionStore.hasActiveSession(this) && !getIntent().getBooleanExtra("FORCE_LOGIN", false)) {
-            openManagerConsoleFromSession();
-            return;
-        }
-
         if (!ActivityUtils.ensureConnectedOrRedirect(this)) {
             return;
         }
@@ -42,15 +44,37 @@ public class PartnerLoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_partner_login);
         activityActive = true;
 
-        spinnerStores = findViewById(R.id.spinnerStores);
-        etUsername = findViewById(R.id.etUsername);
-        etPassword = findViewById(R.id.etPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnRequestAccessCode = findViewById(R.id.btnRequestAccessCode);
-        btnRetryStores = findViewById(R.id.btnRetryStores);
-        progressStores = findViewById(R.id.progressStores);
-        tvStatus = findViewById(R.id.tvStatus);
-        tvPasswordHint = findViewById(R.id.tvPasswordHint);
+        spinnerStores          = findViewById(R.id.spinnerStores);
+        etUsername             = findViewById(R.id.etUsername);
+        etPassword             = findViewById(R.id.etPassword);
+        btnLogin               = findViewById(R.id.btnLogin);
+        btnRequestAccessCode   = findViewById(R.id.btnRequestAccessCode);
+        btnRetryStores         = findViewById(R.id.btnRetryStores);
+        progressStores         = findViewById(R.id.progressStores);
+        tvStatus               = findViewById(R.id.tvStatus);
+        tvPasswordHint         = findViewById(R.id.tvPasswordHint);
+        cardActiveSession      = findViewById(R.id.cardActiveSession);
+        tvActiveSessionStoreName = findViewById(R.id.tvActiveSessionStoreName);
+        btnContinueSession     = findViewById(R.id.btnContinueSession);
+        btnSwitchStore         = findViewById(R.id.btnSwitchStore);
+
+        // Show active-session card if a session already exists
+        boolean forceLogin = getIntent().getBooleanExtra("FORCE_LOGIN", false);
+        if (!forceLogin && PartnerSessionStore.hasActiveSession(this)) {
+            String savedStoreName = PartnerSessionStore.getStoreName(this);
+            if (savedStoreName != null && !savedStoreName.isEmpty()) {
+                cardActiveSession.setVisibility(View.VISIBLE);
+                tvActiveSessionStoreName.setText(savedStoreName);
+            }
+        }
+
+        btnContinueSession.setOnClickListener(v -> openManagerConsoleFromSession());
+
+        btnSwitchStore.setOnClickListener(v -> {
+            PartnerSessionStore.clear(this);
+            cardActiveSession.setVisibility(View.GONE);
+            tvStatus.setVisibility(View.GONE);
+        });
 
         btnRetryStores.setOnClickListener(v -> loadStores());
         etPassword.addTextChangedListener(new TextWatcher() {
