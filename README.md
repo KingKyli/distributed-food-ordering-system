@@ -72,6 +72,16 @@ The system follows a **client–server architecture**:
 - A running backend server (provided separately)
 - An Android device or emulator on the **same network** as the server
 
+### Local Mock Server (recommended for demos)
+This repository includes a lightweight mock backend you can run locally.
+
+- Start it on your PC:
+    - `javac MockServer.java`
+    - `java MockServer`
+- Then in the Android emulator, connect to: `10.0.2.2:8765`
+
+This is great for quick demos and consistent screenshots/videos for your CV.
+
 ### Configuration
 1. Clone the repository and open it in Android Studio.
 2. Build and run the app on your device/emulator.
