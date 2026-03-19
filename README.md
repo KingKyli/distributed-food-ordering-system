@@ -1,6 +1,6 @@
-# Distributed Food Ordering System
+# Distributed Food Ordering System for Android
 
-A distributed restaurant ordering system developed in **Java and Android** as part of a university software engineering project.
+A distributed **food delivery** and **restaurant ordering Android app** developed in **Java** with **Android XML layouts** as part of a university software engineering project.
 
 The application simulates a food ordering platform where users can browse restaurants, manage their basket, and place orders while the system handles communication between different components using distributed system principles.
 
@@ -9,7 +9,7 @@ The application simulates a food ordering platform where users can browse restau
 ## Overview
 
 This project demonstrates the implementation of a **client–server based food ordering system**.  
-The Android application acts as the client interface, communicating with backend components responsible for handling restaurant data, product management, and order processing.
+The Android application acts as the client interface for a **food delivery** and **restaurant app** experience, communicating with backend components responsible for handling restaurant data, product management, and order processing.
 
 The goal of the project was to explore **distributed systems concepts**, application architecture, and mobile development.
 
