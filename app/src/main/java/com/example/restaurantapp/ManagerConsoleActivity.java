@@ -18,6 +18,7 @@ public class ManagerConsoleActivity extends AppCompatActivity {
     private String currentStoreJson;
     private Store currentStore;
     private volatile boolean activityActive;
+    private final RestaurantRepository restaurantRepository = new RestaurantRepository();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,44 +101,32 @@ public class ManagerConsoleActivity extends AppCompatActivity {
     private void refreshStoreData() {
         final String storeJson = currentStoreJson != null ? currentStoreJson : resolveStoreJson();
         if (storeJson == null) return;
-        final String storeName;
-        try {
-            JSONObject jsonObj = new JSONObject(storeJson);
-            storeName = jsonObj.getString("StoreName");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-        if (storeName == null) return;
+        final String storeName = StoreJsonUtils.extractStoreName(storeJson);
+        if (storeName == null || storeName.trim().isEmpty()) return;
         new Thread(() -> {
-            MasterCommunicator comm = ServerConnection.getInstance();
-            if (comm == null) {
-                ActivityUtils.runOnUiThreadIfAlive(this, () -> tvStoreName.setText("Connection lost"));
-                return;
-            }
-            // Στείλε ΚΕΝΕΣ τιμές για να πάρεις ΟΛΑ τα καταστήματα
-            String result = comm.sendSearchRequest("", "", "", "", "");
+            AppResult<Store> result = restaurantRepository.fetchStoreByName(storeName);
             ActivityUtils.runOnUiThreadIfAlive(this, () -> {
-                if (!activityActive || result == null || result.trim().isEmpty()) {
+                if (!activityActive) {
                     return;
                 }
-                try {
-                    org.json.JSONArray arr = new org.json.JSONArray(result);
-                    for (int i = 0; i < arr.length(); i++) {
-                        JSONObject obj = arr.getJSONObject(i);
-                        if (obj.getString("StoreName").equalsIgnoreCase(storeName)) {
-                            Store store = Store.fromJson(obj);
-                            currentStore = store;
-                            currentStoreJson = store.toJson() != null ? store.toJson().toString() : currentStoreJson;
-                            PartnerSessionStore.saveSession(ManagerConsoleActivity.this, store);
-                            if (tvStoreName != null) tvStoreName.setText(store.getStoreName());
-                            updateInventorySummary(store);
-                            break;
-                        }
+                if (!result.isSuccess()) {
+                    if (tvStoreName != null) {
+                        tvStoreName.setText(result.getMessage());
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    return;
                 }
+
+                Store store = result.getData();
+                currentStore = store;
+                try {
+                    currentStoreJson = store.toJson() != null ? store.toJson().toString() : currentStoreJson;
+                } catch (Exception ignored) {
+                }
+                PartnerSessionStore.saveSession(ManagerConsoleActivity.this, store);
+                if (tvStoreName != null) {
+                    tvStoreName.setText(store.getStoreName());
+                }
+                updateInventorySummary(store);
             });
         }).start();
     }

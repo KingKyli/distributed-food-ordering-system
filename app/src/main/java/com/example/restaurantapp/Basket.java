@@ -10,17 +10,22 @@ public class Basket {
     private static Basket instance;
     private final LinkedHashMap<String, BasketItem> items = new LinkedHashMap<>();
 
-    private Basket() {}
+    private Basket() {
+    }
+
     private String storeName = null;
 
     public String getStoreName() {
         return storeName;
     }
 
-
     public static Basket getInstance() {
         if (instance == null) {
-            instance = new Basket();
+            synchronized (Basket.class) {
+                if (instance == null) {
+                    instance = new Basket();
+                }
+            }
         }
         return instance;
     }
@@ -37,7 +42,6 @@ public class Basket {
             this.storeName = storeName;
         }
         if (this.storeName == null || !this.storeName.equals(storeName)) {
-            // Reject addition from a different store
             return false;
         }
 

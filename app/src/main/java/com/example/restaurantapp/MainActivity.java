@@ -40,6 +40,7 @@ public class MainActivity extends BaseActivity {
     private Chip chipBurgers;
     private Chip chipBudget;
     private final List<Store> baseStoreList = new ArrayList<>();
+    private StoreAdapter storeAdapter;
     private volatile boolean activityActive;
     private final RestaurantRepository restaurantRepository = new RestaurantRepository();
 
@@ -73,6 +74,8 @@ public class MainActivity extends BaseActivity {
         chipBudget = findViewById(R.id.chipBudget);
 
         rvRestaurants.setLayoutManager(new LinearLayoutManager(this));
+        storeAdapter = new StoreAdapter(this, new ArrayList<>());
+        rvRestaurants.setAdapter(storeAdapter);
 
         SharedPreferences prefs = getSharedPreferences("filters_prefs", MODE_PRIVATE);
         Intent intent = getIntent();
@@ -148,14 +151,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public static List<Store> parseStores(String jsonString) throws JSONException {
-        List<Store> stores = new ArrayList<>();
-        JSONArray jsonArray = new JSONArray(jsonString);
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject obj = jsonArray.getJSONObject(i);
-            Store store = Store.fromJson(obj); // assuming you have such a method
-            stores.add(store);
-        }
-        return stores;
+        return StoreJsonParser.parseStores(jsonString);
     }
 
     private void applyVisibleFilters() {
@@ -189,8 +185,9 @@ public class MainActivity extends BaseActivity {
         rvRestaurants.setVisibility(View.VISIBLE);
         emptyStateContainer.setVisibility(View.GONE);
         tvMainStatus.setVisibility(View.GONE);
-        StoreAdapter adapter = new StoreAdapter(this, visibleStores);
-        rvRestaurants.setAdapter(adapter);
+        if (storeAdapter != null) {
+            storeAdapter.updateStores(visibleStores);
+        }
         etSearch.setEnabled(true);
         btnBasket.setEnabled(true);
     }

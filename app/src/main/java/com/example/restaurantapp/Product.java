@@ -14,8 +14,6 @@ public class Product {
     private int unitsSold;
     private double revenueFromThisProduct;
 
-    private boolean active;
-
     // Constructor
     public Product(String productName, String productType, int availableAmount, double price) {
         this.productName = productName;

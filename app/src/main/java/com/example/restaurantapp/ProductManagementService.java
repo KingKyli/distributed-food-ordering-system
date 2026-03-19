@@ -12,33 +12,39 @@ public class ProductManagementService {
         if (product == null) {
             return AppResult.error("Product details are missing");
         }
-        MasterCommunicator communicator = ServerConnection.getInstance();
-        if (communicator == null) {
-            return AppResult.error("Server connection is not available");
+        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
+        if (!communicatorResult.isSuccess()) {
+            return AppResult.error(communicatorResult.getMessage());
         }
-        return communicator.sendAddProductRequest(storeName, product)
-                ? AppResult.success(null)
-                : AppResult.error("Failed to add product to server");
+        String response = communicatorResult.getData().sendAddProductRequestDetailed(storeName, product);
+        if (ProtocolUtils.isOkResponse(response)) {
+            return AppResult.success(null);
+        }
+        return AppResult.error(ProtocolUtils.extractErrorMessage(response, "Failed to add product to server"));
     }
 
     public AppResult<Void> updateProduct(String storeName, String productName, double price, int quantity) {
-        MasterCommunicator communicator = ServerConnection.getInstance();
-        if (communicator == null) {
-            return AppResult.error("Server connection is not available");
+        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
+        if (!communicatorResult.isSuccess()) {
+            return AppResult.error(communicatorResult.getMessage());
         }
-        return communicator.sendUpdateProductRequest(storeName, productName, price, quantity)
-                ? AppResult.success(null)
-                : AppResult.error("Failed to update product on server");
+        String response = communicatorResult.getData().sendUpdateProductRequestDetailed(storeName, productName, price, quantity);
+        if (ProtocolUtils.isOkResponse(response)) {
+            return AppResult.success(null);
+        }
+        return AppResult.error(ProtocolUtils.extractErrorMessage(response, "Failed to update product on server"));
     }
 
     public AppResult<Void> removeProduct(String storeName, String productName) {
-        MasterCommunicator communicator = ServerConnection.getInstance();
-        if (communicator == null) {
-            return AppResult.error("Server connection is not available");
+        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
+        if (!communicatorResult.isSuccess()) {
+            return AppResult.error(communicatorResult.getMessage());
         }
-        return communicator.sendRemoveProductRequest(storeName, productName)
-                ? AppResult.success(null)
-                : AppResult.error("Failed to delete product from server");
+        String response = communicatorResult.getData().sendRemoveProductRequestDetailed(storeName, productName);
+        if (ProtocolUtils.isOkResponse(response)) {
+            return AppResult.success(null);
+        }
+        return AppResult.error(ProtocolUtils.extractErrorMessage(response, "Failed to delete product from server"));
     }
 
     public AppResult<Store> refreshStore(String storeName) {

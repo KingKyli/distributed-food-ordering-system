@@ -7,7 +7,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.app.AlertDialog;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -19,6 +21,13 @@ public class BasketAdapter extends RecyclerView.Adapter<BasketAdapter.BasketView
     public BasketAdapter(BasketActivity activity) {
         this.basketActivity = activity;
         items.addAll(Basket.getInstance().getItems());
+        setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        BasketItem item = items.get(position);
+        return item == null ? 0 : item.getStableId().hashCode();
     }
 
     @NonNull
@@ -66,9 +75,45 @@ public class BasketAdapter extends RecyclerView.Adapter<BasketAdapter.BasketView
     }
 
     public void updateItems() {
+        List<BasketItem> next = new ArrayList<>(Basket.getInstance().getItems());
+        List<BasketItem> old = new ArrayList<>(items);
+
+        DiffUtil.DiffResult diff = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return old.size();
+            }
+
+            @Override
+            public int getNewListSize() {
+                return next.size();
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                BasketItem o = old.get(oldItemPosition);
+                BasketItem n = next.get(newItemPosition);
+                if (o == null || n == null) {
+                    return o == n;
+                }
+                return o.getStableId().equals(n.getStableId());
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                BasketItem o = old.get(oldItemPosition);
+                BasketItem n = next.get(newItemPosition);
+                if (o == null || n == null) {
+                    return o == n;
+                }
+                return o.getQuantity() == n.getQuantity()
+                        && Double.compare(o.getUnitPrice(), n.getUnitPrice()) == 0;
+            }
+        });
+
         items.clear();
-        items.addAll(Basket.getInstance().getItems());
-        notifyDataSetChanged();
+        items.addAll(next);
+        diff.dispatchUpdatesTo(this);
     }
 
     static class BasketViewHolder extends RecyclerView.ViewHolder {

@@ -32,23 +32,11 @@ public class AddProductActivity extends AppCompatActivity {
         btnAddProduct = findViewById(R.id.btnAddProduct);
 
         // Get store JSON from intent
-        final String storeName;
         String storeJson = getIntent().getStringExtra("store_json");
         if (storeJson == null || storeJson.trim().isEmpty()) {
             storeJson = PartnerSessionStore.getStoreJson(this);
         }
-        if (storeJson != null) {
-            String tempName = null;
-            try {
-                org.json.JSONObject obj = new org.json.JSONObject(storeJson);
-                tempName = obj.getString("StoreName");
-            } catch (Exception e) {
-                Toast.makeText(this, "Error reading store info", Toast.LENGTH_SHORT).show();
-            }
-            storeName = tempName;
-        } else {
-            storeName = null;
-        }
+        final String storeName = StoreJsonUtils.extractStoreName(storeJson);
 
         btnAddProduct.setOnClickListener(new android.view.View.OnClickListener() {
             @Override
@@ -68,25 +56,28 @@ public class AddProductActivity extends AppCompatActivity {
                     int quantity = Integer.parseInt(quantityStr);
                     Product newProduct = new Product(name, type, quantity, price);
 
-                    if (storeName != null) {
-                        new Thread(() -> {
-                            AppResult<Void> result = productManagementService.addProduct(storeName, newProduct);
-                            ActivityUtils.runOnUiThreadIfAlive(AddProductActivity.this, () -> {
-                                if (!activityActive) {
-                                    return;
-                                }
-                                if (result.isSuccess()) {
-                                    Toast.makeText(AddProductActivity.this, "Product added to server: " + name, Toast.LENGTH_SHORT).show();
-                                    setResult(RESULT_OK);
-                                    finish();
-                                } else {
-                                    Toast.makeText(AddProductActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }).start();
-                    } else {
+                    if (storeName == null || storeName.trim().isEmpty()) {
                         Toast.makeText(AddProductActivity.this, "Store info missing", Toast.LENGTH_SHORT).show();
+                        return;
                     }
+
+                    new Thread(() -> {
+                        AppResult<Void> result = productManagementService.addProduct(storeName, newProduct);
+                        ActivityUtils.runOnUiThreadIfAlive(AddProductActivity.this, () -> {
+                            if (!activityActive) {
+                                return;
+                            }
+                            if (result.isSuccess()) {
+                                Toast.makeText(AddProductActivity.this, "Product added to server: " + name, Toast.LENGTH_SHORT).show();
+                                inputName.setText("");
+                                inputType.setText("");
+                                inputPrice.setText("");
+                                inputQuantity.setText("");
+                            } else {
+                                Toast.makeText(AddProductActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }).start();
                 } catch (NumberFormatException e) {
                     Toast.makeText(AddProductActivity.this, "Invalid number format", Toast.LENGTH_SHORT).show();
                 }

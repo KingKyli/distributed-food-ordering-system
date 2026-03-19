@@ -9,9 +9,12 @@ import android.widget.*;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHolder> {
 
@@ -20,7 +23,60 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
 
     public StoreAdapter(Context context, List<Store> storeList) {
         this.context = context;
-        this.storeList = storeList;
+        this.storeList = storeList == null ? new ArrayList<>() : new ArrayList<>(storeList);
+        setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        Store store = storeList.get(position);
+        String name = store != null ? store.getStoreName() : "";
+        return name == null ? 0 : name.trim().toLowerCase(Locale.ROOT).hashCode();
+    }
+
+    public void updateStores(List<Store> newStores) {
+        List<Store> next = newStores == null ? new ArrayList<>() : new ArrayList<>(newStores);
+        List<Store> old = new ArrayList<>(storeList);
+
+        DiffUtil.DiffResult diff = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return old.size();
+            }
+
+            @Override
+            public int getNewListSize() {
+                return next.size();
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                Store o = old.get(oldItemPosition);
+                Store n = next.get(newItemPosition);
+                if (o == null || n == null) {
+                    return o == n;
+                }
+                String on = o.getStoreName();
+                String nn = n.getStoreName();
+                return on != null && nn != null && on.equalsIgnoreCase(nn);
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                Store o = old.get(oldItemPosition);
+                Store n = next.get(newItemPosition);
+                if (o == null || n == null) {
+                    return o == n;
+                }
+                return safe(o.getFoodCategory()).equals(safe(n.getFoodCategory()))
+                        && safe(o.getPriceCategory()).equals(safe(n.getPriceCategory()))
+                        && safeInt(o.getStoreStars()) == safeInt(n.getStoreStars());
+            }
+        });
+
+        storeList.clear();
+        storeList.addAll(next);
+        diff.dispatchUpdatesTo(this);
     }
 
     @NonNull
@@ -64,7 +120,11 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
 
         holder.btnView.setOnClickListener(v -> {
             Intent intent = new Intent(context, RestaurantDetailsActivity.class);
-            intent.putExtra("store_json", store.toJson().toString());
+            org.json.JSONObject storeJson = store.toJson();
+            if (storeJson == null) {
+                return;
+            }
+            intent.putExtra("store_json", storeJson.toString());
             context.startActivity(intent);
         });
     }
@@ -99,5 +159,13 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
         if (hasHalfStar) sb.append("★"); // Use full star for half (simpler)
         for (int i = 0; i < emptyStars; i++) sb.append("☆");
         return sb.toString();
+    }
+
+    private static String safe(String value) {
+        return value == null ? "" : value;
+    }
+
+    private static int safeInt(Integer value) {
+        return value == null ? 0 : value;
     }
 }

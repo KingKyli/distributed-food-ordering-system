@@ -63,15 +63,7 @@ public class ProductEditActivity extends AppCompatActivity {
         if (storeJson == null || storeJson.trim().isEmpty()) {
             storeJson = PartnerSessionStore.getStoreJson(this);
         }
-        String storeName = null;
-        if (storeJson != null) {
-            try {
-                JSONObject obj = new JSONObject(storeJson);
-                storeName = obj.getString("StoreName");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
+        String storeName = StoreJsonUtils.extractStoreName(storeJson);
 
         final String finalStoreName = storeName;
         final Product finalProduct = product;

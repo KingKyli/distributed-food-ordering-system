@@ -32,7 +32,6 @@
         <activity android:name=".FiltersActivity" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".BaseActivity" />
         <activity android:name=".BasketActivity" />
         <activity android:name=".AddProductActivity" />
         <activity android:name=".EditProductActivity" />

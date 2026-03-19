@@ -30,6 +30,7 @@ public class MasterCommunicator {
             close();
             this.socket = new Socket();
             this.socket.connect(new InetSocketAddress(masterIp, masterPort), 5000);
+            this.socket.setSoTimeout(5000);
             this.out = new PrintWriter(socket.getOutputStream(), true);
             this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out.println("CLIENT_HELLO");
@@ -108,9 +109,13 @@ public class MasterCommunicator {
     }
 
     public boolean sendAddStoreRequest(Store store) {
-        String request = "ADD_STORE:" + store.toJson().toString().replace("\n", "").replace("\r", "");
-        String response = sendRequestAndGetResponse(request);
+        String response = sendAddStoreRequestDetailed(store);
         return response != null && response.toLowerCase().startsWith("ok");
+    }
+
+    public String sendAddStoreRequestDetailed(Store store) {
+        String request = "ADD_STORE:" + store.toJson().toString().replace("\n", "").replace("\r", "");
+        return sendRequestAndGetResponse(request);
     }
 
     public String sendSearchRequest(String latitude, String longitude, String foodCategory, String stars, String priceRange) {
@@ -127,39 +132,59 @@ public class MasterCommunicator {
     }
 
     public boolean sendRemoveStoreRequest(String storeName) {
-        String request = "REMOVE_STORE:" + storeName;
-        String response = sendRequestAndGetResponse(request);
+        String response = sendRemoveStoreRequestDetailed(storeName);
         return response != null && response.toLowerCase().startsWith("ok");
     }
 
+    public String sendRemoveStoreRequestDetailed(String storeName) {
+        String request = "REMOVE_STORE:" + storeName;
+        return sendRequestAndGetResponse(request);
+    }
+
     public boolean sendBuyRequest(String storeName, String productName, int quantity) {
-        String request = "BUY:" + storeName + ":" + productName + ":" + quantity;
-        String response = sendRequestAndGetResponse(request);
+        String response = sendBuyRequestDetailed(storeName, productName, quantity);
         return response != null && response.toLowerCase().startsWith("success");
     }
 
+    public String sendBuyRequestDetailed(String storeName, String productName, int quantity) {
+        String request = "BUY:" + storeName + ":" + productName + ":" + quantity;
+        return sendRequestAndGetResponse(request);
+    }
+
     public boolean sendAddProductRequest(String storeName, Product product) {
+        String response = sendAddProductRequestDetailed(storeName, product);
+        return response != null && response.toLowerCase().startsWith("ok");
+    }
+
+    public String sendAddProductRequestDetailed(String storeName, Product product) {
         try {
             JSONObject productJson = product.toJson();
             String request = "ADD_PRODUCT:" + storeName + ":" + productJson.toString();
-            String response = sendRequestAndGetResponse(request);
-            return response != null && response.toLowerCase().startsWith("ok");
+            return sendRequestAndGetResponse(request);
         } catch (JSONException e) {
             Log.e("MasterCommunicator", "Error creating JSON for product: " + e.getMessage());
-            return false;
+            return null;
         }
     }
 
     public boolean sendRemoveProductRequest(String storeName, String productName) {
-        String request = "REMOVE_PRODUCT:" + storeName + ":" + productName;
-        String response = sendRequestAndGetResponse(request);
+        String response = sendRemoveProductRequestDetailed(storeName, productName);
         return response != null && response.toLowerCase().startsWith("ok");
     }
 
+    public String sendRemoveProductRequestDetailed(String storeName, String productName) {
+        String request = "REMOVE_PRODUCT:" + storeName + ":" + productName;
+        return sendRequestAndGetResponse(request);
+    }
+
     public boolean sendUpdateProductRequest(String storeName, String productName, double newPrice, int newAmount) {
-        String request = "UPDATE_PRODUCT:" + storeName + ":" + productName + ":" + newPrice + ":" + newAmount;
-        String response = sendRequestAndGetResponse(request);
+        String response = sendUpdateProductRequestDetailed(storeName, productName, newPrice, newAmount);
         return response != null && response.toLowerCase().startsWith("ok");
+    }
+
+    public String sendUpdateProductRequestDetailed(String storeName, String productName, double newPrice, int newAmount) {
+        String request = "UPDATE_PRODUCT:" + storeName + ":" + productName + ":" + newPrice + ":" + newAmount;
+        return sendRequestAndGetResponse(request);
     }
 
     /**

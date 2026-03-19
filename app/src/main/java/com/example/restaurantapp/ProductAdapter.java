@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.json.JSONObject;
 import java.util.List;
 import org.json.JSONException;
+import java.util.Locale;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
     private final List<JSONObject> products;
@@ -19,6 +20,19 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     public ProductAdapter(List<JSONObject> products, String storeName) {
         this.products = products;
         this.storeName = storeName;
+        setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        JSONObject productJson = products.get(position);
+        if (productJson == null) {
+            return 0;
+        }
+        String name = productJson.optString("ProductName", "");
+        String type = productJson.optString("ProductType", "");
+        String stable = (name + "::" + type).trim().toLowerCase(Locale.ROOT);
+        return stable.hashCode();
     }
 
     @NonNull
