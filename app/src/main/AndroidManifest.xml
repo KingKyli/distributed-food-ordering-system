@@ -32,7 +32,8 @@
         <activity android:name=".FiltersActivity" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".BaseActivity" />
+        <!-- BaseActivity is abstract and should not be registered -->
+
         <activity android:name=".BasketActivity" />
         <activity android:name=".AddProductActivity" />
         <activity android:name=".EditProductActivity" />
@@ -40,6 +41,7 @@
         <activity android:name=".ManagerConsoleActivity" />
         <activity android:name=".RestaurantDetailsActivity" />
         <activity android:name=".PartnerLoginActivity" />
+        <activity android:name=".OrderConfirmationActivity" />
         <!-- More activities if needed -->
 
     </application>

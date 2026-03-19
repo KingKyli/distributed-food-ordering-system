@@ -32,7 +32,7 @@ public class Basket {
         if (items.isEmpty()) {
             this.storeName = storeName;
         }
-        if (!this.storeName.equals(storeName)) {
+        if (this.storeName != null && !this.storeName.equals(storeName)) {
             // Reject addition from a different store
             return false;
         }

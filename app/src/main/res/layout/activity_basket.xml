@@ -35,7 +35,7 @@
                 android:id="@+id/tvItemCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3 items"
+                android:text="0 items"
                 android:textSize="16sp"
                 android:textColor="#666" />
         </LinearLayout>
@@ -59,12 +59,45 @@
         android:background="#FFF"
         android:padding="4dp" />
 
+    <!-- Total Price -->
+    <TextView
+        android:id="@+id/tvTotalPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total: €0.00"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#222"
+        android:gravity="end"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Delivery Address -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delivery Address"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/etDeliveryAddress"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Enter your delivery address"
+        android:inputType="textPostalAddress"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/search_background" />
+
     <Button
         android:id="@+id/btnBuy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#D32F2F"
-        android:text="Buy"
+        android:text="Place Order"
         android:textColor="#FFFFFF"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="4dp"/>
 </LinearLayout>

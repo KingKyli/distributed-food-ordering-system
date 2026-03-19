@@ -4,60 +4,107 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="vertical"
-        android:padding="24dp"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:layout_width="170dp"
-            android:layout_height="43dp"
-            android:layout_marginBottom="4dp"
-            android:text="Settings"
-            android:textSize="34sp"
-            android:textStyle="bold" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginVertical="24dp"
-            android:background="#000000" />
-
-        <Switch
-            android:id="@+id/switch_manager_mode"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginBottom="24dp"
-            android:text="Manager Mode"
-            android:textSize="20sp" />
-
-        <Switch
-            android:id="@+id/switch_notifications"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginBottom="64dp"
-            android:text="Enable Notifications"
-            android:textSize="20sp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginVertical="24dp"
-            android:background="#000000" />
-
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Foodie Inc. © 2025"
-            android:textColor="#666666"
-            android:textSize="16sp" />
-    </LinearLayout>
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Settings"
+                android:textSize="34sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="24dp"
+                android:background="#000000" />
+
+            <Switch
+                android:id="@+id/switch_manager_mode"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginBottom="24dp"
+                android:text="Manager Mode"
+                android:textSize="20sp" />
+
+            <Switch
+                android:id="@+id/switch_notifications"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginBottom="24dp"
+                android:text="Enable Notifications"
+                android:textSize="20sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="16dp"
+                android:background="#000000" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Server Connection"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/etServerIp"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="8dp"
+                android:hint="Server IP (e.g. 192.168.1.100)"
+                android:inputType="text"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp" />
+
+            <EditText
+                android:id="@+id/etServerPort"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="12dp"
+                android:hint="Port (e.g. 5000)"
+                android:inputType="number"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp" />
+
+            <Button
+                android:id="@+id/btnSaveServer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#D32F2F"
+                android:text="Save Server Settings"
+                android:textColor="#FFFFFF" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="24dp"
+                android:background="#000000" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Foodie Inc. © 2025"
+                android:textColor="#666666"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </ScrollView>
 
     <include
         android:id="@+id/bottom_nav"

@@ -1,5 +1,28 @@
 <resources>
     <string name="app_name">RestaurantApp</string>
+    <string name="app_title">Foodie Express</string>
+    <string name="welcome_subtitle">Something good is\ncooking</string>
+    <string name="btn_get_started">Get Started</string>
+    <string name="search_hint">Search for food or restaurants…</string>
+    <string name="no_filters_message">Set your filters to see available restaurants!</string>
+    <string name="your_basket">Your Basket</string>
+    <string name="products_label">Products</string>
+    <string name="btn_place_order">Place Order</string>
+    <string name="delivery_address_label">Delivery Address</string>
+    <string name="delivery_address_hint">Enter your delivery address</string>
+    <string name="order_confirmed">Order Confirmed!</string>
+    <string name="btn_back_to_home">Back to Home</string>
+    <string name="settings_title">Settings</string>
+    <string name="manager_mode">Manager Mode</string>
+    <string name="enable_notifications">Enable Notifications</string>
+    <string name="server_connection">Server Connection</string>
+    <string name="server_ip_hint">Server IP (e.g. 192.168.1.100)</string>
+    <string name="server_port_hint">Port (e.g. 5000)</string>
+    <string name="btn_save_server">Save Server Settings</string>
+    <string name="copyright">Foodie Inc. © 2025</string>
+    <string name="total_format">Total: €%1$.2f</string>
+    <string name="order_details">Order Details</string>
+    <string name="delivery_status">Delivery Status</string>
     <string-array name="cuisine_options">
         <item>Any</item>
         <item>Greek</item>
@@ -8,5 +31,4 @@
         <item>Japanese</item>
         <item>Indian</item>
     </string-array>
-
 </resources>
