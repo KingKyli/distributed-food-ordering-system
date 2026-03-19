@@ -46,6 +46,17 @@ public class ServerConnection {
         return communicator;
     }
 
+    public static synchronized AppResult<MasterCommunicator> requireCommunicator() {
+        if (ensureReady() && communicator != null && communicator.isConnected()) {
+            return AppResult.success(communicator);
+        }
+        String message = lastError;
+        if (message == null || message.trim().isEmpty()) {
+            message = "Server connection is not available.";
+        }
+        return AppResult.error(message);
+    }
+
     public static synchronized boolean isReady() {
         boolean ready = communicator != null && communicator.isConnected();
         Log.d(TAG, "isReady() = " + ready);

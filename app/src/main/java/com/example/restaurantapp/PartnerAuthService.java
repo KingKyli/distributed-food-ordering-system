@@ -18,17 +18,18 @@ public class PartnerAuthService {
             return AppResult.error("Please fill in all fields.");
         }
 
-        MasterCommunicator communicator = ServerConnection.getInstance();
-        if (communicator == null) {
-            return AppResult.error("Server connection is not available.");
+        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
+        if (!communicatorResult.isSuccess()) {
+            return AppResult.error(communicatorResult.getMessage());
         }
+        MasterCommunicator communicator = communicatorResult.getData();
 
         String response = communicator.sendPartnerLoginRequestDetailed(normalizedStoreName, normalizedPassword);
         if (response == null || response.trim().isEmpty()) {
             return AppResult.error("Could not complete login. Please try again.");
         }
-        if (!response.toLowerCase(Locale.ROOT).startsWith("ok")) {
-            return AppResult.error(parseErrorMessage(response));
+        if (!ProtocolUtils.isOkResponse(response)) {
+            return AppResult.error(ProtocolUtils.extractErrorMessage(response, "Login failed."));
         }
 
         return restaurantRepository.fetchStoreByName(normalizedStoreName);
@@ -39,17 +40,18 @@ public class PartnerAuthService {
             return AppResult.error("Select your store first.");
         }
 
-        MasterCommunicator communicator = ServerConnection.getInstance();
-        if (communicator == null) {
-            return AppResult.error("Server connection is not available.");
+        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
+        if (!communicatorResult.isSuccess()) {
+            return AppResult.error(communicatorResult.getMessage());
         }
+        MasterCommunicator communicator = communicatorResult.getData();
 
         String response = communicator.requestPartnerAccessCode(storeName);
         if (response == null || response.trim().isEmpty()) {
             return AppResult.error("Could not request an access code.");
         }
         if (!response.startsWith("CODE_SENT:")) {
-            return AppResult.error(parseErrorMessage(response));
+            return AppResult.error(ProtocolUtils.extractErrorMessage(response, "Could not request an access code."));
         }
 
         String[] parts = response.split(":", 4);
@@ -65,16 +67,6 @@ public class PartnerAuthService {
         }
 
         return AppResult.success(new PartnerAccessCodeInfo(storeName, parts[1], parts[2], expiresInMinutes));
-    }
-
-    private String parseErrorMessage(String response) {
-        if (response == null || response.trim().isEmpty()) {
-            return "An unknown error occurred.";
-        }
-        if (response.startsWith("ERROR:")) {
-            return response.substring("ERROR:".length()).trim();
-        }
-        return response;
     }
 }
 

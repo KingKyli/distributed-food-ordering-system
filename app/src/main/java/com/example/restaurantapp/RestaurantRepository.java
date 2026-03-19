@@ -9,10 +9,11 @@ import java.util.List;
 public class RestaurantRepository {
 
     public AppResult<List<Store>> searchStores(String latitude, String longitude, String cuisine, int stars, String price) {
-        MasterCommunicator communicator = ServerConnection.getInstance();
-        if (communicator == null) {
-            return AppResult.error("Server connection is not available.");
+        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
+        if (!communicatorResult.isSuccess()) {
+            return AppResult.error(communicatorResult.getMessage());
         }
+        MasterCommunicator communicator = communicatorResult.getData();
 
         String response = communicator.sendSearchRequest(
                 safe(latitude),
@@ -25,9 +26,12 @@ public class RestaurantRepository {
         if (response == null || response.trim().isEmpty()) {
             return AppResult.error("Could not load restaurants from the server.");
         }
+        if (response.trim().toUpperCase().startsWith("ERROR:")) {
+            return AppResult.error(ProtocolUtils.extractErrorMessage(response, "Server returned an error."));
+        }
 
         try {
-            return AppResult.success(MainActivity.parseStores(response));
+            return AppResult.success(StoreJsonParser.parseStores(response));
         } catch (Exception e) {
             return AppResult.error("Error loading restaurants: " + e.getMessage());
         }
