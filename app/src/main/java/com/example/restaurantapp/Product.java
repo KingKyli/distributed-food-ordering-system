@@ -3,7 +3,7 @@ package com.example.restaurantapp;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-class Product {
+public class Product {
     private String productName;
     private String productType;
     private int availableAmount;
