@@ -5,128 +5,279 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.*;
-import androidx.appcompat.app.AppCompatActivity;
-import java.util.HashMap;
-import java.util.Map;
 
-import java.security.SecureRandom;
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class PartnerLoginActivity extends AppCompatActivity {
 
+    private Spinner spinnerStores;
     private EditText etUsername, etPassword;
     private Button btnLogin;
+    private Button btnRequestAccessCode;
+    private Button btnRetryStores;
+    private ProgressBar progressStores;
     private TextView tvStatus;
+    private TextView tvPasswordHint;
     private List<Store> stores;
+    private String requestedAccessCodeStoreName;
+    private volatile boolean activityActive;
+    private final PartnerAuthService partnerAuthService = new PartnerAuthService();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_partner_login);
 
-        etUsername = findViewById(R.id.etUsername);
-        etPassword = findViewById(R.id.etPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        tvStatus = findViewById(R.id.tvStatus);
-
-        btnLogin.setEnabled(false);
-        showStatus("Loading stores...", 0xFF666666);
-
-        MasterCommunicator comm = ConnectionUtils.requireConnected(this);
-        if (comm == null) {
+        if (PartnerSessionStore.hasActiveSession(this) && !getIntent().getBooleanExtra("FORCE_LOGIN", false)) {
+            openManagerConsoleFromSession();
             return;
         }
 
-        // ΑΛΛΑΓΗ: Στείλε κενές τιμές για να πάρεις όλα τα καταστήματα
-        new Thread(() -> {
-            try {
-                String result = comm.sendSearchRequest("", "", "", "", "");
-                if (result == null || result.trim().isEmpty()) {
-                    runOnUiThread(() -> {
-                        showStatus("Failed to load stores", 0xFFFF0000);
-                        btnLogin.setEnabled(false);
-                    });
-                    return;
-                }
-                List<Store> parsedList = MainActivity.parseStores(result);
-                runOnUiThread(() -> {
-                    stores = parsedList;
-                    btnLogin.setEnabled(true);
-                    tvStatus.setVisibility(View.GONE);
-                });
-            } catch (Exception e) {
-                runOnUiThread(() -> {
-                    showStatus("Failed to load stores", 0xFFFF0000);
-                    btnLogin.setEnabled(false);
-                });
-            }
-        }).start();
+        if (!ActivityUtils.ensureConnectedOrRedirect(this)) {
+            return;
+        }
 
-        TextWatcher watcher = new TextWatcher() {
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        setContentView(R.layout.activity_partner_login);
+        activityActive = true;
+
+        spinnerStores = findViewById(R.id.spinnerStores);
+        etUsername = findViewById(R.id.etUsername);
+        etPassword = findViewById(R.id.etPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnRequestAccessCode = findViewById(R.id.btnRequestAccessCode);
+        btnRetryStores = findViewById(R.id.btnRetryStores);
+        progressStores = findViewById(R.id.progressStores);
+        tvStatus = findViewById(R.id.tvStatus);
+        tvPasswordHint = findViewById(R.id.tvPasswordHint);
+
+        btnRetryStores.setOnClickListener(v -> loadStores());
+        etPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateActionButtons(false);
                 tvStatus.setVisibility(View.GONE);
             }
-            public void afterTextChanged(Editable s) {}
-        };
-        etUsername.addTextChangedListener(watcher);
-        etPassword.addTextChangedListener(watcher);
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        spinnerStores.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                requestedAccessCodeStoreName = null;
+                if (position <= 0) {
+                    etUsername.setText("");
+                    etPassword.setText("");
+                } else {
+                    String selectedStore = (String) parent.getItemAtPosition(position);
+                    etUsername.setText(selectedStore);
+                    etPassword.setText("");
+                }
+                updateActionButtons(false);
+                tvStatus.setVisibility(View.GONE);
+                tvPasswordHint.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                requestedAccessCodeStoreName = null;
+                etUsername.setText("");
+                etPassword.setText("");
+                updateActionButtons(false);
+            }
+        });
+
+        btnRequestAccessCode.setOnClickListener(v -> {
+            String storeName = getSelectedStoreName();
+            if (storeName.isEmpty()) {
+                showStatus("Select your store first.", 0xFFD32F2F);
+                return;
+            }
+            requestedAccessCodeStoreName = null;
+            setLoadingState(true, "Sending access code...");
+            new Thread(() -> {
+                AppResult<PartnerAccessCodeInfo> result = partnerAuthService.requestAccessCode(storeName);
+                ActivityUtils.runOnUiThreadIfAlive(this, () -> {
+                    if (!activityActive) {
+                        return;
+                    }
+                    setLoadingState(false, null);
+                    if (!result.isSuccess()) {
+                        showStatus(result.getMessage(), 0xFFD32F2F);
+                        tvPasswordHint.setVisibility(View.GONE);
+                        updateActionButtons(false);
+                        return;
+                    }
+
+                    PartnerAccessCodeInfo info = result.getData();
+                    requestedAccessCodeStoreName = storeName;
+                    showStatus("Access code sent successfully", 0xFF2E7D32);
+                    etPassword.setText(info.getDemoCode());
+                    etPassword.setSelection(etPassword.getText() != null ? etPassword.getText().length() : 0);
+                    tvPasswordHint.setText(getString(
+                            R.string.partner_access_code_hint,
+                            info.getDeliveryDestination(),
+                            info.getDemoCode(),
+                            info.getExpiresInMinutes()
+                    ));
+                    tvPasswordHint.setVisibility(View.VISIBLE);
+                    etPassword.requestFocus();
+                    updateActionButtons(false);
+                });
+            }).start();
+        });
+
+        setLoadingState(true, "Loading stores...");
+        loadStores();
 
         btnLogin.setOnClickListener(view -> {
-            if (stores == null) {
-                showStatus("Stores are still loading", 0xFFFF0000);
-                return;
-            }
-            String username = etUsername.getText().toString().trim();
-            String password = etPassword.getText().toString();
+            String username = getSelectedStoreName();
+            String password = etPassword.getText().toString().trim();
 
-            if (username.isEmpty() || password.isEmpty()) {
-                tvStatus.setTextColor(0xFFFF0000);
-                tvStatus.setText("Please fill in all fields");
-                tvStatus.setVisibility(View.VISIBLE);
-                return;
-            }
-            Store matchedStore = findStoreByName(username);
-            if (matchedStore == null) {
-                showStatus("Store not found", 0xFFFF0000);
-                return;
-            }
+            setLoadingState(true, "Signing in...");
+            new Thread(() -> {
+                AppResult<Store> result = partnerAuthService.loginPartner(username, password);
+                ActivityUtils.runOnUiThreadIfAlive(this, () -> {
+                    if (!activityActive) {
+                        return;
+                    }
+                    setLoadingState(false, null);
+                    if (!result.isSuccess()) {
+                        showStatus(result.getMessage(), 0xFFD32F2F);
+                        return;
+                    }
 
-            String expectedPassword = PartnerLoginManager.getInstance().getOrGeneratePassword(username, this);
-            if (password.equals(expectedPassword)) {
-                tvStatus.setTextColor(0xFF00AA00);
-                tvStatus.setText("Login successful");
-                tvStatus.setVisibility(View.VISIBLE);
-                // Open ManagerConsoleActivity with store JSON
-                android.content.Intent intent = new android.content.Intent(PartnerLoginActivity.this, ManagerConsoleActivity.class);
-                try {
-                    intent.putExtra("store_json", matchedStore.toJson().toString());
-                } catch (Exception e) {
-                    showStatus("Error passing store data", 0xFFFF0000);
-                    return;
-                }
-                startActivity(intent);
-                finish();
-                return;
-            } else {
-                tvStatus.setTextColor(0xFFFF0000);
-                tvStatus.setText("Invalid credentials");
-            }
-            tvStatus.setVisibility(View.VISIBLE);
+                    showStatus("Login successful", 0xFF2E7D32);
+                    requestedAccessCodeStoreName = null;
+                    PartnerSessionStore.saveSession(PartnerLoginActivity.this, result.getData());
+                    android.content.Intent intent = new android.content.Intent(PartnerLoginActivity.this, ManagerConsoleActivity.class);
+                    try {
+                        intent.putExtra("store_json", result.getData().toJson().toString());
+                    } catch (Exception e) {
+                        showStatus("Error passing store data", 0xFFD32F2F);
+                        return;
+                    }
+                    startActivity(intent);
+                    finish();
+                });
+            }).start();
         });
     }
-    private Store findStoreByName(String name) {
-        if (stores == null) return null;
-        for (Store s : stores) {
-            if (s.getStoreName().equalsIgnoreCase(name)) return s;
+
+    @Override
+    protected void onDestroy() {
+        activityActive = false;
+        super.onDestroy();
+    }
+
+    private void loadStores() {
+        setLoadingState(true, "Loading stores...");
+        new Thread(() -> {
+            AppResult<List<Store>> result = partnerAuthService.loadStores();
+            ActivityUtils.runOnUiThreadIfAlive(this, () -> {
+                if (!activityActive) {
+                    return;
+                }
+                if (!result.isSuccess()) {
+                    setErrorState(result.getMessage());
+                    return;
+                }
+
+                stores = result.getData();
+                setupStoreSpinner(stores);
+                setLoadingState(false, stores.isEmpty() ? "No partner stores found." : null);
+                updateActionButtons(false);
+            });
+        }).start();
+    }
+
+    private void openManagerConsoleFromSession() {
+        String savedStoreJson = PartnerSessionStore.getStoreJson(this);
+        if (savedStoreJson == null || savedStoreJson.trim().isEmpty()) {
+            PartnerSessionStore.clear(this);
+            return;
         }
-        return null;
+        android.content.Intent intent = new android.content.Intent(this, ManagerConsoleActivity.class);
+        intent.putExtra("store_json", savedStoreJson);
+        startActivity(intent);
+        finish();
+    }
+
+    private void setupStoreSpinner(List<Store> parsedList) {
+        List<String> storeNames = new ArrayList<>();
+        storeNames.add("-- Select your store --");
+        if (parsedList != null) {
+            for (Store store : parsedList) {
+                if (store != null && store.getStoreName() != null) {
+                    storeNames.add(store.getStoreName());
+                }
+            }
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, storeNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerStores.setAdapter(adapter);
+        spinnerStores.setEnabled(true);
+        spinnerStores.setSelection(0);
+    }
+
+    private String getSelectedStoreName() {
+        Object selectedItem = spinnerStores.getSelectedItem();
+        if (selectedItem instanceof String && spinnerStores.getSelectedItemPosition() > 0) {
+            return ((String) selectedItem).trim();
+        }
+        return etUsername.getText() == null ? "" : etUsername.getText().toString().trim();
+    }
+
+    private boolean hasPasswordInput() {
+        return etPassword.getText() != null && !etPassword.getText().toString().trim().isEmpty();
+    }
+
+    private boolean hasRequestedAccessCodeForSelectedStore() {
+        String selectedStoreName = getSelectedStoreName();
+        return !selectedStoreName.isEmpty()
+                && requestedAccessCodeStoreName != null
+                && requestedAccessCodeStoreName.equalsIgnoreCase(selectedStoreName);
+    }
+
+    private void updateActionButtons(boolean loading) {
+        boolean hasStoreSelection = spinnerStores.getSelectedItemPosition() > 0;
+        spinnerStores.setEnabled(!loading);
+        etPassword.setEnabled(!loading && hasStoreSelection);
+        btnRequestAccessCode.setEnabled(!loading && hasStoreSelection);
+        btnLogin.setEnabled(!loading && hasStoreSelection && hasRequestedAccessCodeForSelectedStore() && hasPasswordInput());
     }
 
     private void showStatus(String message, int color) {
         tvStatus.setTextColor(color);
         tvStatus.setText(message);
         tvStatus.setVisibility(View.VISIBLE);
+    }
+
+    private void setLoadingState(boolean loading, String message) {
+        progressStores.setVisibility(loading ? View.VISIBLE : View.GONE);
+        btnRetryStores.setVisibility(View.GONE);
+        updateActionButtons(loading);
+        if (message == null || message.isEmpty()) {
+            tvStatus.setVisibility(View.GONE);
+        } else {
+            showStatus(message, 0xFF757575);
+        }
+    }
+
+    private void setErrorState(String message) {
+        progressStores.setVisibility(View.GONE);
+        btnRetryStores.setVisibility(View.VISIBLE);
+        updateActionButtons(false);
+        showStatus(message, 0xFFD32F2F);
     }
 }
 

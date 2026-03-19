@@ -1,5 +1,39 @@
 <resources>
     <string name="app_name">RestaurantApp</string>
+    <string name="product_management_title">Product management</string>
+    <string name="product_management_subtitle">Review items, adjust stock, and keep your menu updated.</string>
+    <string name="product_status_active">Active</string>
+    <string name="product_status_inactive">Inactive</string>
+    <string name="product_stock_format">%1$d in stock</string>
+    <string name="product_type_fallback">Menu item</string>
+    <string name="product_edit_content_description">Edit product</string>
+    <string name="product_delete_content_description">Delete product</string>
+    <string name="product_delete_confirm_title">Delete product?</string>
+    <string name="product_delete_confirm_message">Are you sure you want to delete %1$s from your menu?</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="product_deleted_success">Product deleted from server</string>
+    <string name="partner_access_code_hint">A one-time access code was sent to %1$s
+Demo environment code: %2$s
+Code expires in %3$d minutes.</string>
+    <string name="home_search_hint">Search for food or restaurants...</string>
+    <string name="home_quick_filter_top_rated">Top rated</string>
+    <string name="home_quick_filter_pizza">Pizza</string>
+    <string name="home_quick_filter_burgers">Burgers</string>
+    <string name="home_quick_filter_budget">Budget</string>
+    <string name="home_empty_filtered">No restaurants match your search or quick filters.</string>
+    <string name="home_empty_selected_filters">No restaurants found for the selected filters.</string>
+    <string name="home_loading_restaurants">Loading restaurants...</string>
+    <string name="home_searching_restaurants">Searching restaurants...</string>
+    <string name="home_delivery_label">Deliver to · Campus Center</string>
+    <string name="home_brand_title">Foodie Express</string>
+    <string name="home_basket_content_description">Basket</string>
+    <string name="home_featured_label">Featured now</string>
+    <string name="home_featured_title">Discover restaurants with fast delivery and top picks for tonight.</string>
+    <string name="home_featured_eta">20-30 min</string>
+    <string name="home_popular_title">Popular near you</string>
+    <string name="home_popular_subtitle">Rated stores and quick meal options</string>
+    <string name="home_no_restaurants_content_description">No restaurants</string>
     <string-array name="cuisine_options">
         <item>Any</item>
         <item>Greek</item>

@@ -5,7 +5,7 @@ import org.json.JSONException;
 
 import java.util.Objects;
 
-class Product {
+public class Product {
     private String productName;
     private String productType;
     private int availableAmount;
@@ -13,6 +13,8 @@ class Product {
     private boolean isActive;
     private int unitsSold;
     private double revenueFromThisProduct;
+
+    private boolean active;
 
     // Constructor
     public Product(String productName, String productType, int availableAmount, double price) {
@@ -59,15 +61,11 @@ class Product {
         String type = obj.optString("ProductType", "Unknown");
         int amount = obj.optInt("AvailableAmount", 0);
         double price = obj.getDouble("Price");
+        boolean active = obj.optBoolean("IsActive", true);
 
-        Product p = new Product(name, type, amount, price);
-        // Optional fields (may not exist in server responses)
-        if (obj.has("IsActive")) {
-            p.setActive(obj.optBoolean("IsActive", true));
-        } else if (obj.has("Active")) {
-            p.setActive(obj.optBoolean("Active", true));
-        }
-        return p;
+        Product product = new Product(name, type, amount, price);
+        product.setActive(active);
+        return product;
     }
 
 
@@ -78,7 +76,29 @@ class Product {
         json.put("ProductType", this.productType);
         json.put("AvailableAmount", this.availableAmount);
         json.put("Price", this.price);
+        json.put("IsActive", this.isActive);
         return json;
+    }
+
+    public String getStableKey() {
+        return normalize(productName) + "::" + normalize(productType);
+    }
+
+    private static String normalize(String value) {
+        return value == null ? "" : value.trim().toLowerCase();
+    }
+
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "name='" + productName + '\'' +
+                ", type='" + productType + '\'' +
+                ", amount=" + availableAmount +
+                ", price=" + price +
+                ", active=" + isActive +
+                ", sold=" + unitsSold +
+                '}';
     }
 
     @Override
@@ -93,18 +113,5 @@ class Product {
     @Override
     public int hashCode() {
         return Objects.hash(productName, productType);
-    }
-
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "name='" + productName + '\'' +
-                ", type='" + productType + '\'' +
-                ", amount=" + availableAmount +
-                ", price=" + price +
-                ", active=" + isActive +
-                ", sold=" + unitsSold +
-                '}';
     }
 }

@@ -2,9 +2,11 @@ package com.example.restaurantapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.card.MaterialCardView;
 
 import org.json.JSONObject;
 import java.util.List;
@@ -12,14 +14,23 @@ import java.util.List;
 public class ManagerConsoleActivity extends AppCompatActivity {
 
     private TextView tvTotalProducts, tvLowStock, tvOutOfStock, tvStoreName;
+    private String currentStoreJson;
+    private Store currentStore;
+    private volatile boolean activityActive;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_manager_console);
 
-        LinearLayout btnAddProduct = findViewById(R.id.btnAddProduct);
-        LinearLayout btnEditProduct = findViewById(R.id.btnEditProduct);
+        if (!ActivityUtils.ensureConnectedOrRedirect(this)) {
+            return;
+        }
+
+        setContentView(R.layout.activity_manager_console);
+        activityActive = true;
+
+        MaterialCardView btnAddProduct = findViewById(R.id.btnAddProduct);
+        MaterialCardView btnEditProduct = findViewById(R.id.btnEditProduct);
 
         // Bind views
         tvTotalProducts = findViewById(R.id.tvTotalProducts);
@@ -27,31 +38,37 @@ public class ManagerConsoleActivity extends AppCompatActivity {
         tvOutOfStock = findViewById(R.id.tvOutOfStock);
         tvStoreName = findViewById(R.id.tvStoreName);
 
-        // Get the store JSON string (passed from previous screen or hardcoded for testing)
-        String storeJson = getIntent().getStringExtra("store_json");
-        android.util.Log.d("ManagerConsoleActivity", "Your Store is: " + storeJson);
-        if (storeJson != null) {
+        currentStoreJson = resolveStoreJson();
+        android.util.Log.d("ManagerConsoleActivity", "Your Store is: " + currentStoreJson);
+        if (currentStoreJson != null) {
             try {
-                JSONObject jsonObj = new JSONObject(storeJson);
-                Store store = Store.fromJson(jsonObj);
+                JSONObject jsonObj = new JSONObject(currentStoreJson);
+                currentStore = Store.fromJson(jsonObj);
+                PartnerSessionStore.saveSession(this, currentStore);
                 if (tvStoreName != null) {
-                    tvStoreName.setText(store.getStoreName());
+                    tvStoreName.setText(currentStore.getStoreName());
                 }
-                updateInventorySummary(store);
+                updateInventorySummary(currentStore);
             } catch (Exception e) {
-                e.printStackTrace();
+                android.util.Log.e("ManagerConsoleActivity", "Failed to restore store data", e);
+                PartnerSessionStore.clear(this);
+                redirectToPartnerLogin();
+                return;
             }
+        } else {
+            redirectToPartnerLogin();
+            return;
         }
 
         btnAddProduct.setOnClickListener(v -> {
             Intent intent = new Intent(ManagerConsoleActivity.this, AddProductActivity.class);
-            intent.putExtra("store_json", storeJson);  // 🔁 Pass the same JSON string
+            intent.putExtra("store_json", currentStoreJson);
             startActivity(intent);
         });
 
         btnEditProduct.setOnClickListener(v -> {
             Intent intent = new Intent(ManagerConsoleActivity.this, EditProductActivity.class);
-            intent.putExtra("store_json", storeJson);  // 🔁 Pass the same JSON string
+            intent.putExtra("store_json", currentStoreJson);
             startActivity(intent);
         });
 
@@ -63,8 +80,14 @@ public class ManagerConsoleActivity extends AppCompatActivity {
         refreshStoreData();
     }
 
+    @Override
+    protected void onDestroy() {
+        activityActive = false;
+        super.onDestroy();
+    }
+
     private void refreshStoreData() {
-        final String storeJson = getIntent().getStringExtra("store_json");
+        final String storeJson = currentStoreJson != null ? currentStoreJson : resolveStoreJson();
         if (storeJson == null) return;
         final String storeName;
         try {
@@ -76,17 +99,26 @@ public class ManagerConsoleActivity extends AppCompatActivity {
         }
         if (storeName == null) return;
         new Thread(() -> {
-            MasterCommunicator comm = ConnectionUtils.requireConnected(this);
-            if (comm == null) return;
+            MasterCommunicator comm = ServerConnection.getInstance();
+            if (comm == null) {
+                ActivityUtils.runOnUiThreadIfAlive(this, () -> tvStoreName.setText("Connection lost"));
+                return;
+            }
             // Στείλε ΚΕΝΕΣ τιμές για να πάρεις ΟΛΑ τα καταστήματα
             String result = comm.sendSearchRequest("", "", "", "", "");
-            runOnUiThread(() -> {
+            ActivityUtils.runOnUiThreadIfAlive(this, () -> {
+                if (!activityActive || result == null || result.trim().isEmpty()) {
+                    return;
+                }
                 try {
                     org.json.JSONArray arr = new org.json.JSONArray(result);
                     for (int i = 0; i < arr.length(); i++) {
                         JSONObject obj = arr.getJSONObject(i);
                         if (obj.getString("StoreName").equalsIgnoreCase(storeName)) {
                             Store store = Store.fromJson(obj);
+                            currentStore = store;
+                            currentStoreJson = store.toJson() != null ? store.toJson().toString() : currentStoreJson;
+                            PartnerSessionStore.saveSession(ManagerConsoleActivity.this, store);
                             if (tvStoreName != null) tvStoreName.setText(store.getStoreName());
                             updateInventorySummary(store);
                             break;
@@ -100,6 +132,9 @@ public class ManagerConsoleActivity extends AppCompatActivity {
     }
 
     private void updateInventorySummary(Store store) {
+        if (store == null) {
+            return;
+        }
         List<Product> products = store.getProducts();
 
         int total = products.size();
@@ -119,6 +154,21 @@ public class ManagerConsoleActivity extends AppCompatActivity {
         tvTotalProducts.setText("📦 Total Products: " + total);
         tvLowStock.setText("⚠️ Low Stock: " + lowStock);
         tvOutOfStock.setText("💲 Out of Stock: " + outOfStock);
+    }
+
+    private String resolveStoreJson() {
+        String fromIntent = getIntent().getStringExtra("store_json");
+        if (fromIntent != null && !fromIntent.trim().isEmpty()) {
+            return fromIntent;
+        }
+        return PartnerSessionStore.getStoreJson(this);
+    }
+
+    private void redirectToPartnerLogin() {
+        Intent intent = new Intent(this, PartnerLoginActivity.class);
+        intent.putExtra("FORCE_LOGIN", true);
+        startActivity(intent);
+        finish();
     }
 
 }

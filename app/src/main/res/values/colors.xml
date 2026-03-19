@@ -1,5 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Primary Colors - Food Red Theme -->
+    <color name="primary">#D32F2F</color>
+    <color name="primary_dark">#B71C1C</color>
+    <color name="primary_light">#EF5350</color>
+    <color name="primary_variant">#C62828</color>
+
+    <!-- Secondary Colors - Warm Orange -->
+    <color name="secondary">#FF7043</color>
+    <color name="secondary_dark">#E64A19</color>
+    <color name="secondary_light">#FF8A65</color>
+    <color name="secondary_soft">#FFF0EB</color>
+
+    <!-- Accent -->
+    <color name="accent">#FFC107</color>
+    <color name="accent_dark">#FFA000</color>
+
+    <!-- Surface & Background -->
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F5F5F5</color>
+    <color name="background">#FAFAFA</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="featured_filter_selected_background">#FFF1EA</color>
+    <color name="featured_filter_default_background">#FFFFFF</color>
+    <color name="featured_filter_selected_stroke">#FF7043</color>
+    <color name="featured_filter_default_stroke">#E0E0E0</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#9E9E9E</color>
+    <color name="text_on_primary">#FFFFFF</color>
+    <color name="text_on_secondary">#FFFFFF</color>
+
+    <!-- Status Colors -->
+    <color name="success">#4CAF50</color>
+    <color name="success_light">#C8E6C9</color>
+    <color name="error">#F44336</color>
+    <color name="error_light">#FFCDD2</color>
+    <color name="warning">#FF9800</color>
+    <color name="warning_light">#FFE0B2</color>
+    <color name="info">#2196F3</color>
+
+    <!-- Star Rating -->
+    <color name="star_filled">#FFC107</color>
+    <color name="star_empty">#E0E0E0</color>
+
+    <!-- Price Colors -->
+    <color name="price_cheap">#4CAF50</color>
+    <color name="price_medium">#FF9800</color>
+    <color name="price_expensive">#F44336</color>
+
+    <!-- Dividers & Borders -->
+    <color name="divider">#E0E0E0</color>
+    <color name="border">#BDBDBD</color>
+
+    <!-- Legacy colors for compatibility -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

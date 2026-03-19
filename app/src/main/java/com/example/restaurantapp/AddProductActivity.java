@@ -11,11 +11,19 @@ public class AddProductActivity extends AppCompatActivity {
 
     private EditText inputName, inputType, inputPrice, inputQuantity;
     private Button btnAddProduct;
+    private volatile boolean activityActive;
+    private final ProductManagementService productManagementService = new ProductManagementService();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!ActivityUtils.ensureConnectedOrRedirect(this)) {
+            return;
+        }
+
         setContentView(R.layout.activity_manage_products);  // Make sure this XML exists
+        activityActive = true;
 
         inputName = findViewById(R.id.inputName);
         inputType = findViewById(R.id.inputType);
@@ -26,6 +34,9 @@ public class AddProductActivity extends AppCompatActivity {
         // Get store JSON from intent
         final String storeName;
         String storeJson = getIntent().getStringExtra("store_json");
+        if (storeJson == null || storeJson.trim().isEmpty()) {
+            storeJson = PartnerSessionStore.getStoreJson(this);
+        }
         if (storeJson != null) {
             String tempName = null;
             try {
@@ -58,8 +69,7 @@ public class AddProductActivity extends AppCompatActivity {
                     Product newProduct = new Product(name, type, quantity, price);
 
                     if (storeName != null) {
-                        MasterCommunicator comm = ConnectionUtils.requireConnected(AddProductActivity.this);
-                        if (comm == null) return;
+                        MasterCommunicator comm = ServerConnection.getInstance();
                         Thread t = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -89,6 +99,12 @@ public class AddProductActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        activityActive = false;
+        super.onDestroy();
     }
 }
 

@@ -1,15 +1,18 @@
 // src/main/java/com/example/restaurantapp/Basket.java
 package com.example.restaurantapp;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Basket {
-    private static volatile Basket instance;
-    private final Map<Product, Integer> items = new HashMap<>();
+    private static Basket instance;
+    private final LinkedHashMap<String, BasketItem> items = new LinkedHashMap<>();
 
-    private Basket() {}
+    private Basket() {
+    }
+
     private String storeName = null;
 
     public String getStoreName() {
@@ -27,39 +30,80 @@ public class Basket {
         return instance;
     }
 
-    public synchronized void addProduct(Product product) {
-        int count = items.getOrDefault(product, 0);
-        items.put(product, count + 1);
+    public void addProduct(Product product) {
+        addProduct(product, storeName);
     }
 
     public synchronized boolean addProduct(Product product, String storeName) {
+        if (product == null || storeName == null || storeName.trim().isEmpty()) {
+            return false;
+        }
         if (items.isEmpty()) {
             this.storeName = storeName;
         }
-        if (!this.storeName.equals(storeName)) {
-            // Reject addition from a different store
+        if (this.storeName == null || !this.storeName.equals(storeName)) {
             return false;
         }
-        int count = items.getOrDefault(product, 0);
-        items.put(product, count + 1);
+
+        String stableId = BasketItem.buildStableId(storeName, product.getProductName(), product.getProductType());
+        BasketItem item = items.get(stableId);
+        if (item == null) {
+            items.put(stableId, new BasketItem(storeName, product.getProductName(), product.getProductType(), 1, product.getPrice()));
+        } else {
+            item.setQuantity(item.getQuantity() + 1);
+            item.setUnitPrice(product.getPrice());
+        }
         return true;
     }
 
     public synchronized void removeProduct(Product product) {
-        if (!items.containsKey(product)) return;
-        int count = items.get(product);
-        if (count > 1) {
-            items.put(product, count - 1);
+        if (product == null) {
+            return;
+        }
+        removeProductById(BasketItem.buildStableId(storeName, product.getProductName(), product.getProductType()));
+    }
+
+    public synchronized void removeProductById(String stableId) {
+        BasketItem item = items.get(stableId);
+        if (item == null) {
+            return;
+        }
+        if (item.getQuantity() > 1) {
+            item.setQuantity(item.getQuantity() - 1);
         } else {
-            items.remove(product);
+            items.remove(stableId);
             if (items.isEmpty()) {
                 storeName = null;
             }
         }
     }
 
-    public synchronized Map<Product, Integer> getItems() {
-        return Collections.unmodifiableMap(new HashMap<>(items));
+    public synchronized List<BasketItem> getItems() {
+        return new ArrayList<>(items.values());
+    }
+
+    public synchronized boolean isEmpty() {
+        return items.isEmpty();
+    }
+
+    public synchronized int getItemCount() {
+        int count = 0;
+        for (BasketItem item : items.values()) {
+            count += item.getQuantity();
+        }
+        return count;
+    }
+
+    public synchronized double getTotalPrice() {
+        double total = 0;
+        for (BasketItem item : items.values()) {
+            total += item.getSubtotal();
+        }
+        return total;
+    }
+
+    public synchronized Map<String, BasketItem> getItemsById() {
+        return items;
     }
 
     public synchronized void clear() {

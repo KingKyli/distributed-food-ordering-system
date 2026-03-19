@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Locale;
 import android.util.Log;
 
 public class MasterCommunicator {
@@ -23,23 +24,19 @@ public class MasterCommunicator {
         this.masterPort = masterPort;
     }
 
-    public boolean isConnected() {
-        return socket != null
-                && socket.isConnected()
-                && !socket.isClosed()
-                && out != null
-                && in != null;
-    }
-
-    public boolean connect() {
+    public synchronized boolean connect() {
         Log.d("MasterCommunicator", "connect() called");
         try {
+            close();
             this.socket = new Socket();
-            this.socket.connect(new InetSocketAddress(masterIp, masterPort), 5000); // 5 second timeout
+            this.socket.connect(new InetSocketAddress(masterIp, masterPort), 5000);
             this.out = new PrintWriter(socket.getOutputStream(), true);
             this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out.println("CLIENT_HELLO");
             out.flush();
+            // Read and discard the SERVER_HELLO response
+            String response = in.readLine();
+            Log.d("MasterCommunicator", "Server responded: " + response);
             Log.d("MasterCommunicator", "Connected to server at " + masterIp + ":" + masterPort);
             return true;
         } catch (IOException e) {
@@ -49,28 +46,63 @@ public class MasterCommunicator {
         }
     }
 
-    public void close() {
+    public synchronized boolean isConnected() {
+        return socket != null && socket.isConnected() && !socket.isClosed() && out != null && in != null;
+    }
+
+    public synchronized void close() {
         try {
             if (out != null) out.close();
             if (in != null) in.close();
             if (socket != null && !socket.isClosed()) socket.close();
         } catch (IOException e) {
             Log.e("MasterCommunicator", "Error closing connection to Master: " + e.getMessage());
+        } finally {
+            out = null;
+            in = null;
+            socket = null;
         }
     }
 
     private synchronized String sendRequestAndGetResponse(String request) {
+        // Try to reconnect if not connected
         if (!isConnected()) {
-            Log.e("MasterCommunicator", "Not connected to server");
-            return null;
+            Log.w("MasterCommunicator", "Not connected, attempting to reconnect...");
+            if (!connect()) {
+                Log.e("MasterCommunicator", "Reconnection failed");
+                return null;
+            }
+            Log.d("MasterCommunicator", "Reconnected successfully");
         }
+        
         try {
             out.println(request);
             out.flush();
             Log.d("MasterCommunicator", "Sent request to master: " + request);
-            return in.readLine(); // Read response
+            String response = in.readLine();
+            if (response == null) {
+                // Connection was closed, try to reconnect and retry once
+                Log.w("MasterCommunicator", "Got null response, reconnecting...");
+                if (connect()) {
+                    out.println(request);
+                    out.flush();
+                    response = in.readLine();
+                }
+            }
+            return response;
         } catch (IOException e) {
             Log.e("MasterCommunicator", "Error communicating with Master: " + e.getMessage());
+            // Try to reconnect and retry once
+            try {
+                Log.w("MasterCommunicator", "Attempting reconnect after error...");
+                if (connect()) {
+                    out.println(request);
+                    out.flush();
+                    return in.readLine();
+                }
+            } catch (IOException e2) {
+                Log.e("MasterCommunicator", "Retry also failed: " + e2.getMessage());
+            }
             return null;
         }
     }
@@ -128,6 +160,42 @@ public class MasterCommunicator {
         String request = "UPDATE_PRODUCT:" + storeName + ":" + productName + ":" + newPrice + ":" + newAmount;
         String response = sendRequestAndGetResponse(request);
         return response != null && response.toLowerCase().startsWith("ok");
+    }
+
+    /**
+     * Validate partner login credentials with the server
+     * @return true if login is successful, false otherwise
+     */
+    public boolean sendPartnerLoginRequest(String storeName, String password) {
+        String response = sendPartnerLoginRequestDetailed(storeName, password);
+        return response != null && response.toLowerCase(Locale.ROOT).startsWith("ok");
+    }
+
+    public String sendPartnerLoginRequestDetailed(String storeName, String password) {
+        String request = "PARTNER_LOGIN:" + storeName + ":" + password;
+        String response = sendRequestAndGetResponse(request);
+        Log.d("MasterCommunicator", "Partner login response: " + response);
+        return response;
+    }
+
+    public String requestPartnerAccessCode(String storeName) {
+        String request = "REQUEST_PARTNER_ACCESS_CODE:" + storeName;
+        String response = sendRequestAndGetResponse(request);
+        Log.d("MasterCommunicator", "Partner access code response: " + response);
+        return response;
+    }
+
+    /**
+     * Get credentials for a store (for demo purposes only)
+     * In production, this would be replaced with a proper authentication system
+     */
+    public String getStoreCredentials(String storeName) {
+        String request = "GET_CREDENTIALS:" + storeName;
+        String response = sendRequestAndGetResponse(request);
+        if (response != null && response.startsWith("PASSWORD:")) {
+            return response.substring("PASSWORD:".length());
+        }
+        return null;
     }
 
 }
