@@ -16,17 +16,28 @@ public class ProductEditActivity extends AppCompatActivity {
     private EditText inputName, inputType, inputPrice, inputQuantity;
     private CheckBox checkboxActive;
     private Product product;
+    private volatile boolean activityActive;
+    private final ProductManagementService productManagementService = new ProductManagementService();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!ActivityUtils.ensureConnectedOrRedirect(this)) {
+            return;
+        }
+
         setContentView(R.layout.activity_product_edit);
+        activityActive = true;
 
         inputName = findViewById(R.id.inputName);
         inputType = findViewById(R.id.inputType);
         inputPrice = findViewById(R.id.inputPrice);
         inputQuantity = findViewById(R.id.inputQuantity);
         checkboxActive = findViewById(R.id.checkboxActive);
+        checkboxActive.setChecked(true);
+        checkboxActive.setEnabled(false);
+        checkboxActive.setVisibility(android.view.View.GONE);
         Button btnSave = findViewById(R.id.btnSave);
 
         String productJson = getIntent().getStringExtra("product_json");
@@ -49,6 +60,9 @@ public class ProductEditActivity extends AppCompatActivity {
         }
 
         String storeJson = getIntent().getStringExtra("store_json");
+        if (storeJson == null || storeJson.trim().isEmpty()) {
+            storeJson = PartnerSessionStore.getStoreJson(this);
+        }
         String storeName = null;
         if (storeJson != null) {
             try {
@@ -66,8 +80,6 @@ public class ProductEditActivity extends AppCompatActivity {
             String type = inputType.getText().toString().trim();
             String priceStr = inputPrice.getText().toString().trim();
             String quantityStr = inputQuantity.getText().toString().trim();
-            boolean isActive = checkboxActive.isChecked();
-
             if (name.isEmpty() || type.isEmpty() || priceStr.isEmpty() || quantityStr.isEmpty()) {
                 Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();
                 return;
@@ -79,21 +91,22 @@ public class ProductEditActivity extends AppCompatActivity {
 
                 finalProduct.setAvailableAmount(quantity);
                 finalProduct.setPrice(price);
-                finalProduct.setActive(isActive);
                 // Optionally update name/type if allowed
 
                 // Send update to server
                 if (finalStoreName != null && finalProduct != null) {
                     String productName = finalProduct.getProductName();
-                    MasterCommunicator comm = ServerConnection.getInstance();
                     new Thread(() -> {
-                        boolean success = comm.sendUpdateProductRequest(finalStoreName, productName, price, quantity);
-                        runOnUiThread(() -> {
-                            if (success) {
+                        AppResult<Void> result = productManagementService.updateProduct(finalStoreName, productName, price, quantity);
+                        ActivityUtils.runOnUiThreadIfAlive(this, () -> {
+                            if (!activityActive) {
+                                return;
+                            }
+                            if (result.isSuccess()) {
                                 Toast.makeText(this, "Product updated on server", Toast.LENGTH_SHORT).show();
                                 finish();
                             } else {
-                                Toast.makeText(this, "Failed to update product on server", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, result.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }).start();
@@ -104,5 +117,11 @@ public class ProductEditActivity extends AppCompatActivity {
                 Toast.makeText(this, "Invalid price or quantity", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        activityActive = false;
+        super.onDestroy();
     }
 }

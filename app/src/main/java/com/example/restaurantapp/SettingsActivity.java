@@ -27,8 +27,16 @@ public class SettingsActivity extends BaseActivity {
 
         switchManagerMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                // Navigate to Partner Login
-                Intent intent = new Intent(SettingsActivity.this, PartnerLoginActivity.class);
+                Intent intent = new Intent(
+                        SettingsActivity.this,
+                        PartnerSessionStore.hasActiveSession(SettingsActivity.this)
+                                ? ManagerConsoleActivity.class
+                                : PartnerLoginActivity.class
+                );
+                String savedStoreJson = PartnerSessionStore.getStoreJson(SettingsActivity.this);
+                if (savedStoreJson != null) {
+                    intent.putExtra("store_json", savedStoreJson);
+                }
                 startActivity(intent);
                 switchManagerMode.setChecked(false); // reset switch
             }

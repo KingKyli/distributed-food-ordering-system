@@ -3,11 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/bottomNav"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
-    android:background="#D5D5D5"
+    android:layout_height="74dp"
+    android:background="@drawable/bottom_nav_background"
     android:gravity="center"
     android:orientation="horizontal"
-    android:padding="5dp">
+    android:paddingStart="12dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="10dp">
 
     <TextView
         android:id="@+id/nav_home"
@@ -17,9 +20,10 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
-        android:text="🏠︎ Main"
+        android:text="⌂\nHome"
         android:textColor="#9E9E9E"
-        android:textSize="16sp" />
+        android:textSize="13sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/nav_filters"
@@ -29,9 +33,10 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
-        android:text="Filters"
+        android:text="◫\nDiscover"
         android:textColor="#9E9E9E"
-        android:textSize="16sp" />
+        android:textSize="13sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/nav_settings"
@@ -41,7 +46,8 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
-        android:text="Settings"
+        android:text="⚙\nProfile"
         android:textColor="#9E9E9E"
-        android:textSize="16sp" />
+        android:textSize="13sp"
+        android:textStyle="bold" />
 </LinearLayout>

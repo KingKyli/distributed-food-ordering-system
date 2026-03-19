@@ -38,17 +38,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             holder.tvProductPrice.setText("€" + productJson.getDouble("Price"));
 
             holder.ivProductCart.setOnClickListener(v -> {
-                Product product = null;
                 try {
-                    product = Product.fromJson(productJson);
+                    Product product = Product.fromJson(productJson);
+                    boolean added = Basket.getInstance().addProduct(product, storeName);
+                    if (!added) {
+                        Toast.makeText(holder.itemView.getContext(), "You can only add products from one store at a time.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(holder.itemView.getContext(), "Added to basket", Toast.LENGTH_SHORT).show();
+                    }
                 } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-                boolean added = Basket.getInstance().addProduct(product, storeName);
-                if (!added) {
-                    Toast.makeText(holder.itemView.getContext(), "You can only add products from one store at a time.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(holder.itemView.getContext(), "Added to basket", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(holder.itemView.getContext(), "Failed to add product to basket", Toast.LENGTH_SHORT).show();
                 }
             });
         } catch (JSONException e) {

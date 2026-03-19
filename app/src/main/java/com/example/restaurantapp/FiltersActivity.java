@@ -3,10 +3,11 @@ package com.example.restaurantapp;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.*;
+import java.util.ArrayList;
 import java.util.Arrays;
-
-import androidx.appcompat.app.AppCompatActivity;
+import java.util.List;
 
 public class FiltersActivity extends BaseActivity {
 
@@ -41,9 +42,13 @@ public class FiltersActivity extends BaseActivity {
         spinnerStars = findViewById(R.id.spinner_stars);
         radioPrice = findViewById(R.id.radio_price);
         checkboxOpenNow = findViewById(R.id.checkbox_open_now);
+        checkboxOpenNow.setChecked(false);
+        checkboxOpenNow.setVisibility(View.GONE);
 
-        // Set values for the stars spinner (1 to 5)
-        ArrayAdapter<Integer> starAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, Arrays.asList(1, 2, 3, 4, 5));
+        List<String> starOptions = new ArrayList<>();
+        starOptions.add("Any");
+        starOptions.addAll(Arrays.asList("1", "2", "3", "4", "5"));
+        ArrayAdapter<String> starAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, starOptions);
         starAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerStars.setAdapter(starAdapter);
 
@@ -60,7 +65,7 @@ public class FiltersActivity extends BaseActivity {
         seekBarDistance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                distanceValue.setText(progress + " km");
+                distanceValue.setText(formatDistance(progress));
             }
 
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -69,20 +74,18 @@ public class FiltersActivity extends BaseActivity {
 
         // Restore filters from SharedPreferences
         String savedCuisine = prefs.getString("cuisine", "Any");
-        if (savedCuisine != null) {
-            int cuisinePos = adapter.getPosition(savedCuisine.isEmpty() ? "Any" : savedCuisine);
-            if (cuisinePos >= 0) spinnerCuisine.setSelection(cuisinePos);
-        }
+        int cuisinePos = adapter.getPosition(savedCuisine.isEmpty() ? "Any" : savedCuisine);
+        if (cuisinePos >= 0) spinnerCuisine.setSelection(cuisinePos);
         seekBarDistance.setProgress(prefs.getInt("distance", 0));
-        distanceValue.setText(prefs.getInt("distance", 0) + " km");
+        distanceValue.setText(formatDistance(prefs.getInt("distance", 0)));
         editLatitude.setText(prefs.getString("latitude", ""));
         editLongitude.setText(prefs.getString("longitude", ""));
-        spinnerStars.setSelection(prefs.getInt("stars", 0));
+        spinnerStars.setSelection(prefs.getInt("starsPosition", 0));
         int priceIndex = prefs.getInt("price", -1);
         if (priceIndex != -1 && priceIndex < radioPrice.getChildCount()) {
             radioPrice.check(radioPrice.getChildAt(priceIndex).getId());
         }
-        checkboxOpenNow.setChecked(prefs.getBoolean("openNow", false));
+        checkboxOpenNow.setChecked(false);
 
         // Collect filter data and start MainActivity with extras
         Button applyButton = findViewById(R.id.button_apply_filters);
@@ -97,9 +100,7 @@ public class FiltersActivity extends BaseActivity {
 
             int stars = 0;
             Object selectedStar = spinnerStars.getSelectedItem();
-            if (selectedStar instanceof Integer) {
-                stars = (Integer) selectedStar;
-            } else if (selectedStar != null) {
+            if (selectedStar != null && !"Any".equalsIgnoreCase(selectedStar.toString())) {
                 try {
                     stars = Integer.parseInt(selectedStar.toString());
                 } catch (NumberFormatException e) {
@@ -113,8 +114,6 @@ public class FiltersActivity extends BaseActivity {
                 RadioButton selectedPrice = findViewById(priceId);
                 price = selectedPrice != null ? selectedPrice.getText().toString() : "";
             }
-            boolean openNow = checkboxOpenNow != null && checkboxOpenNow.isChecked();
-
             Intent intent = new Intent(FiltersActivity.this, MainActivity.class);
             intent.putExtra("FILTER_CUISINE", cuisine);
             intent.putExtra("FILTER_DISTANCE", distance);
@@ -122,20 +121,25 @@ public class FiltersActivity extends BaseActivity {
             intent.putExtra("FILTER_LONGITUDE", longitude);
             intent.putExtra("FILTER_STARS", stars);
             intent.putExtra("FILTER_PRICE", price);
-            intent.putExtra("FILTER_OPEN_NOW", openNow);
 
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("cuisine", cuisine);
             editor.putInt("distance", distance);
             editor.putString("latitude", latitude);
             editor.putString("longitude", longitude);
-            editor.putInt("stars", spinnerStars.getSelectedItemPosition());
+            editor.putInt("stars", stars);
+            editor.putInt("starsPosition", spinnerStars.getSelectedItemPosition());
             editor.putInt("price", radioPrice.indexOfChild(findViewById(priceId)));
-            editor.putBoolean("openNow", openNow);
+            editor.putString("priceValue", price);
+            editor.putBoolean("openNow", false);
             editor.apply();
 
             startActivity(intent);
             finish();
         });
+    }
+
+    private String formatDistance(int distance) {
+        return distance + " km";
     }
 }

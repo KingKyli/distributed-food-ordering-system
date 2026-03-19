@@ -3,7 +3,9 @@ package com.example.restaurantapp;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-class Product {
+import java.util.Objects;
+
+public class Product {
     private String productName;
     private String productType;
     private int availableAmount;
@@ -59,8 +61,11 @@ class Product {
         String type = obj.optString("ProductType", "Unknown");
         int amount = obj.optInt("AvailableAmount", 0);
         double price = obj.getDouble("Price");
+        boolean active = obj.optBoolean("IsActive", true);
 
-        return new Product(name, type, amount, price);
+        Product product = new Product(name, type, amount, price);
+        product.setActive(active);
+        return product;
     }
 
 
@@ -71,7 +76,16 @@ class Product {
         json.put("ProductType", this.productType);
         json.put("AvailableAmount", this.availableAmount);
         json.put("Price", this.price);
+        json.put("IsActive", this.isActive);
         return json;
+    }
+
+    public String getStableKey() {
+        return normalize(productName) + "::" + normalize(productType);
+    }
+
+    private static String normalize(String value) {
+        return value == null ? "" : value.trim().toLowerCase();
     }
 
 
@@ -85,5 +99,19 @@ class Product {
                 ", active=" + isActive +
                 ", sold=" + unitsSold +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Objects.equals(productName, product.productName)
+                && Objects.equals(productType, product.productType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(productName, productType);
     }
 }
