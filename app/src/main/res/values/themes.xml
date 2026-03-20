@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme with Material Design 3 -->
-    <style name="Theme.RestaurantApp" parent="Theme.Material3.Light.NoActionBar">
+    <style name="Theme.RestaurantApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color - Food Red -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/primary_variant</item>

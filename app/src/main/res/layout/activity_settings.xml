@@ -92,16 +92,16 @@
             android:inputType="number"
             android:singleLine="true" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_save_server"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="52dp"
             android:layout_marginBottom="8dp"
-            android:backgroundTint="#D32F2F"
-            android:text="Save Server Settings"
+            android:text="Save &amp; Reconnect"
             android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="12dp" />
 
         <TextView
             android:id="@+id/tv_server_status"
