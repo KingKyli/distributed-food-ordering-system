@@ -11,6 +11,28 @@ import java.net.Socket;
 import java.util.Locale;
 import android.util.Log;
 
+/**
+ * Handles all socket-level communication with the distributed-systems Master node.
+ *
+ * <h3>Protocol design rationale</h3>
+ * <p>Commands are encoded as plain colon-separated strings
+ * (e.g. {@code SEARCH:lat:lon:cuisine:stars:price}, {@code BUY:store:product:qty}).
+ * This is a <em>deliberate design choice</em> dictated by the distributed-systems
+ * assignment specification: the Master and Worker nodes share the same lightweight
+ * text protocol, so the Android client must speak the same format to interoperate
+ * without an intermediary translation layer.
+ *
+ * <p>In a production context one would replace this with a proper REST/gRPC API and
+ * structured payloads; however, for the assignment's client-server-worker topology
+ * the raw-socket approach allows direct end-to-end validation of the full pipeline.
+ *
+ * <h3>Resilience</h3>
+ * <ul>
+ *   <li>A 5 s connect + read timeout prevents the UI thread from blocking indefinitely.</li>
+ *   <li>{@link #sendRequestAndGetResponse} transparently reconnects and retries once
+ *       on a broken connection before surfacing an error.</li>
+ * </ul>
+ */
 public class MasterCommunicator {
 
     private String masterIp;

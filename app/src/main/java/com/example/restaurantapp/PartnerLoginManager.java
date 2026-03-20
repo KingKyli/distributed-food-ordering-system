@@ -1,71 +1,44 @@
 package com.example.restaurantapp;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Log;
-import android.widget.Toast;
-import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Map;
 
-public class PartnerLoginManager {
-    private static volatile PartnerLoginManager instance;
-    private final Map<String, String> storePasswords = new HashMap<>();
-    private MasterCommunicator communicator;
-    private SharedPreferences sharedPreferences;
-    private static final String PREFS_NAME = "partner_passwords";
-
+/**
+ * @deprecated This class was an early prototype that generated store passwords client-side
+ * and persisted them in SharedPreferences — a design that is inherently insecure and
+ * unsuitable for any real deployment.
+ *
+ * <p><strong>It is fully superseded by the server-driven access-code flow:</strong>
+ * <ol>
+ *   <li>Partner taps "Request access code" in {@link PartnerLoginActivity}.</li>
+ *   <li>{@link PartnerAuthService#requestAccessCode(String)} sends
+ *       {@code REQUEST_PARTNER_ACCESS_CODE:<storeName>} over the socket.</li>
+ *   <li>The master server responds with a one-time {@code CODE_SENT:<dest>:<code>:<ttl>}
+ *       message; the code is shown in the UI hint only for demo environments.</li>
+ *   <li>The partner submits the code via {@code PARTNER_LOGIN:<storeName>:<code>},
+ *       and the server validates it server-side.</li>
+ * </ol>
+ *
+ * <p>No password is ever generated, stored, or visible on the client.
+ * This class is retained as an empty stub so that any stale build references compile;
+ * it must not be instantiated or called.
+ */
+@Deprecated
+public final class PartnerLoginManager {
     private PartnerLoginManager() {
+        throw new UnsupportedOperationException(
+                "PartnerLoginManager is deprecated. Use PartnerAuthService instead.");
     }
 
+    /** @deprecated Use {@link PartnerAuthService#requestAccessCode(String)}. */
+    @Deprecated
     public static PartnerLoginManager getInstance() {
-        if (instance == null) {
-            synchronized (PartnerLoginManager.class) {
-                if (instance == null) {
-                    instance = new PartnerLoginManager();
-                }
-            }
-        }
-        return instance;
+        throw new UnsupportedOperationException(
+                "PartnerLoginManager is deprecated. Use PartnerAuthService instead.");
     }
 
+    /** @deprecated No-op stub. Context initialisation is no longer required. */
+    @Deprecated
     public void init(Context context) {
-        if (sharedPreferences == null && context != null) {
-            sharedPreferences = context.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-            // Load all stored passwords into memory
-            Map<String, ?> all = sharedPreferences.getAll();
-            for (Map.Entry<String, ?> entry : all.entrySet()) {
-                storePasswords.put(entry.getKey(), entry.getValue().toString());
-                android.util.Log.d("PartnerLoginManager", "Your Password is: " + entry.getKey());
-                android.util.Log.d("PartnerLoginManager", "Your Password is: " + entry.getValue().toString());
-            }
-        }
-    }
-
-    // Generates a password: storeName + 5 random alphanumeric characters
-    public static String generateStorePassword(String storeName) {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789,.?!@#";
-        SecureRandom random = new SecureRandom();
-        StringBuilder sb = new StringBuilder(storeName);
-        for (int i = 0; i < 5; i++) {
-            sb.append(chars.charAt(random.nextInt(chars.length())));
-        }
-        return sb.toString();
-    }
-
-    public String getOrGeneratePassword(String storeName, Context context) {
-        init(context);
-        if (!storePasswords.containsKey(storeName)) {
-            String password = generateStorePassword(storeName);
-            android.util.Log.d("PartnerLoginManager", "Your Password is: " + password);
-            storePasswords.put(storeName, password);
-            if (sharedPreferences != null) {
-                sharedPreferences.edit().putString(storeName, password).apply();
-            }
-            if (context != null) {
-                Toast.makeText(context, "Password for " + storeName + ": " + password, Toast.LENGTH_LONG).show();
-            }
-        }
-        return storePasswords.get(storeName);
+        // No-op: superseded by server-driven auth.
     }
 }

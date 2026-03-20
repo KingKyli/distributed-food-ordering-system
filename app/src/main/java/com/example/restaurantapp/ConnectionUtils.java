@@ -1,24 +1,29 @@
 package com.example.restaurantapp;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+/**
+ * @deprecated Connection-checking and redirect logic is now handled exclusively by
+ * {@link ActivityUtils#ensureConnectedOrRedirect(AppCompatActivity)}.
+ * This class is kept only for source-level backward compatibility and delegates
+ * its sole method to {@code ActivityUtils}. No new callers should use it.
+ */
+@Deprecated
 public final class ConnectionUtils {
     private ConnectionUtils() {
     }
 
+    /**
+     * @deprecated Use {@link ActivityUtils#ensureConnectedOrRedirect(AppCompatActivity)} instead.
+     */
+    @Deprecated
     public static MasterCommunicator requireConnected(Activity activity) {
-        MasterCommunicator comm = ServerConnection.getInstance();
-        if (comm != null && comm.isConnected()) {
-            return comm;
+        if (!(activity instanceof AppCompatActivity)) {
+            return null;
         }
-
-        Toast.makeText(activity, "Not connected to server. Please connect first.", Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(activity, WelcomeActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        activity.startActivity(intent);
-        activity.finish();
-        return null;
+        boolean ready = ActivityUtils.ensureConnectedOrRedirect((AppCompatActivity) activity);
+        return ready ? ServerConnection.getInstance() : null;
     }
 }

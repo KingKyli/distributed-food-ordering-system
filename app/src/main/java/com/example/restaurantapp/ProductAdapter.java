@@ -3,21 +3,25 @@ package com.example.restaurantapp;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ImageView; // <-- Add this import
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import org.json.JSONObject;
+
 import java.util.List;
-import org.json.JSONException;
 import java.util.Locale;
 
+/**
+ * Displays a list of {@link Product} objects on the restaurant detail screen.
+ * Operates entirely on typed model objects — no raw JSON parsing in the UI layer.
+ */
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
-    private final List<JSONObject> products;
+    private final List<Product> products;
     private final String storeName;
-    public ProductAdapter(List<JSONObject> products, String storeName) {
+
+    public ProductAdapter(List<Product> products, String storeName) {
         this.products = products;
         this.storeName = storeName;
         setHasStableIds(true);
@@ -25,14 +29,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public long getItemId(int position) {
-        JSONObject productJson = products.get(position);
-        if (productJson == null) {
-            return 0;
-        }
-        String name = productJson.optString("ProductName", "");
-        String type = productJson.optString("ProductType", "");
-        String stable = (name + "::" + type).trim().toLowerCase(Locale.ROOT);
-        return stable.hashCode();
+        Product product = products.get(position);
+        return product == null ? 0 : product.getStableKey().hashCode();
     }
 
     @NonNull
@@ -45,30 +43,18 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-        JSONObject productJson = products.get(position);
-        try {
-            holder.tvProductName.setText(productJson.getString("ProductName"));
-            holder.tvProductType.setText(productJson.getString("ProductType"));
-            holder.tvProductPrice.setText("€" + productJson.getDouble("Price"));
-
-            holder.ivProductCart.setOnClickListener(v -> {
-                try {
-                    Product product = Product.fromJson(productJson);
-                    boolean added = Basket.getInstance().addProduct(product, storeName);
-                    if (!added) {
-                        Toast.makeText(holder.itemView.getContext(), "You can only add products from one store at a time.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(holder.itemView.getContext(), "Added to basket", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    Toast.makeText(holder.itemView.getContext(), "Failed to add product to basket", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } catch (JSONException e) {
-            holder.tvProductName.setText("-");
-            holder.tvProductType.setText("");
-            holder.tvProductPrice.setText("");
-        }
+        Product product = products.get(position);
+        holder.tvProductName.setText(product.getProductName());
+        holder.tvProductType.setText(product.getProductType());
+        holder.tvProductPrice.setText(
+                String.format(Locale.getDefault(), "\u20ac%.2f", product.getPrice()));
+        holder.ivProductCart.setOnClickListener(v -> {
+            boolean added = Basket.getInstance().addProduct(product, storeName);
+            String msg = added
+                    ? holder.itemView.getContext().getString(R.string.product_added_to_basket)
+                    : holder.itemView.getContext().getString(R.string.product_single_store_warning);
+            Toast.makeText(holder.itemView.getContext(), msg, Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override
@@ -78,7 +64,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     static class ProductViewHolder extends RecyclerView.ViewHolder {
         TextView tvProductName, tvProductType, tvProductPrice;
-        ImageView ivProductCart; // <-- Make sure this is ImageView
+        ImageView ivProductCart;
+
         ProductViewHolder(@NonNull View itemView) {
             super(itemView);
             tvProductName = itemView.findViewById(R.id.tvProductName);

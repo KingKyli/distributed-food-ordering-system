@@ -34,6 +34,9 @@ Code expires in %3$d minutes.</string>
     <string name="home_popular_title">Popular near you</string>
     <string name="home_popular_subtitle">Rated stores and quick meal options</string>
     <string name="home_no_restaurants_content_description">No restaurants</string>
+    <string name="product_added_to_basket">Added to basket</string>
+    <string name="product_single_store_warning">You can only add products from one store at a time.</string>
+
     <string name="home_clear_all_filters">Clear all</string>
     <string name="home_retry">Try again</string>
     <string name="home_search_recent_label">Recent:</string>
