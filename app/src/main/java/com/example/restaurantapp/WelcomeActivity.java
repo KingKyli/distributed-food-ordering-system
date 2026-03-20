@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.widget.Button;
+import com.google.android.material.button.MaterialButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -19,8 +19,8 @@ public class WelcomeActivity extends AppCompatActivity {
     private static final String PREFS_SERVER = "server_config";
     private static final String KEY_IP = "server_ip";
     private static final String KEY_PORT = "server_port";
-    // 127.0.0.1      = localhost → used with "adb reverse tcp:8765 tcp:8765" (USB cable)
-    // 10.0.2.2       = emulator → host machine
+    // 127.0.0.1      = localhost â†’ used with "adb reverse tcp:8765 tcp:8765" (USB cable)
+    // 10.0.2.2       = emulator â†’ host machine
     // 10.0.4.30      = PC on current network
     // 10.4.34.139    = PC on current network (alternate adapter)
     // 192.168.56.1   = VirtualBox host-only
@@ -36,9 +36,9 @@ public class WelcomeActivity extends AppCompatActivity {
             "192.168.0.1"
     );
 
-    private Button btnCustomerFlow;
-    private Button btnPartnerFlow;
-    private Button btnRetryConnection;
+    private MaterialButton btnCustomerFlow;
+    private MaterialButton btnPartnerFlow;
+    private MaterialButton btnRetryConnection;
     private ProgressBar progressConnection;
     private TextView tvConnectionStatus;
 
@@ -108,7 +108,7 @@ public class WelcomeActivity extends AppCompatActivity {
             ActivityUtils.runOnUiThreadIfAlive(this, () -> {
                 if (finalConnected) {
                     updateConnectionUi(true,
-                            "✓ Connected to " + finalSuccessfulIp + ":" + finalPort + "\nChoose how to continue.",
+                            "âœ“ Connected to " + finalSuccessfulIp + ":" + finalPort + "\nChoose how to continue.",
                             false, false);
                 } else {
                     updateConnectionUi(false,
@@ -116,10 +116,10 @@ public class WelcomeActivity extends AppCompatActivity {
                             "1. Make sure MockServer is running on your PC:\n" +
                             "   java MockServer\n\n" +
                             "2. For physical device, go to:\n" +
-                            "   Settings → Server Configuration\n" +
+                            "   Settings â†’ Server Configuration\n" +
                             "   and enter your PC's IP:\n" +
-                            "   • 10.0.4.30\n" +
-                            "   • 10.4.34.139\n\n" +
+                            "   â€¢ 10.0.4.30\n" +
+                            "   â€¢ 10.4.34.139\n\n" +
                             "3. Make sure phone & PC are on the same WiFi.",
                             false, true);
                 }
@@ -149,3 +149,4 @@ public class WelcomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 }
+

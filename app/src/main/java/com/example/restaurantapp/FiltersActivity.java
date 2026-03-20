@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
+import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -88,7 +89,7 @@ public class FiltersActivity extends BaseActivity {
         checkboxOpenNow.setChecked(false);
 
         // Collect filter data and start MainActivity with extras
-        Button applyButton = findViewById(R.id.button_apply_filters);
+        MaterialButton applyButton = findViewById(R.id.button_apply_filters);
         applyButton.setOnClickListener(v -> {
             String cuisine = spinnerCuisine.getSelectedItem() != null ? spinnerCuisine.getSelectedItem().toString() : "";
             if ("Any".equalsIgnoreCase(cuisine)) {

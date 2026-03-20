@@ -1,4 +1,3 @@
-// src/main/java/com/example/restaurantapp/Basket.java
 package com.example.restaurantapp;
 
 import java.util.ArrayList;

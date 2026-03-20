@@ -1,7 +1,7 @@
 package com.example.restaurantapp;
 
 import android.os.Bundle;
-import android.widget.Button;
+import com.google.android.material.button.MaterialButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class AddProductActivity extends AppCompatActivity {
 
     private EditText inputName, inputType, inputPrice, inputQuantity;
-    private Button btnAddProduct;
+    private MaterialButton btnAddProduct;
     private volatile boolean activityActive;
     private final ProductManagementService productManagementService = new ProductManagementService();
 
@@ -91,4 +91,5 @@ public class AddProductActivity extends AppCompatActivity {
         super.onDestroy();
     }
 }
+
 

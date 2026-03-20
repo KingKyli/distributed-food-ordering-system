@@ -1,8 +1,7 @@
-// src/main/java/com/example/restaurantapp/BasketActivity.java
 package com.example.restaurantapp;
 
 import android.os.Bundle;
-import android.widget.Button;
+import com.google.android.material.button.MaterialButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,7 +19,7 @@ public class BasketActivity extends AppCompatActivity {
     private TextView tvBasketStore;
     private TextView tvBasketTotal;
     private TextView tvBasketStatus;
-    private Button btnBuy;
+    private MaterialButton btnBuy;
     private ProgressBar progressBasket;
     private volatile boolean activityActive;
     private final OrderService orderService = new OrderService();
@@ -93,7 +92,7 @@ public class BasketActivity extends AppCompatActivity {
         tvBasketStore.setText(storeName == null || storeName.trim().isEmpty()
                 ? "No store selected"
                 : "Store: " + storeName);
-        tvBasketTotal.setText(String.format(Locale.getDefault(), "Total: €%.2f", Basket.getInstance().getTotalPrice()));
+        tvBasketTotal.setText(String.format(Locale.getDefault(), "Total: \u20AC%.2f", Basket.getInstance().getTotalPrice()));
     }
 
     @Override
@@ -134,4 +133,5 @@ public class BasketActivity extends AppCompatActivity {
         tvBasketStatus.setVisibility(android.view.View.VISIBLE);
     }
 }
+
 

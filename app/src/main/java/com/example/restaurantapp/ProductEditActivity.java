@@ -1,7 +1,7 @@
 package com.example.restaurantapp;
 
 import android.os.Bundle;
-import android.widget.Button;
+import com.google.android.material.button.MaterialButton;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -38,7 +38,7 @@ public class ProductEditActivity extends AppCompatActivity {
         checkboxActive.setChecked(true);
         checkboxActive.setEnabled(false);
         checkboxActive.setVisibility(android.view.View.GONE);
-        Button btnSave = findViewById(R.id.btnSave);
+        MaterialButton btnSave = findViewById(R.id.btnSave);
 
         String productJson = getIntent().getStringExtra("product_json");
         if (productJson != null) {
@@ -117,3 +117,4 @@ public class ProductEditActivity extends AppCompatActivity {
         super.onDestroy();
     }
 }
+

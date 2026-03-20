@@ -12,6 +12,8 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -136,7 +138,7 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
 
     static class StoreViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvPrice, tvCategory, tvStars, tvRating;
-        Button btnView;
+        MaterialButton btnView;
 
         public StoreViewHolder(@NonNull View itemView) {
             super(itemView);

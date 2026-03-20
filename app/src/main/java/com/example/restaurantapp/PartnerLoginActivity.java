@@ -18,9 +18,9 @@ public class PartnerLoginActivity extends AppCompatActivity {
 
     private Spinner spinnerStores;
     private EditText etUsername, etPassword;
-    private Button btnLogin;
-    private Button btnRequestAccessCode;
-    private Button btnRetryStores;
+    private MaterialButton btnLogin;
+    private MaterialButton btnRequestAccessCode;
+    private MaterialButton btnRetryStores;
     private ProgressBar progressStores;
     private TextView tvStatus;
     private TextView tvPasswordHint;
@@ -318,4 +318,5 @@ public class PartnerLoginActivity extends AppCompatActivity {
         showStatus(message, 0xFFD32F2F);
     }
 }
+
 

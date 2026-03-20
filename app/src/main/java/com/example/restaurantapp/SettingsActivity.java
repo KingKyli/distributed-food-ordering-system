@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
+import com.google.android.material.button.MaterialButton;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Switch;
@@ -24,7 +24,7 @@ public class SettingsActivity extends BaseActivity {
     private Switch switchNotifications;
     private EditText editServerIp;
     private EditText editServerPort;
-    private Button btnSaveServer;
+    private MaterialButton btnSaveServer;
     private TextView tvServerStatus;
 
     @Override
@@ -110,7 +110,7 @@ public class SettingsActivity extends BaseActivity {
         prefs.edit().putString(KEY_IP, ipRaw).putInt(KEY_PORT, port).apply();
 
         btnSaveServer.setEnabled(false);
-        showServerStatus("Connecting to " + ipRaw + ":" + port + "…", false);
+        showServerStatus("Connecting to " + ipRaw + ":" + port + "â€¦", false);
 
         final String ip = ipRaw;
         final int finalPort = port;
@@ -119,11 +119,11 @@ public class SettingsActivity extends BaseActivity {
             ActivityUtils.runOnUiThreadIfAlive(this, () -> {
                 btnSaveServer.setEnabled(true);
                 if (ok) {
-                    showServerStatus("✓ Connected to " + ip + ":" + finalPort, false);
+                    showServerStatus("âœ“ Connected to " + ip + ":" + finalPort, false);
                     Toast.makeText(this, "Connected!", Toast.LENGTH_SHORT).show();
                 } else {
                     String err = ServerConnection.getLastError();
-                    showServerStatus("✗ " + (err != null ? err : "Could not connect"), true);
+                    showServerStatus("âœ— " + (err != null ? err : "Could not connect"), true);
                 }
             });
         }).start();
@@ -136,3 +136,4 @@ public class SettingsActivity extends BaseActivity {
         tvServerStatus.setVisibility(View.VISIBLE);
     }
 }
+
