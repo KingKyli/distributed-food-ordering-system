@@ -40,6 +40,7 @@ public class MainActivity extends BaseActivity {
     private Chip chipPizza;
     private Chip chipBurgers;
     private Chip chipBudget;
+    private Chip chipSaved;
     private final List<Store> baseStoreList = new ArrayList<>();
     private StoreAdapter storeAdapter;
     private volatile boolean activityActive;
@@ -74,6 +75,7 @@ public class MainActivity extends BaseActivity {
         chipPizza = findViewById(R.id.chipPizza);
         chipBurgers = findViewById(R.id.chipBurgers);
         chipBudget = findViewById(R.id.chipBudget);
+        chipSaved = findViewById(R.id.chipSaved);
 
         // Pre-fill search if coming from Order History "Reorder"
         String incomingQuery = getIntent().getStringExtra("SEARCH_QUERY");
@@ -109,6 +111,7 @@ public class MainActivity extends BaseActivity {
         chipPizza.setOnClickListener(quickFilterListener);
         chipBurgers.setOnClickListener(quickFilterListener);
         chipBudget.setOnClickListener(quickFilterListener);
+        chipSaved.setOnClickListener(quickFilterListener);
 
         setLoadingState(true, getString(R.string.home_loading_restaurants));
         loadRestaurants(latitude, longitude, cuisine, stars, price, distance);
@@ -181,7 +184,13 @@ public class MainActivity extends BaseActivity {
         }
 
         if (filteredList.isEmpty()) {
-            showEmptyState(getString(R.string.home_empty_filtered));
+            // Specific message when "Saved" chip is active but no favorites saved
+            if (chipSaved != null && chipSaved.isChecked()
+                    && FavoritesRepository.getFavorites(this).isEmpty()) {
+                showEmptyState("No saved restaurants yet.\nTap ♡ on any restaurant to save it.");
+            } else {
+                showEmptyState(getString(R.string.home_empty_filtered));
+            }
             return;
         }
 
@@ -312,6 +321,13 @@ public class MainActivity extends BaseActivity {
     }
 
     private boolean matchesQuickFilters(Store store) {
+        // Saved / Favorites filter — highest priority
+        if (chipSaved != null && chipSaved.isChecked()) {
+            if (!FavoritesRepository.isFavorite(this, store.getStoreName())) {
+                return false;
+            }
+        }
+
         if (chipTopRated.isChecked() && !hasTopRating(store)) {
             return false;
         }

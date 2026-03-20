@@ -5,12 +5,10 @@ import android.os.Bundle;
 import android.graphics.Color;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.restaurantapp.MainActivity;
-import com.example.restaurantapp.FiltersActivity;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    protected abstract String getBottomNavType();  // "home" or "bookings"
+    protected abstract String getBottomNavType();  // "home", "filters", "orders", "settings"
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,15 +19,19 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void setupBottomNav() {
         TextView navHome = findViewById(R.id.nav_home);
         TextView navFilters = findViewById(R.id.nav_filters);
+        TextView navOrders = findViewById(R.id.nav_orders);
         TextView navSettings = findViewById(R.id.nav_settings);
         // Highlight the current section
         String type = getBottomNavType();
+        int activeColor = Color.parseColor("#726EFF"); // primary color
         if ("home".equals(type)) {
-            navHome.setTextColor(Color.parseColor("#726EFF"));
+            navHome.setTextColor(activeColor);
         } else if ("filters".equals(type)) {
-            navFilters.setTextColor(Color.parseColor("#726EFF"));
-        }else if ("settings".equals(type)) {
-            navSettings.setTextColor(Color.parseColor("#726EFF"));
+            navFilters.setTextColor(activeColor);
+        } else if ("orders".equals(type)) {
+            navOrders.setTextColor(activeColor);
+        } else if ("settings".equals(type)) {
+            navSettings.setTextColor(activeColor);
         }
 
         navHome.setOnClickListener(v -> {
@@ -45,6 +47,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                 finish();
             }
         });
+        navOrders.setOnClickListener(v ->
+                startActivity(new Intent(this, OrderHistoryActivity.class)));
         navSettings.setOnClickListener(v -> {
             if (!(this instanceof SettingsActivity)) {
                 startActivity(new Intent(this, SettingsActivity.class));

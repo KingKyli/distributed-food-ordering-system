@@ -7,9 +7,9 @@
     android:background="@drawable/bottom_nav_background"
     android:gravity="center"
     android:orientation="horizontal"
-    android:paddingStart="12dp"
+    android:paddingStart="8dp"
     android:paddingTop="8dp"
-    android:paddingEnd="12dp"
+    android:paddingEnd="8dp"
     android:paddingBottom="10dp">
 
     <TextView
@@ -20,9 +20,9 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
-        android:text="⌂\nHome"
+        android:text="&#x2302;\nHome"
         android:textColor="#9E9E9E"
-        android:textSize="13sp"
+        android:textSize="12sp"
         android:textStyle="bold" />
 
     <TextView
@@ -33,9 +33,22 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
-        android:text="◫\nDiscover"
+        android:text="&#x25A6;\nDiscover"
         android:textColor="#9E9E9E"
-        android:textSize="13sp"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/nav_orders"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:text="&#x23F3;\nOrders"
+        android:textColor="#9E9E9E"
+        android:textSize="12sp"
         android:textStyle="bold" />
 
     <TextView
@@ -46,8 +59,8 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
-        android:text="⚙\nProfile"
+        android:text="&#x2699;\nProfile"
         android:textColor="#9E9E9E"
-        android:textSize="13sp"
+        android:textSize="12sp"
         android:textStyle="bold" />
 </LinearLayout>
