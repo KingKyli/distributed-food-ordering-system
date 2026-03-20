@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ── Backgrounds ── -->
+    <color name="background">#121212</color>
+    <color name="surface">#1E1E1E</color>
+    <color name="surface_variant">#2C2C2C</color>
+    <color name="card_background">#1E1E1E</color>
+
+    <!-- ── Text ── -->
+    <color name="text_primary">#EEEEEE</color>
+    <color name="text_secondary">#AAAAAA</color>
+    <color name="text_hint">#757575</color>
+
+    <!-- ── Borders / Dividers ── -->
+    <color name="divider">#3D3D3D</color>
+    <color name="border">#555555</color>
+
+    <!-- ── Chip / Filter states ── -->
+    <color name="featured_filter_selected_background">#3D1F0E</color>
+    <color name="featured_filter_default_background">#2C2C2C</color>
+    <color name="featured_filter_default_stroke">#3D3D3D</color>
+
+    <!-- ── Icon / Tag backgrounds ── -->
+    <color name="chip_icon_bg">#3D2008</color>
+
+    <!-- ── Status ── -->
+    <color name="success_light">#1B4332</color>
+    <color name="error_light">#4A1010</color>
+    <color name="warning_light">#3D2800</color>
+</resources>
+
