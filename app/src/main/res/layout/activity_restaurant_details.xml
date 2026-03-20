@@ -85,8 +85,9 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:id="@+id/tvPrice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:background="@drawable/chip_background_neutral"
                             android:paddingHorizontal="12dp"
