@@ -19,10 +19,19 @@ public class WelcomeActivity extends AppCompatActivity {
     private static final String PREFS_SERVER = "server_config";
     private static final String KEY_IP = "server_ip";
     private static final String KEY_PORT = "server_port";
+    // 127.0.0.1      = localhost → used with "adb reverse tcp:8765 tcp:8765" (USB cable)
+    // 10.0.2.2       = emulator → host machine
+    // 10.0.4.30      = PC on current network
+    // 10.4.34.139    = PC on current network (alternate adapter)
+    // 192.168.56.1   = VirtualBox host-only
+    // 172.20.10.x    = iPhone hotspot range
     private static final List<String> SERVER_IP_FALLBACKS = Arrays.asList(
+            "127.0.0.1",
             "10.0.2.2",
-            "172.20.10.3",
+            "10.0.4.30",
+            "10.4.34.139",
             "192.168.56.1",
+            "172.20.10.3",
             "192.168.1.1",
             "192.168.0.1"
     );
@@ -104,10 +113,14 @@ public class WelcomeActivity extends AppCompatActivity {
                 } else {
                     updateConnectionUi(false,
                             "Could not connect to server on port " + DEFAULT_SERVER_PORT + ".\n\n" +
-                            "Make sure the mock server is running on your PC:\n" +
-                            "  java MockServer\n\n" +
-                            "Emulator address: 10.0.2.2:" + DEFAULT_SERVER_PORT + "\n" +
-                            "Physical device: set your PC's IP in Settings.",
+                            "1. Make sure MockServer is running on your PC:\n" +
+                            "   java MockServer\n\n" +
+                            "2. For physical device, go to:\n" +
+                            "   Settings → Server Configuration\n" +
+                            "   and enter your PC's IP:\n" +
+                            "   • 10.0.4.30\n" +
+                            "   • 10.4.34.139\n\n" +
+                            "3. Make sure phone & PC are on the same WiFi.",
                             false, true);
                 }
             });
