@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.app.AlertDialog;
+import com.google.android.material.snackbar.Snackbar;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,18 +52,28 @@ public class BasketAdapter extends RecyclerView.Adapter<BasketAdapter.BasketView
             basketActivity.notifyBasketChanged();
         });
         holder.ivMinus.setOnClickListener(v -> {
-            if (quantity > 1) {
+            if (item.getQuantity() > 1) {
                 Basket.getInstance().removeProductById(item.getStableId());
                 basketActivity.notifyBasketChanged();
-            } else if (quantity == 1) {
-                new AlertDialog.Builder(holder.itemView.getContext())
-                        .setTitle("Remove Item")
-                        .setMessage("Are you sure you want to remove this item from the basket?")
-                        .setPositiveButton("Yes", (dialog, which) -> {
-                            Basket.getInstance().removeProductById(item.getStableId());
+            } else {
+                // Snapshot before removal for undo
+                String removedName = item.getProductName();
+                String removedType = item.getProductType();
+                double removedPrice = item.getUnitPrice();
+                String removedStore = item.getStoreName();
+
+                Basket.getInstance().removeProductById(item.getStableId());
+                basketActivity.notifyBasketChanged();
+
+                View anchor = basketActivity.findViewById(android.R.id.content);
+                Snackbar.make(anchor,
+                        basketActivity.getString(R.string.basket_item_removed),
+                        Snackbar.LENGTH_LONG)
+                        .setAction(basketActivity.getString(R.string.common_undo), u -> {
+                            Product restored = new Product(removedName, removedType, 1, removedPrice);
+                            Basket.getInstance().addProduct(restored, removedStore);
                             basketActivity.notifyBasketChanged();
                         })
-                        .setNegativeButton("No", null)
                         .show();
             }
         });

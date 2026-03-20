@@ -34,6 +34,21 @@ Code expires in %3$d minutes.</string>
     <string name="home_popular_title">Popular near you</string>
     <string name="home_popular_subtitle">Rated stores and quick meal options</string>
     <string name="home_no_restaurants_content_description">No restaurants</string>
+    <string name="home_clear_all_filters">Clear all</string>
+    <string name="home_retry">Try again</string>
+    <string name="home_search_recent_label">Recent:</string>
+
+    <string name="basket_subtotal_label">Subtotal</string>
+    <string name="basket_delivery_fee_label">Delivery fee</string>
+    <string name="basket_delivery_fee_value">€1.99</string>
+    <string name="basket_total_label">Total</string>
+    <string name="basket_item_removed">Item removed</string>
+    <string name="common_undo">Undo</string>
+    <string name="basket_clear_title">Clear basket?</string>
+    <string name="basket_clear_message">Remove all items from your basket?</string>
+    <string name="basket_clear_confirm">Clear</string>
+    <string name="basket_clear_content_description">Clear basket</string>
+
     <string-array name="cuisine_options">
         <item>Any</item>
         <item>Greek</item>

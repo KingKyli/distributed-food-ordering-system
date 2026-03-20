@@ -3,10 +3,12 @@ package com.example.restaurantapp;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,12 +20,15 @@ public class BasketActivity extends AppCompatActivity {
     private BasketAdapter basketAdapter;
     private TextView tvItemCount;
     private TextView tvBasketStore;
+    private TextView tvSubtotal;
     private TextView tvBasketTotal;
     private TextView tvBasketStatus;
     private Button btnBuy;
     private ProgressBar progressBasket;
     private volatile boolean activityActive;
     private final OrderService orderService = new OrderService();
+
+    private static final double DELIVERY_FEE = 1.99;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +43,7 @@ public class BasketActivity extends AppCompatActivity {
 
         tvItemCount = findViewById(R.id.tvItemCount);
         tvBasketStore = findViewById(R.id.tvBasketStore);
+        tvSubtotal = findViewById(R.id.tvSubtotal);
         tvBasketTotal = findViewById(R.id.tvBasketTotal);
         tvBasketStatus = findViewById(R.id.tvBasketStatus);
         progressBasket = findViewById(R.id.progressBasket);
@@ -49,6 +55,10 @@ public class BasketActivity extends AppCompatActivity {
 
         btnBuy = findViewById(R.id.btnBuy);
         btnBuy.setOnClickListener(v -> performBuy());
+
+        ImageButton btnClearBasket = findViewById(R.id.btnClearBasket);
+        btnClearBasket.setOnClickListener(v -> confirmClearBasket());
+
         refreshBasketState();
     }
 
@@ -93,7 +103,11 @@ public class BasketActivity extends AppCompatActivity {
         tvBasketStore.setText(storeName == null || storeName.trim().isEmpty()
                 ? "No store selected"
                 : "Store: " + storeName);
-        tvBasketTotal.setText(String.format(Locale.getDefault(), "Total: €%.2f", Basket.getInstance().getTotalPrice()));
+        double subtotal = Basket.getInstance().getTotalPrice();
+        boolean hasItems = !Basket.getInstance().isEmpty();
+        tvSubtotal.setText(String.format(Locale.getDefault(), "\u20ac%.2f", subtotal));
+        double total = hasItems ? subtotal + DELIVERY_FEE : 0.0;
+        tvBasketTotal.setText(String.format(Locale.getDefault(), "\u20ac%.2f", total));
     }
 
     @Override
@@ -121,6 +135,19 @@ public class BasketActivity extends AppCompatActivity {
         } else {
             tvBasketStatus.setVisibility(android.view.View.GONE);
         }
+    }
+
+    private void confirmClearBasket() {
+        if (Basket.getInstance().isEmpty()) return;
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.basket_clear_title))
+                .setMessage(getString(R.string.basket_clear_message))
+                .setPositiveButton(getString(R.string.basket_clear_confirm), (dialog, which) -> {
+                    Basket.getInstance().clear();
+                    notifyBasketChanged();
+                })
+                .setNegativeButton(getString(R.string.common_cancel), null)
+                .show();
     }
 
     private void setPurchaseLoading(boolean loading) {

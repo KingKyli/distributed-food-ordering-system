@@ -7,16 +7,23 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,21 +35,39 @@ import org.json.JSONObject;
 
 public class MainActivity extends BaseActivity {
 
+    private static final String PREFS_SEARCH = "search_prefs";
+    private static final String KEY_RECENT_SEARCHES = "recent_searches";
+    private static final int MAX_RECENT_SEARCHES = 3;
+
     private RecyclerView rvRestaurants;
     private View emptyStateContainer;
     private TextView tvNoFilters;
     private TextView tvMainStatus;
     private ProgressBar progressRestaurants;
+    private LinearLayout skeletonContainer;
     private EditText etSearch;
     private ImageButton btnBasket;
+    private ImageButton btnClearSearch;
     private Chip chipTopRated;
     private Chip chipPizza;
     private Chip chipBurgers;
     private Chip chipBudget;
+    private Chip chipClearAll;
+    private View recentSearchesScroll;
+    private ChipGroup recentSearchesGroup;
+    private MaterialButton btnRetry;
     private final List<Store> baseStoreList = new ArrayList<>();
     private StoreAdapter storeAdapter;
     private volatile boolean activityActive;
     private final RestaurantRepository restaurantRepository = new RestaurantRepository();
+
+    // Saved load params for retry
+    private String lastLatitude = "";
+    private String lastLongitude = "";
+    private String lastCuisine = "";
+    private int lastStars = 0;
+    private String lastPrice = "";
+    private int lastDistance = 0;
 
     @Override
     protected String getBottomNavType() {
@@ -66,12 +91,18 @@ public class MainActivity extends BaseActivity {
         tvNoFilters = findViewById(R.id.tvNoFilters);
         tvMainStatus = findViewById(R.id.tvMainStatus);
         progressRestaurants = findViewById(R.id.progressRestaurants);
+        skeletonContainer = findViewById(R.id.skeletonContainer);
         etSearch = findViewById(R.id.etSearch);
         btnBasket = findViewById(R.id.btnBasket);
+        btnClearSearch = findViewById(R.id.btnClearSearch);
         chipTopRated = findViewById(R.id.chipTopRated);
         chipPizza = findViewById(R.id.chipPizza);
         chipBurgers = findViewById(R.id.chipBurgers);
         chipBudget = findViewById(R.id.chipBudget);
+        chipClearAll = findViewById(R.id.chipClearAll);
+        recentSearchesScroll = findViewById(R.id.recentSearchesScroll);
+        recentSearchesGroup = findViewById(R.id.recentSearchesGroup);
+        btnRetry = findViewById(R.id.btnRetry);
 
         rvRestaurants.setLayoutManager(new LinearLayoutManager(this));
         storeAdapter = new StoreAdapter(this, new ArrayList<>());
@@ -96,11 +127,32 @@ public class MainActivity extends BaseActivity {
         String price = intent.hasExtra("FILTER_PRICE") ?
                 intent.getStringExtra("FILTER_PRICE") : prefs.getString("priceValue", "");
 
-        View.OnClickListener quickFilterListener = v -> applyVisibleFilters();
+        View.OnClickListener quickFilterListener = v -> {
+            applyVisibleFilters();
+            updateClearAllVisibility();
+        };
         chipTopRated.setOnClickListener(quickFilterListener);
         chipPizza.setOnClickListener(quickFilterListener);
         chipBurgers.setOnClickListener(quickFilterListener);
         chipBudget.setOnClickListener(quickFilterListener);
+
+        chipClearAll.setOnClickListener(v -> {
+            chipTopRated.setChecked(false);
+            chipPizza.setChecked(false);
+            chipBurgers.setChecked(false);
+            chipBudget.setChecked(false);
+            etSearch.setText("");
+            updateClearAllVisibility();
+            applyVisibleFilters();
+        });
+
+        btnClearSearch.setOnClickListener(v -> etSearch.setText(""));
+
+        btnRetry.setOnClickListener(v -> {
+            btnRetry.setVisibility(View.GONE);
+            setLoadingState(true, getString(R.string.home_loading_restaurants));
+            loadRestaurants(lastLatitude, lastLongitude, lastCuisine, lastStars, lastPrice, lastDistance);
+        });
 
         setLoadingState(true, getString(R.string.home_loading_restaurants));
         loadRestaurants(latitude, longitude, cuisine, stars, price, distance);
@@ -111,12 +163,29 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                boolean hasText = s != null && s.length() > 0;
+                btnClearSearch.setVisibility(hasText ? View.VISIBLE : View.GONE);
+                updateClearAllVisibility();
                 applyVisibleFilters();
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
+
+        etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                String query = etSearch.getText() != null ? etSearch.getText().toString().trim() : "";
+                if (!query.isEmpty()) {
+                    saveRecentSearch(query);
+                    refreshRecentSearchesUi();
+                }
+                return true;
+            }
+            return false;
+        });
+
+        refreshRecentSearchesUi();
 
         btnBasket.setOnClickListener(v -> {
             Intent basketIntent = new Intent(this, BasketActivity.class);
@@ -131,6 +200,12 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadRestaurants(String latitude, String longitude, String cuisine, int stars, String price, int distanceKm) {
+        lastLatitude = latitude;
+        lastLongitude = longitude;
+        lastCuisine = cuisine;
+        lastStars = stars;
+        lastPrice = price;
+        lastDistance = distanceKm;
         new Thread(() -> {
             AppResult<List<Store>> result = restaurantRepository.searchStores(latitude, longitude, cuisine, stars, price);
             ActivityUtils.runOnUiThreadIfAlive(this, () -> {
@@ -152,6 +227,59 @@ public class MainActivity extends BaseActivity {
 
     public static List<Store> parseStores(String jsonString) throws JSONException {
         return StoreJsonParser.parseStores(jsonString);
+    }
+
+    private void updateClearAllVisibility() {
+        boolean anyActive = chipTopRated.isChecked() || chipPizza.isChecked()
+                || chipBurgers.isChecked() || chipBudget.isChecked()
+                || (etSearch.getText() != null && etSearch.getText().length() > 0);
+        chipClearAll.setVisibility(anyActive ? View.VISIBLE : View.GONE);
+    }
+
+    private void saveRecentSearch(String query) {
+        if (query == null || query.trim().isEmpty()) return;
+        SharedPreferences prefs = getSharedPreferences(PREFS_SEARCH, MODE_PRIVATE);
+        String existing = prefs.getString(KEY_RECENT_SEARCHES, "");
+        LinkedHashSet<String> set = new LinkedHashSet<>(Arrays.asList(existing.split("\\|")));
+        set.remove(query);           // move to front if already exists
+        set.add(query);
+        List<String> list = new ArrayList<>(set);
+        // Keep only the last MAX_RECENT_SEARCHES entries
+        while (list.size() > MAX_RECENT_SEARCHES) {
+            list.remove(0);
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) sb.append("|");
+            sb.append(list.get(i));
+        }
+        prefs.edit().putString(KEY_RECENT_SEARCHES, sb.toString()).apply();
+    }
+
+    private void refreshRecentSearchesUi() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_SEARCH, MODE_PRIVATE);
+        String existing = prefs.getString(KEY_RECENT_SEARCHES, "");
+        recentSearchesGroup.removeAllViews();
+        if (existing.trim().isEmpty()) {
+            recentSearchesScroll.setVisibility(View.GONE);
+            return;
+        }
+        String[] terms = existing.split("\\|");
+        // Show in reverse so newest appears first
+        for (int i = terms.length - 1; i >= 0; i--) {
+            String term = terms[i].trim();
+            if (term.isEmpty()) continue;
+            Chip chip = new Chip(this);
+            chip.setText(term);
+            chip.setCheckable(false);
+            chip.setTextSize(12f);
+            chip.setOnClickListener(v -> {
+                etSearch.setText(term);
+                etSearch.setSelection(term.length());
+            });
+            recentSearchesGroup.addView(chip);
+        }
+        recentSearchesScroll.setVisibility(View.VISIBLE);
     }
 
     private void applyVisibleFilters() {
@@ -185,6 +313,7 @@ public class MainActivity extends BaseActivity {
         rvRestaurants.setVisibility(View.VISIBLE);
         emptyStateContainer.setVisibility(View.GONE);
         tvMainStatus.setVisibility(View.GONE);
+        btnRetry.setVisibility(View.GONE);
         if (storeAdapter != null) {
             storeAdapter.updateStores(visibleStores);
         }
@@ -193,7 +322,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setLoadingState(boolean loading, String message) {
-        progressRestaurants.setVisibility(loading ? View.VISIBLE : View.GONE);
+        progressRestaurants.setVisibility(View.GONE);
+        skeletonContainer.setVisibility(loading ? View.VISIBLE : View.GONE);
         tvMainStatus.setVisibility(message == null ? View.GONE : View.VISIBLE);
         if (message != null) {
             tvMainStatus.setText(message);
@@ -212,6 +342,7 @@ public class MainActivity extends BaseActivity {
         emptyStateContainer.setVisibility(View.VISIBLE);
         tvMainStatus.setVisibility(View.GONE);
         tvNoFilters.setText(message);
+        btnRetry.setVisibility(View.GONE);
         etSearch.setEnabled(true);
         btnBasket.setEnabled(true);
     }
@@ -221,8 +352,8 @@ public class MainActivity extends BaseActivity {
         rvRestaurants.setVisibility(View.GONE);
         emptyStateContainer.setVisibility(View.VISIBLE);
         tvNoFilters.setText(message);
-        tvMainStatus.setText(message);
-        tvMainStatus.setVisibility(View.VISIBLE);
+        tvMainStatus.setVisibility(View.GONE);
+        btnRetry.setVisibility(View.VISIBLE);
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         etSearch.setEnabled(false);
         btnBasket.setEnabled(true);
