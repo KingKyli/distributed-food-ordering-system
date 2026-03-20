@@ -85,7 +85,13 @@ public class PartnerLoginActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 updateActionButtons(false);
-                tvStatus.setVisibility(View.GONE);
+                // Only hide status if it's NOT the success message from access code request
+                if (tvStatus.getVisibility() == View.VISIBLE) {
+                    String current = tvStatus.getText() != null ? tvStatus.getText().toString() : "";
+                    if (!current.contains("Access code")) {
+                        tvStatus.setVisibility(View.GONE);
+                    }
+                }
             }
 
             @Override
@@ -274,10 +280,18 @@ public class PartnerLoginActivity extends AppCompatActivity {
 
     private void updateActionButtons(boolean loading) {
         boolean hasStoreSelection = spinnerStores.getSelectedItemPosition() > 0;
+        boolean codeRequested = hasRequestedAccessCodeForSelectedStore();
+        boolean hasPassword = hasPasswordInput();
+
         spinnerStores.setEnabled(!loading);
         etPassword.setEnabled(!loading && hasStoreSelection);
         btnRequestAccessCode.setEnabled(!loading && hasStoreSelection);
-        btnLogin.setEnabled(!loading && hasStoreSelection && hasRequestedAccessCodeForSelectedStore() && hasPasswordInput());
+        btnLogin.setEnabled(!loading && hasStoreSelection && codeRequested && hasPassword);
+
+        // Show a subtle step hint when store selected but no code yet
+        if (!loading && hasStoreSelection && !codeRequested && tvStatus.getVisibility() != View.VISIBLE) {
+            showStatus("Step 1: Tap \"Send Access Code\" to receive your login code.", 0xFF1565C0);
+        }
     }
 
     private void showStatus(String message, int color) {
