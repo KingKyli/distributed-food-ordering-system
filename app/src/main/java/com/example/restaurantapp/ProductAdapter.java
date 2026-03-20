@@ -5,19 +5,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ImageView; // <-- Add this import
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import org.json.JSONObject;
+
 import java.util.List;
-import org.json.JSONException;
 import java.util.Locale;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
-    private final List<JSONObject> products;
+
+    private final List<Product> products;
     private final String storeName;
-    public ProductAdapter(List<JSONObject> products, String storeName) {
+
+    public ProductAdapter(List<Product> products, String storeName) {
         this.products = products;
         this.storeName = storeName;
         setHasStableIds(true);
@@ -25,14 +26,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public long getItemId(int position) {
-        JSONObject productJson = products.get(position);
-        if (productJson == null) {
-            return 0;
-        }
-        String name = productJson.optString("ProductName", "");
-        String type = productJson.optString("ProductType", "");
-        String stable = (name + "::" + type).trim().toLowerCase(Locale.ROOT);
-        return stable.hashCode();
+        Product p = products.get(position);
+        if (p == null) return 0;
+        return p.getStableKey().hashCode();
     }
 
     @NonNull
@@ -45,46 +41,57 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-        JSONObject productJson = products.get(position);
-        try {
-            holder.tvProductName.setText(productJson.getString("ProductName"));
-            holder.tvProductType.setText(productJson.getString("ProductType"));
-            holder.tvProductPrice.setText("€" + productJson.getDouble("Price"));
+        Product product = products.get(position);
+        if (product == null) return;
 
-            holder.ivProductCart.setOnClickListener(v -> {
-                try {
-                    Product product = Product.fromJson(productJson);
-                    boolean added = Basket.getInstance().addProduct(product, storeName);
-                    if (!added) {
-                        Toast.makeText(holder.itemView.getContext(), "You can only add products from one store at a time.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(holder.itemView.getContext(), "Added to basket", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    Toast.makeText(holder.itemView.getContext(), "Failed to add product to basket", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } catch (JSONException e) {
-            holder.tvProductName.setText("-");
-            holder.tvProductType.setText("");
-            holder.tvProductPrice.setText("");
+        holder.tvProductName.setText(product.getProductName());
+        holder.tvProductType.setText(product.getProductType());
+        holder.tvProductPrice.setText(String.format(Locale.getDefault(), "€%.2f", product.getPrice()));
+
+        // Show stock badge
+        int stock = product.getAvailableAmount();
+        if (holder.tvProductStock != null) {
+            if (stock <= 0) {
+                holder.tvProductStock.setText("Out of stock");
+                holder.tvProductStock.setTextColor(0xFFD32F2F);
+                holder.ivProductCart.setAlpha(0.4f);
+                holder.ivProductCart.setEnabled(false);
+            } else {
+                holder.tvProductStock.setText(stock + " left");
+                holder.tvProductStock.setTextColor(stock <= 3 ? 0xFFF57C00 : 0xFF2E7D32);
+                holder.ivProductCart.setAlpha(1f);
+                holder.ivProductCart.setEnabled(true);
+            }
         }
+
+        holder.ivProductCart.setOnClickListener(v -> {
+            boolean added = Basket.getInstance().addProduct(product, storeName);
+            if (!added) {
+                Toast.makeText(holder.itemView.getContext(),
+                        "You can only add items from one store at a time.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(holder.itemView.getContext(),
+                        product.getProductName() + " added to basket ✓", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return products.size();
+        return products == null ? 0 : products.size();
     }
 
     static class ProductViewHolder extends RecyclerView.ViewHolder {
-        TextView tvProductName, tvProductType, tvProductPrice;
-        ImageView ivProductCart; // <-- Make sure this is ImageView
+        TextView tvProductName, tvProductType, tvProductPrice, tvProductStock;
+        ImageView ivProductCart;
+
         ProductViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvProductName = itemView.findViewById(R.id.tvProductName);
-            tvProductType = itemView.findViewById(R.id.tvProductType);
+            tvProductName  = itemView.findViewById(R.id.tvProductName);
+            tvProductType  = itemView.findViewById(R.id.tvProductType);
             tvProductPrice = itemView.findViewById(R.id.tvProductPrice);
-            ivProductCart = itemView.findViewById(R.id.ivProductCart);
+            tvProductStock = itemView.findViewById(R.id.tvProductStock);
+            ivProductCart  = itemView.findViewById(R.id.ivProductCart);
         }
     }
 }
