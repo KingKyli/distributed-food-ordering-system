@@ -39,7 +39,7 @@
         <activity android:name=".ManagerConsoleActivity" />
         <activity android:name=".RestaurantDetailsActivity" />
         <activity android:name=".PartnerLoginActivity" />
-        <!-- More activities if needed -->
+        <activity android:name=".OrderHistoryActivity" />
 
     </application>
 </manifest>

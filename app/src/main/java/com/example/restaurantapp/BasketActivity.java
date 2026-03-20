@@ -1,5 +1,6 @@
 package com.example.restaurantapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import com.google.android.material.button.MaterialButton;
 import android.widget.ProgressBar;
@@ -22,7 +23,7 @@ public class BasketActivity extends AppCompatActivity {
     private MaterialButton btnBuy;
     private ProgressBar progressBasket;
     private volatile boolean activityActive;
-    private final OrderService orderService = new OrderService();
+    private OrderService orderService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,7 @@ public class BasketActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_basket);
         activityActive = true;
+        orderService = new OrderService(this);
 
         tvItemCount = findViewById(R.id.tvItemCount);
         tvBasketStore = findViewById(R.id.tvBasketStore);
@@ -48,6 +50,15 @@ public class BasketActivity extends AppCompatActivity {
 
         btnBuy = findViewById(R.id.btnBuy);
         btnBuy.setOnClickListener(v -> performBuy());
+
+        // Order history link
+        TextView tvHistoryLink = findViewById(R.id.tvHistoryLink);
+        if (tvHistoryLink != null) {
+            tvHistoryLink.setPaintFlags(tvHistoryLink.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
+            tvHistoryLink.setOnClickListener(v ->
+                    startActivity(new Intent(this, OrderHistoryActivity.class)));
+        }
+
         refreshBasketState();
     }
 
@@ -133,5 +144,3 @@ public class BasketActivity extends AppCompatActivity {
         tvBasketStatus.setVisibility(android.view.View.VISIBLE);
     }
 }
-
-

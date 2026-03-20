@@ -54,6 +54,9 @@
     <!-- ── Icon / Tag backgrounds ── -->
     <color name="chip_icon_bg">#FFF3E0</color>
 
+    <!-- Skeleton loading placeholder -->
+    <color name="skeleton_bg">#E0E0E0</color>
+
     <!-- Dividers & Borders -->
     <color name="divider">#E0E0E0</color>
     <color name="border">#BDBDBD</color>

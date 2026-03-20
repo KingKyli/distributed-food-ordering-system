@@ -23,6 +23,9 @@
     <!-- ── Icon / Tag backgrounds ── -->
     <color name="chip_icon_bg">#3D2008</color>
 
+    <!-- Skeleton loading placeholder -->
+    <color name="skeleton_bg">#3A3A3A</color>
+
     <!-- ── Status ── -->
     <color name="success_light">#1B4332</color>
     <color name="error_light">#4A1010</color>

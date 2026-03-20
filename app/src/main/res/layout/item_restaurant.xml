@@ -43,6 +43,18 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
+            <!-- Heart / Favourites button -->
+            <ImageView
+                android:id="@+id/ivHeart"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="10dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
+                android:src="@drawable/ic_heart_outline"
+                android:contentDescription="Add to favourites" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

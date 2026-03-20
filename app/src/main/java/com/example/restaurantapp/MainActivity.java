@@ -30,6 +30,7 @@ public class MainActivity extends BaseActivity {
 
     private RecyclerView rvRestaurants;
     private View emptyStateContainer;
+    private View skeletonContainer;
     private TextView tvNoFilters;
     private TextView tvMainStatus;
     private ProgressBar progressRestaurants;
@@ -63,6 +64,7 @@ public class MainActivity extends BaseActivity {
 
         rvRestaurants = findViewById(R.id.rvRestaurants);
         emptyStateContainer = findViewById(R.id.emptyStateContainer);
+        skeletonContainer = findViewById(R.id.skeletonContainer);
         tvNoFilters = findViewById(R.id.tvNoFilters);
         tvMainStatus = findViewById(R.id.tvMainStatus);
         progressRestaurants = findViewById(R.id.progressRestaurants);
@@ -72,6 +74,12 @@ public class MainActivity extends BaseActivity {
         chipPizza = findViewById(R.id.chipPizza);
         chipBurgers = findViewById(R.id.chipBurgers);
         chipBudget = findViewById(R.id.chipBudget);
+
+        // Pre-fill search if coming from Order History "Reorder"
+        String incomingQuery = getIntent().getStringExtra("SEARCH_QUERY");
+        if (incomingQuery != null && !incomingQuery.isEmpty()) {
+            etSearch.setText(incomingQuery);
+        }
 
         rvRestaurants.setLayoutManager(new LinearLayoutManager(this));
         storeAdapter = new StoreAdapter(this, new ArrayList<>());
@@ -193,17 +201,47 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setLoadingState(boolean loading, String message) {
-        progressRestaurants.setVisibility(loading ? View.VISIBLE : View.GONE);
-        tvMainStatus.setVisibility(message == null ? View.GONE : View.VISIBLE);
-        if (message != null) {
-            tvMainStatus.setText(message);
+        progressRestaurants.setVisibility(View.GONE); // always hidden — skeleton replaces it
+
+        if (skeletonContainer != null) {
+            skeletonContainer.setVisibility(loading ? View.VISIBLE : View.GONE);
+            if (loading) {
+                // Pulse animation
+                skeletonContainer.animate().cancel();
+                skeletonContainer.setAlpha(1f);
+                animateSkeleton();
+            } else {
+                skeletonContainer.animate().cancel();
+                skeletonContainer.setAlpha(1f);
+            }
         }
+
+        tvMainStatus.setVisibility(message == null ? View.GONE : View.VISIBLE);
+        if (message != null) tvMainStatus.setText(message);
+
         if (loading) {
             rvRestaurants.setVisibility(View.GONE);
             emptyStateContainer.setVisibility(View.GONE);
         }
         etSearch.setEnabled(!loading);
         btnBasket.setEnabled(!loading);
+    }
+
+    private void animateSkeleton() {
+        if (skeletonContainer == null || skeletonContainer.getVisibility() != View.VISIBLE) return;
+        skeletonContainer.animate()
+                .alpha(0.4f)
+                .setDuration(700)
+                .withEndAction(() -> {
+                    if (skeletonContainer.getVisibility() == View.VISIBLE) {
+                        skeletonContainer.animate()
+                                .alpha(1f)
+                                .setDuration(700)
+                                .withEndAction(this::animateSkeleton)
+                                .start();
+                    }
+                })
+                .start();
     }
 
     private void showEmptyState(String message) {

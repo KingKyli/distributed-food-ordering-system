@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ManagerConsoleActivity extends AppCompatActivity {
 
-    private TextView tvTotalProducts, tvLowStock, tvOutOfStock, tvStoreName;
+    private TextView tvTotalProducts, tvLowStock, tvOutOfStock, tvStoreName, tvInventoryValue;
     private String currentStoreJson;
     private Store currentStore;
     private volatile boolean activityActive;
@@ -37,9 +37,10 @@ public class ManagerConsoleActivity extends AppCompatActivity {
 
         // Bind views
         tvTotalProducts = findViewById(R.id.tvTotalProducts);
-        tvLowStock = findViewById(R.id.tvLowStock);
-        tvOutOfStock = findViewById(R.id.tvOutOfStock);
-        tvStoreName = findViewById(R.id.tvStoreName);
+        tvLowStock      = findViewById(R.id.tvLowStock);
+        tvOutOfStock    = findViewById(R.id.tvOutOfStock);
+        tvStoreName     = findViewById(R.id.tvStoreName);
+        tvInventoryValue= findViewById(R.id.tvInventoryValue);
 
         currentStoreJson = resolveStoreJson();
         android.util.Log.d("ManagerConsoleActivity", "Your Store is: " + currentStoreJson);
@@ -132,18 +133,17 @@ public class ManagerConsoleActivity extends AppCompatActivity {
     }
 
     private void updateInventorySummary(Store store) {
-        if (store == null) {
-            return;
-        }
+        if (store == null) return;
         List<Product> products = store.getProducts();
 
         int total = products.size();
         int lowStock = 0;
         int outOfStock = 0;
+        double inventoryValue = 0;
 
         for (Product p : products) {
             int available = p.getAvailableAmount();
-
+            inventoryValue += available * p.getPrice();
             if (available == 0) {
                 outOfStock++;
             } else if (available <= 2) {
@@ -151,9 +151,13 @@ public class ManagerConsoleActivity extends AppCompatActivity {
             }
         }
 
-        tvTotalProducts.setText("📦 Total Products: " + total);
-        tvLowStock.setText("⚠️ Low Stock: " + lowStock);
-        tvOutOfStock.setText("💲 Out of Stock: " + outOfStock);
+        tvTotalProducts.setText("\uD83D\uDCE6 Total Products: " + total);
+        tvLowStock.setText("\u26A0\uFE0F Low Stock: " + lowStock);
+        tvOutOfStock.setText("\uD83D\uDEAB Out of Stock: " + outOfStock);
+        if (tvInventoryValue != null) {
+            tvInventoryValue.setText(String.format(java.util.Locale.getDefault(),
+                    "\uD83D\uDCB0 Inventory Value: \u20AC%.2f", inventoryValue));
+        }
     }
 
     private String resolveStoreJson() {

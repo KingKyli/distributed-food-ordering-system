@@ -8,6 +8,12 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @deprecated The password-generation approach has been replaced by a server-side
+ * one-time access-code flow handled in {@link PartnerAuthService#requestAccessCode(String)}.
+ * This class is kept only for compatibility references and is not used in the active code path.
+ */
+@Deprecated
 public class PartnerLoginManager {
     private static volatile PartnerLoginManager instance;
     private final Map<String, String> storePasswords = new HashMap<>();

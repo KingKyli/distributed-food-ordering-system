@@ -57,6 +57,18 @@
                 android:textColor="@color/primary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvHistoryLink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="View order history"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:drawableStart="@drawable/ic_history"
+                android:drawablePadding="4dp"
+                android:drawableTint="@color/text_secondary" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

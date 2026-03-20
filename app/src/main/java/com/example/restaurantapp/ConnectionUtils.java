@@ -4,6 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.widget.Toast;
 
+/**
+ * @deprecated Use {@link ActivityUtils#ensureConnectedOrRedirect(androidx.appcompat.app.AppCompatActivity)}
+ * and {@link ServerConnection#requireCommunicator()} instead.
+ * This class is kept only for backward compatibility and will not be removed,
+ * but it is no longer part of the active design.
+ */
+@Deprecated
 public final class ConnectionUtils {
     private ConnectionUtils() {
     }
