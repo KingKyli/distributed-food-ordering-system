@@ -1,173 +1,246 @@
-# Distributed Food Ordering System
-> A full-stack Android food ordering platform built on a **Master–Worker distributed architecture** with real-time TCP socket communication.
+# ? Distributed Food Ordering System
+
+> A full-stack distributed system simulating a real-world food delivery platform ? built with a custom TCP protocol, multi-threaded Java backend, and a native Android client.
+
+**GitHub:** https://github.com/KingKyli/distributed-food-ordering-system
+
 ---
-## The Problem
-Online food ordering platforms need to handle concurrent requests from many users — searching restaurants, placing orders, and managing menus — reliably and in real time.
-This project builds such a platform from scratch, using a **distributed backend** (Master + Worker nodes) and a **native Android client**, connected over raw TCP sockets with a custom JSON protocol.
+
+## ? Screenshots
+
+| Home | Restaurant | Basket | Manager Dashboard |
+|------|------------|--------|-------------------|
+| *(Home screen with 25+ restaurants, quick filters, skeleton loading)* | *(Restaurant detail with product list, stock badges)* | *(Basket with order total, checkout, history link)* | *(Dashboard with inventory stats)* |
+
+> Add screenshots to `docs/screenshots/` and replace the placeholders above.
+
 ---
-## Architecture
-```
-+---------------------------------------------------------+
-¦                   Android Client App                    ¦
-¦                                                         ¦
-¦  WelcomeActivity --? MainActivity --? RestaurantDetails ¦
-¦                           ¦                   ¦         ¦
-¦                           ?                   ?         ¦
-¦                     FiltersActivity     BasketActivity  ¦
-¦                                                         ¦
-¦  PartnerLoginActivity --? ManagerConsole                ¦
-¦                                ¦                        ¦
-¦                    AddProduct / EditProduct              ¦
-+---------------------------------------------------------+
-                         ¦
-                  TCP Socket (port 8765)
-                  JSON protocol
-                         ¦
-              +----------?----------+
-              ¦    Master Server    ¦
-              ¦                     ¦
-              ¦  Receives requests  ¦
-              ¦  Routes to Workers  ¦
-              ¦  Aggregates results ¦
-              +---------------------+
-                     ¦      ¦
-          +----------?--+ +-?----------+
-          ¦  Worker  1  ¦ ¦  Worker  2  ¦  ...
-          ¦             ¦ ¦             ¦
-          ¦Restaurant A ¦ ¦Restaurant B ¦
-          ¦Restaurant C ¦ ¦Restaurant D ¦
-          +-------------+ +-------------+
-```
-**How it works:**
-- The Android app opens a **persistent TCP socket** to the Master
-- The client sends requests like `SEARCH:lat:lon:cuisine:stars:price`
-- The Master **routes the request** to the appropriate Worker nodes
-- Workers process the request and respond
-- The Master **aggregates** all Worker responses and returns one JSON result to the client
----
-## Features
-| Feature | Description |
+
+## ? Key Highlights
+
+| | |
 |---|---|
-| ?? **Restaurant search** | Real-time search with text query matching |
-| ??? **Advanced filters** | Filter by cuisine, stars (1–5), price range, distance |
-| ?? **Restaurant details** | Full menu view per restaurant |
-| ?? **Basket** | Add/remove items, quantity stepper, single-store enforcement |
-| ?? **Checkout** | Submit order to server in real time |
-| ?? **Partner login** | Secure one-time access code authentication |
-| ????? **Manager console** | Live inventory snapshot (total / low stock / out of stock) |
-| ? **Add product** | Create new menu items from the app |
-| ?? **Edit product** | Update price, stock, availability |
-| ??? **Delete product** | Remove menu items with confirmation |
-| ?? **Server config** | Change server IP/port at runtime from Settings — no recompile needed |
+| ? | **Custom TCP protocol** for real-time client?server communication |
+| ? | **OTP-based partner authentication** with expiring 6-digit access codes |
+| ? | **Multi-threaded backend** handling concurrent client connections safely |
+| ? | **Android client** with Material 3 design, dark mode, skeleton loading |
+| ? | **Thread-safe basket** enforcing single-store ordering constraints |
+| ??  | **Favorites & Order History** stored locally with SharedPreferences |
+| ?? | **Repository / Service / Protocol** layered architecture |
+| ? | **Skeleton loading, empty states, quick filters** ? production-quality UX |
+
 ---
-## Screenshots
-| Welcome | Home | Restaurant | Basket |
-|---|---|---|---|
-| ![welcome](docs/screenshots/welcome.png) | ![home](docs/screenshots/home.png) | ![restaurant](docs/screenshots/restaurant.png) | ![basket](docs/screenshots/basket.png) |
-| Partner Login | Manager Console | Product Management | Settings |
-|---|---|---|---|
-| ![login](docs/screenshots/partner_login.png) | ![console](docs/screenshots/manager_console.png) | ![products](docs/screenshots/product_list.png) | ![settings](docs/screenshots/settings.png) |
----
-## Setup & Running
-### Prerequisites
-- Android Studio (Hedgehog / Electric Eel or newer)
-- JDK 17+
-- An Android device or emulator on the **same network** as the server
-### 1 — Run the Mock Server (local demo)
-```bash
-# In the project root
-javac MockServer.java
-java MockServer
-# Server starts on port 8765
+
+## ? Architecture
+
 ```
-The emulator connects automatically via `10.0.2.2:8765`.
-### 2 — Build & Run the App
+???????????????????????????????????????????????????????????????
+?                   Android Client (UI Layer)                  ?
+?  MainActivity  RestaurantDetailsActivity  BasketActivity     ?
+?  OrderHistoryActivity  PartnerLoginActivity  ManagerConsole  ?
+???????????????????????????????????????????????????????????????
+                         ?  Repository / Service Layer
+              ???????????????????????
+              ?  RestaurantRepository?  OrderService
+              ?  PartnerAuthService  ?  ProductMgmtService
+              ???????????????????????
+                         ?  Protocol / Network Layer
+              ???????????????????????
+              ?   MasterCommunicator ?  ? reconnect strategy
+              ?   ServerConnection   ?  ? singleton, thread-safe
+              ?   ProtocolUtils      ?  ? command serialization
+              ???????????????????????
+                         ?
+              TCP Socket  (port 8765)
+                         ?
+???????????????????????????????????????????????????????????????
+?               Java Backend (MockServer)                      ?
+?                                                             ?
+?  ????????????????   ????????????????   ??????????????????  ?
+?  ? SEARCH       ?   ? BUY          ?   ? PARTNER_LOGIN  ?  ?
+?  ? Returns JSON ?   ? Decrements   ?   ? OTP code flow  ?  ?
+?  ? store list   ?   ? stock safely ?   ? 5-min expiry   ?  ?
+?  ????????????????   ????????????????   ??????????????????  ?
+?                                                             ?
+?  ????????????????   ????????????????                       ?
+?  ? ADD_PRODUCT  ?   ? UPDATE/REMOVE?                       ?
+?  ? REMOVE_STORE ?   ? PRODUCT      ?                       ?
+?  ????????????????   ????????????????                       ?
+?                                                             ?
+?   25 seed restaurants  ·  thread-safe synchronized state   ?
+???????????????????????????????????????????????????????????????
+```
+
+---
+
+## ? Request Flows
+
+### Customer ? Search & Order
+```
+App opens ? WelcomeActivity tries IP list (127.0.0.1, 10.0.2.2, ...)
+         ? TCP handshake (CLIENT_HELLO / SERVER_HELLO)
+         ? SEARCH command ? JSON store list ? RecyclerView
+         ? User taps restaurant ? RestaurantDetailsActivity
+         ? User adds items ? Basket (thread-safe, single-store)
+         ? Place order ? BUY:storeName:productName:qty (for each item)
+         ? Server decrements stock ? SUCCESS ? History saved locally
+```
+
+### Partner ? Login & Inventory Management
+```
+PartnerLoginActivity ? select store
+         ? REQUEST_PARTNER_ACCESS_CODE:storeName
+         ? Server generates 6-digit OTP (5-min expiry) ? returns masked email + code
+         ? User enters code ? PARTNER_LOGIN:storeName:code
+         ? Server validates, removes code ? OK: Login successful
+         ? ManagerConsoleActivity shows inventory snapshot
+         ? ADD_PRODUCT / UPDATE_PRODUCT / REMOVE_PRODUCT
+```
+
+---
+
+## ?? Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Android Client** | Java, Android SDK 28?35 |
+| **UI** | Material Design 3 (DayNight), ConstraintLayout, RecyclerView |
+| **Backend** | Java 11, raw TCP Sockets, multi-threaded |
+| **Serialization** | JSON (org.json) ? hand-crafted protocol |
+| **Persistence** | SharedPreferences (favorites, order history, filters, session) |
+| **Build** | Gradle Kotlin DSL |
+| **VCS** | Git / GitHub |
+
+---
+
+## ? Why Custom TCP Instead of REST?
+
+This is an intentional design choice:
+
+| | Custom TCP | REST/HTTP |
+|---|---|---|
+| **Latency** | Lower (persistent connection, no HTTP overhead) | Higher (connection per request) |
+| **Learning** | Forces understanding of protocol design | Abstracted away by libraries |
+| **Concurrency** | Explicit thread-per-client model | Handled by framework |
+| **Control** | Full control over wire format | Constrained by HTTP verbs/status codes |
+
+> In a production system, I would use REST with Retrofit + MVVM + Coroutines. The TCP approach here is a deliberate academic choice to demonstrate distributed systems fundamentals.
+
+---
+
+## ? Why `ServerConnection.requireCommunicator()` & `AppResult<T>`?
+
+- `requireCommunicator()` ? single point of truth for connection state. Any service that needs the network calls this; it either returns the communicator or an error wrapped in `AppResult<T>`. No null checks scattered across activities.
+- `AppResult<T>` ? typed result monad (success + data, or error + message). Forces callers to handle both branches. Eliminates try/catch at the UI layer.
+- `MasterCommunicator` reconnect strategy ? exponential back-off reconnect loop runs on a background thread. The UI layer only sees `ServerConnection.isReady()`.
+
+---
+
+## ? Why Thread-Safe Basket?
+
+The basket is a **singleton** (`Basket.getInstance()`) modified from multiple threads (UI thread adds/removes; background thread reads for order submission). Key constraints enforced:
+
+1. **Single-store rule** ? adding a product from a different store is silently rejected (returns `false`).
+2. **Synchronized methods** ? `addProduct`, `removeProduct`, `clear` are all `synchronized`.
+3. **Stable IDs** ? `BasketItem.buildStableId(storeName, productName, productType)` for `DiffUtil` in the adapter.
+
+---
+
+## ? Repository / Service Architecture
+
+```
+Activity  ?  Service  ?  Repository  ?  MasterCommunicator
+             (business     (data            (network)
+              rules)        access)
+```
+
+| Class | Responsibility |
+|---|---|
+| `RestaurantRepository` | Fetches/parses store list and individual stores |
+| `OrderService` | Submits basket items, saves to order history |
+| `ProductManagementService` | Add/update/delete products via partner session |
+| `PartnerAuthService` | OTP request + login flow |
+| `MasterCommunicator` | Raw TCP send/receive with reconnect |
+| `ServerConnection` | Singleton wrapper, `requireCommunicator()` |
+| `ProtocolUtils` | OK/ERROR response parsing |
+
+---
+
+## ? Running the Project
+
+### 1. Start the backend
+```bash
+cd distributed-food-ordering-system
+javac MockServer.java && java MockServer
+```
+
+### 2. Connect from Android Emulator
+The app auto-connects to `10.0.2.2:8765` (Android emulator loopback to host).
+
+### 3. Connect from a physical device (USB)
+```bash
+adb reverse tcp:8765 tcp:8765
+```
+Then use `127.0.0.1` as server IP in the app's Settings screen.
+
+### 4. Build the Android app
 ```bash
 ./gradlew assembleDebug
-# or open in Android Studio and press Run ?
+adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
-### 3 — Real Device
-1. Connect your phone to the same WiFi as your PC
-2. Find your PC's local IP: `ipconfig` (Windows) / `ifconfig` (Mac/Linux)
-3. Open the app ? **Settings ? Server Configuration**
-4. Enter your PC's IP + port `8765` ? **Save Server Settings**
+
 ---
-## Key Technical Decisions
-| Decision | Reason |
-|---|---|
-| Raw TCP sockets | Matches the distributed systems requirement; no HTTP overhead |
-| Custom text protocol (`COMMAND:arg1:arg2`) | Simple to parse, easy to debug |
-| DiffUtil in RecyclerView | Smooth animated list updates without full redraws |
-| Deep copy in `Basket.getItems()` | Prevents DiffUtil comparing stale references after in-place mutations |
-| Thread-safe singleton `Basket` | Multiple activities read/write the basket concurrently |
-| `ServerConnection.ensureReady()` | Auto-reconnects if the socket drops between requests |
-| Session persistence (`PartnerSessionStore`) | Partners stay logged in across app restarts |
+
+## ? Partner Login (Demo)
+
+1. Open the app ? tap **Partner Login**
+2. Select any store from the dropdown
+3. Tap **Request Access Code** ? the 6-digit code appears in the server console
+4. Enter the code ? you are logged into the Manager Dashboard
+
 ---
-## Project Structure
+
+## ? Store Catalog (25 restaurants)
+
+| Stars | Stores | Price |
+|---|---|---|
+| ????? | Sushi Sun, Pasta Paradise, Ramen Republic, Le Bistro Paris, Greek Tavern, Indian Spice Garden, Poke Bowl Bar | $$?$$$ |
+| ???? | Pizza Palace, Burger Barn, Gyros Express, Souvlaki Square, Noodle Nook, BBQ Nation, Thai Palace, Dim Sum Dragon, The Vegan Garden, Steakhouse Seven, Brunch Club, Crepe Cafe | $?$$$ |
+| ??? | Taco Town, Kebab House, Falafel House, Tex Mex Grill, The Sandwich Bar, Cookie Corner | $?$$ |
+
+---
+
+## ? CV Entry (Copy?Paste Ready)
+
 ```
-app/src/main/java/com/example/restaurantapp/
-+-- Activities
-¦   +-- WelcomeActivity.java           # Entry point + server connection bootstrap
-¦   +-- MainActivity.java              # Restaurant list, search, quick filters
-¦   +-- FiltersActivity.java           # Advanced search filters
-¦   +-- RestaurantDetailsActivity.java # Menu view for a restaurant
-¦   +-- BasketActivity.java            # Shopping basket + checkout
-¦   +-- SettingsActivity.java          # Server config, manager mode
-¦   +-- PartnerLoginActivity.java      # One-time code partner auth
-¦   +-- ManagerConsoleActivity.java    # Inventory dashboard
-¦   +-- AddProductActivity.java        # Add menu item
-¦   +-- EditProductActivity.java       # List products (edit/delete)
-¦   +-- ProductEditActivity.java       # Edit a single product
-+-- Network
-¦   +-- ServerConnection.java          # Thread-safe singleton TCP wrapper
-¦   +-- MasterCommunicator.java        # All TCP request/response methods
-+-- Services
-¦   +-- RestaurantRepository.java      # Search + fetch stores
-¦   +-- ProductManagementService.java  # Add / update / remove products
-¦   +-- PartnerAuthService.java        # Partner login flow
-¦   +-- OrderService.java              # Submit purchase order
-+-- Models
-¦   +-- Store.java                     # Restaurant data model + JSON
-¦   +-- Product.java                   # Menu item data model + JSON
-¦   +-- Basket.java                    # Thread-safe order accumulator
-¦   +-- BasketItem.java                # Single basket line item
-+-- Utilities
-    +-- ActivityUtils.java             # Connection guards, UI-thread helper
-    +-- AppResult.java                 # Generic success/error wrapper
-    +-- PartnerSessionStore.java       # SharedPreferences session management
-    +-- StoreJsonParser.java           # JSON parsing helpers
+Distributed Food Ordering System  |  Java · Android · TCP Sockets  |  github.com/KingKyli/distributed-food-ordering-system
+
+? Designed and implemented a distributed client?server food ordering system using Java and Android
+? Built a custom TCP-based communication protocol supporting search, ordering, and inventory management commands
+? Developed a multi-threaded backend server handling concurrent client requests with thread-safe shared state
+? Implemented OTP-style partner authentication system with expiring 6-digit access codes
+? Engineered a thread-safe basket system enforcing single-store ordering constraints across concurrent operations
+? Designed advanced filtering functionality (location, cuisine, price, rating) with persistent user preferences
+? Applied layered architecture (UI / Service / Repository / Protocol) with typed AppResult<T> error handling
+? Built native Android client with Material Design 3, dark mode, skeleton loading, favorites, and order history
 ```
+
 ---
-## Technologies
-- **Java** — primary language (Android client + mock server)
-- **Android SDK** — UI, lifecycle, RecyclerView, Material Design
-- **TCP Sockets** — raw socket communication (`java.net.Socket`)
-- **JSON** — data format (`org.json`)
-- **Gradle (Kotlin DSL)** — build system
-- **DiffUtil** — efficient RecyclerView diffing
-- **SharedPreferences** — local session + settings persistence
-- **GitHub Actions** — CI pipeline (assembleDebug on every push)
+
+## ? Interview Answers
+
+**"Tell me about your project"**
+> *"I built a distributed food ordering system consisting of an Android client and a multi-threaded Java backend. The system communicates over a custom TCP protocol, supporting real-time restaurant search, ordering, and inventory management. I also implemented an OTP-based authentication mechanism for partners and designed the system to handle concurrent users safely through thread-safe shared state."*
+
+**"What was the hardest part?"**
+> *"Designing the communication layer and ensuring thread-safe operations on the backend, especially when handling concurrent order requests that modify shared inventory state. I also had to think carefully about the reconnect strategy on the client side so the UI never blocks the main thread."*
+
+**"What would you improve?"**
+> *"I would migrate the communication layer to a REST API with Retrofit, refactor the Android app to MVVM with ViewModels and LiveData/StateFlow, and replace the in-memory server state with a real database like PostgreSQL."*
+
+**"What did you learn?"**
+> *"I learned how to design systems end-to-end ? not just UI code ? including networking, concurrency, protocol design, and how to structure scalable, testable components using repository and service layers."*
+
 ---
-## CV Bullets
-> Ready to paste into your résumé or LinkedIn:
-- Built a **distributed food ordering platform** using Java, Android, TCP sockets, and JSON-based client–server communication
-- Implemented a **Master–Worker architecture** with request routing and response aggregation across multiple backend nodes
-- Developed full **restaurant discovery, filtering, basket, checkout**, and **partner-side product management** flows end-to-end
-- Engineered **connection lifecycle management** with auto-reconnect, async data loading, and thread-safe state across concurrent Activities
-- Applied **DiffUtil + deep-copy patterns** to eliminate stale-reference bugs in animated RecyclerView updates
-- Added **runtime server reconfiguration** from the Settings screen — no recompile needed to switch networks or devices
-- Maintained code quality through a **layered architecture** (UI ? Service ? Network ? Model) with a consistent `AppResult<T>` error contract
----
-## Academic Context
-Developed as part of the **Distributed Systems** course at the  
-**Athens University of Economics and Business (AUEB)** — Department of Computer Science.
-The project demonstrates:
-- Custom application-level protocol design over TCP
-- Concurrent request handling from multiple clients
-- Real-time inventory and order management
-- Mobile client integration with a distributed backend
----
-## Author
-**Sotiris Kylintireas**  
-Computer Science — Athens University of Economics and Business (AUEB)  
-GitHub: [KingKyli](https://github.com/KingKyli)
+
+*Built with Java · Android SDK · Material Design 3 · TCP Sockets · Gradle*
