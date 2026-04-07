@@ -25,15 +25,28 @@
             android:paddingEnd="20dp"
             android:paddingBottom="26dp">
 
+            <ImageView
+                android:id="@+id/ivBrandIcon"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:background="@drawable/chip_background_light"
+                android:contentDescription="@string/app_name"
+                android:padding="8dp"
+                android:src="@mipmap/ic_launcher_round"
+                app:layout_constraintBottom_toBottomOf="@id/tvTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <TextView
                 android:id="@+id/tvDeliveryLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
                 android:text="@string/home_delivery_label"
                 android:textColor="@color/text_on_primary_subtle"
                 android:textSize="13sp"
                 app:layout_constraintEnd_toStartOf="@id/btnBasket"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ivBrandIcon"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
@@ -41,11 +54,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:fontFamily="serif"
+                android:layout_marginStart="14dp"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/home_brand_title"
-                android:textSize="28sp"
+                android:textSize="26sp"
                 android:textColor="@color/white"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ivBrandIcon"
                 app:layout_constraintEnd_toStartOf="@id/btnBasket"
                 app:layout_constraintTop_toBottomOf="@id/tvDeliveryLabel" />
 
@@ -209,6 +223,21 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="16dp">
+
+                <FrameLayout
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/chip_background_light">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_restaurant"
+                        app:tint="@color/primary" />
+                </FrameLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"

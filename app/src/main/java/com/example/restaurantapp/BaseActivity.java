@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -21,17 +20,21 @@ public abstract class BaseActivity extends AppCompatActivity {
         TextView navFilters = findViewById(R.id.nav_filters);
         TextView navOrders = findViewById(R.id.nav_orders);
         TextView navSettings = findViewById(R.id.nav_settings);
-        // Highlight the current section
+
+        navHome.setSelected(false);
+        navFilters.setSelected(false);
+        navOrders.setSelected(false);
+        navSettings.setSelected(false);
+
         String type = getBottomNavType();
-        int activeColor = ContextCompat.getColor(this, R.color.bottom_nav_active);
         if ("home".equals(type)) {
-            navHome.setTextColor(activeColor);
+            navHome.setSelected(true);
         } else if ("filters".equals(type)) {
-            navFilters.setTextColor(activeColor);
+            navFilters.setSelected(true);
         } else if ("orders".equals(type)) {
-            navOrders.setTextColor(activeColor);
+            navOrders.setSelected(true);
         } else if ("settings".equals(type)) {
-            navSettings.setTextColor(activeColor);
+            navSettings.setSelected(true);
         }
 
         navHome.setOnClickListener(v -> {

@@ -5,10 +5,11 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
+    <!-- Background food image -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:alpha="0.28"
+        android:alpha="0.18"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
         android:src="@drawable/background_image"
@@ -17,134 +18,205 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Warm overlay gradient -->
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@drawable/welcome_overlay_background"
+        android:background="@drawable/welcome_overlay_warm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <!-- App icon in warm orange circle -->
+    <ImageView
         android:id="@+id/tvAppEyebrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
-        android:background="@drawable/chip_background_light"
-        android:fontFamily="sans-serif-medium"
-        android:paddingHorizontal="14dp"
-        android:paddingVertical="8dp"
-        android:text="Curated delivery experience"
-        android:textColor="@color/primary"
-        android:textSize="12sp"
-        android:textStyle="bold"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="52dp"
+        android:background="@drawable/welcome_icon_circle"
+        android:contentDescription="@string/app_name"
+        android:padding="14dp"
+        android:src="@mipmap/ic_launcher_round"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- App name -->
     <TextView
         android:id="@+id/tvAppTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="22dp"
-        android:fontFamily="serif"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-black"
         android:text="Foodie Express"
-        android:textColor="@color/primary"
-        android:textSize="44sp"
+        android:textColor="@color/text_primary"
+        android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAppEyebrow" />
 
+    <!-- Orange accent line under title -->
+    <View
+        android:id="@+id/titleAccent"
+        android:layout_width="48dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/food_orange"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAppTitle" />
+
+    <!-- Subtitle -->
     <TextView
         android:id="@+id/tvSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
         android:gravity="center"
-        android:text="Elevated meals, fast ordering, and a cleaner partner workflow in one polished demo app."
+        android:lineSpacingExtra="3dp"
+        android:text="Discover restaurants nearby, order your favourite meals, and get them delivered fast."
         android:textColor="@color/text_secondary"
-        android:textSize="15sp"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvAppTitle" />
+        app:layout_constraintTop_toBottomOf="@id/titleAccent" />
 
+    <!-- Feature pills row -->
+    <LinearLayout
+        android:id="@+id/featurePills"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/welcome_hero_bg"
+            android:drawablePadding="5dp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingStart="14dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="8dp"
+            android:text="🍔  Browse"
+            android:textColor="@color/food_orange_dark"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/welcome_hero_bg"
+            android:drawablePadding="5dp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingStart="14dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="8dp"
+            android:text="🛒  Order"
+            android:textColor="@color/food_orange_dark"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/welcome_hero_bg"
+            android:drawablePadding="5dp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingStart="14dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="8dp"
+            android:text="🚴  Deliver"
+            android:textColor="@color/food_orange_dark"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- Hero card with delivery bike icon -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/welcomeHeroCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="22dp"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        app:cardBackgroundColor="@color/card_background"
-        app:cardCornerRadius="28dp"
-        app:cardElevation="0dp"
-        app:strokeColor="@color/divider"
+        app:cardBackgroundColor="#FFFAF6"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="2dp"
+        app:strokeColor="@color/food_orange_soft"
         app:strokeWidth="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
+        app:layout_constraintTop_toBottomOf="@id/featurePills">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="22dp">
+            android:padding="18dp">
 
             <FrameLayout
-                android:layout_width="88dp"
-                android:layout_height="88dp"
-                android:background="@drawable/chip_background_light">
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/welcome_icon_circle">
 
                 <ImageView
                     android:id="@+id/ivChefIcon"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_gravity="center"
-                    android:contentDescription="Chef hat"
-                    android:src="@drawable/ic_chef_hat"
-                    app:tint="@color/primary" />
+                    android:contentDescription="Delivery"
+                    android:src="@drawable/ic_delivery_bike" />
             </FrameLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
+                android:layout_marginStart="14dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Something exceptional is cooking"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Fast delivery demo"
                     android:textColor="@color/text_primary"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
+                    android:textSize="17sp" />
 
                 <TextView
                     android:id="@+id/tvSubtitle2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Browse premium restaurant cards, place orders, and review history with a more polished UI."
+                    android:layout_marginTop="4dp"
+                    android:text="Browse menus, place orders, and track them in real time."
                     android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="2dp" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- Connection status card -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/statusCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="14dp"
         android:layout_marginEnd="32dp"
         app:cardBackgroundColor="@color/card_background"
-        app:cardCornerRadius="22dp"
+        app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
         app:strokeColor="@color/divider"
         app:strokeWidth="1dp"
@@ -157,7 +229,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="18dp">
+            android:padding="14dp">
 
             <TextView
                 android:id="@+id/tvConnectionStatus"
@@ -166,52 +238,67 @@
                 android:gravity="center"
                 android:text="Connecting to server..."
                 android:textColor="@color/text_secondary"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
 
             <ProgressBar
                 android:id="@+id/progressConnection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:indeterminateTint="@color/secondary" />
+                android:layout_marginTop="8dp"
+                android:indeterminateTint="@color/food_orange" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRetryConnection"
                 style="@style/Widget.App.Button.Outlined"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="14dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
                 android:text="Retry connection"
                 android:visibility="gone"
-                app:strokeColor="@color/secondary" />
+                app:strokeColor="@color/food_orange" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- Primary CTA: orange filled pill button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCustomerFlow"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
+        android:backgroundTint="@color/food_orange"
         android:enabled="false"
+        android:fontFamily="sans-serif-medium"
         android:text="Continue as Customer"
+        android:textColor="@color/white"
         android:textSize="16sp"
+        app:cornerRadius="28dp"
+        app:icon="@drawable/ic_shopping_bag"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        app:iconTint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/statusCard" />
 
+    <!-- Secondary CTA: orange outlined pill button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnPartnerFlow"
         style="@style/Widget.App.Button.Outlined"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="32dp"
         android:enabled="false"
+        android:fontFamily="sans-serif-medium"
         android:text="Partner / Manager Login"
+        android:textColor="@color/food_orange_dark"
         android:textSize="16sp"
+        app:cornerRadius="28dp"
+        app:strokeColor="@color/food_orange"
+        app:strokeWidth="1.5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnCustomerFlow" />
