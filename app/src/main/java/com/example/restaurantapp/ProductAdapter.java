@@ -8,6 +8,7 @@ import android.widget.Toast;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -53,12 +54,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         if (holder.tvProductStock != null) {
             if (stock <= 0) {
                 holder.tvProductStock.setText("Out of stock");
-                holder.tvProductStock.setTextColor(0xFFD32F2F);
+                holder.tvProductStock.setTextColor(
+                        ContextCompat.getColor(holder.itemView.getContext(), R.color.text_error));
                 holder.ivProductCart.setAlpha(0.4f);
                 holder.ivProductCart.setEnabled(false);
             } else {
                 holder.tvProductStock.setText(stock + " left");
-                holder.tvProductStock.setTextColor(stock <= 3 ? 0xFFF57C00 : 0xFF2E7D32);
+                holder.tvProductStock.setTextColor(ContextCompat.getColor(holder.itemView.getContext(),
+                        stock <= 3 ? R.color.text_warning : R.color.text_success));
                 holder.ivProductCart.setAlpha(1f);
                 holder.ivProductCart.setEnabled(true);
             }

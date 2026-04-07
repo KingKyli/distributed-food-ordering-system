@@ -29,7 +29,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/home_delivery_label"
-                android:textColor="#FFF2F2"
+                android:textColor="@color/text_on_primary_subtle"
                 android:textSize="13sp"
                 app:layout_constraintEnd_toStartOf="@id/btnBasket"
                 app:layout_constraintStart_toStartOf="parent"

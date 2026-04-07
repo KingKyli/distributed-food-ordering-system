@@ -7,11 +7,10 @@ import android.text.TextUtils;
 import android.view.View;
 import com.google.android.material.button.MaterialButton;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -110,7 +109,7 @@ public class SettingsActivity extends BaseActivity {
         prefs.edit().putString(KEY_IP, ipRaw).putInt(KEY_PORT, port).apply();
 
         btnSaveServer.setEnabled(false);
-        showServerStatus("Connecting to " + ipRaw + ":" + port + "â€¦", false);
+        showServerStatus("Connecting to " + ipRaw + ":" + port + "...", false);
 
         final String ip = ipRaw;
         final int finalPort = port;
@@ -119,11 +118,11 @@ public class SettingsActivity extends BaseActivity {
             ActivityUtils.runOnUiThreadIfAlive(this, () -> {
                 btnSaveServer.setEnabled(true);
                 if (ok) {
-                    showServerStatus("âœ“ Connected to " + ip + ":" + finalPort, false);
+                    showServerStatus("Connected to " + ip + ":" + finalPort, false);
                     Toast.makeText(this, "Connected!", Toast.LENGTH_SHORT).show();
                 } else {
                     String err = ServerConnection.getLastError();
-                    showServerStatus("âœ— " + (err != null ? err : "Could not connect"), true);
+                    showServerStatus(err != null ? err : "Could not connect", true);
                 }
             });
         }).start();
@@ -132,7 +131,8 @@ public class SettingsActivity extends BaseActivity {
     private void showServerStatus(String msg, boolean isError) {
         if (tvServerStatus == null) return;
         tvServerStatus.setText(msg);
-        tvServerStatus.setTextColor(isError ? 0xFFD32F2F : 0xFF2E7D32);
+        tvServerStatus.setTextColor(ContextCompat.getColor(this,
+                isError ? R.color.text_error : R.color.text_success));
         tvServerStatus.setVisibility(View.VISIBLE);
     }
 }

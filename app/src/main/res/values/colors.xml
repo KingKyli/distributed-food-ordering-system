@@ -31,7 +31,15 @@
     <color name="text_secondary">#757575</color>
     <color name="text_hint">#9E9E9E</color>
     <color name="text_on_primary">#FFFFFF</color>
+    <color name="text_on_primary_subtle">#FFF2F2</color>
+    <color name="text_on_primary_outline">#B3FFFFFF</color>
     <color name="text_on_secondary">#FFFFFF</color>
+    <color name="text_success">#2E7D32</color>
+    <color name="text_error">#D32F2F</color>
+    <color name="text_warning">#F57C00</color>
+    <color name="text_info">#1565C0</color>
+    <color name="bottom_nav_inactive">#9E9E9E</color>
+    <color name="bottom_nav_active">#D32F2F</color>
 
     <!-- Status Colors -->
     <color name="success">#4CAF50</color>

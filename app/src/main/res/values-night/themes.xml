@@ -2,31 +2,35 @@
     <!-- Dark theme — auto-applied when system is in dark mode -->
     <style name="Theme.RestaurantApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color stays the same in dark mode -->
-        <item name="colorPrimary">#EF5350</item>
-        <item name="colorPrimaryVariant">#D32F2F</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimary">@color/primary_light</item>
+        <item name="colorPrimaryVariant">@color/primary</item>
+        <item name="colorOnPrimary">@color/text_on_primary</item>
 
         <!-- Secondary -->
-        <item name="colorSecondary">#FF8A65</item>
-        <item name="colorOnSecondary">#000000</item>
+        <item name="colorSecondary">@color/secondary_light</item>
+        <item name="colorOnSecondary">@color/black</item>
 
         <!-- Surface / Background — dark -->
-        <item name="colorSurface">#1E1E1E</item>
-        <item name="colorOnSurface">#EEEEEE</item>
-        <item name="colorSurfaceVariant">#2C2C2C</item>
-        <item name="android:colorBackground">#121212</item>
-        <item name="colorOnBackground">#EEEEEE</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+
+        <!-- Keep typography stable across light/dark modes -->
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
 
         <!-- Error -->
-        <item name="colorError">#CF6679</item>
-        <item name="colorOnError">#000000</item>
+        <item name="colorError">@color/error</item>
+        <item name="colorOnError">@color/black</item>
 
         <!-- Status bar -->
-        <item name="android:statusBarColor">#1E1E1E</item>
+        <item name="android:statusBarColor">@color/surface</item>
         <item name="android:windowLightStatusBar">false</item>
 
         <!-- Navigation bar -->
-        <item name="android:navigationBarColor">#1E1E1E</item>
+        <item name="android:navigationBarColor">@color/surface</item>
 
         <!-- Button styles (inherit from day theme) -->
         <item name="materialButtonStyle">@style/Widget.App.Button</item>

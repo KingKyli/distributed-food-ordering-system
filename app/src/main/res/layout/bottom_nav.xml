@@ -18,10 +18,11 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:clickable="true"
+        android:fontFamily="sans-serif-medium"
         android:focusable="true"
         android:gravity="center"
         android:text="&#x2302;\nHome"
-        android:textColor="#9E9E9E"
+        android:textColor="@color/bottom_nav_inactive"
         android:textSize="12sp"
         android:textStyle="bold" />
 
@@ -31,10 +32,11 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:clickable="true"
+        android:fontFamily="sans-serif-medium"
         android:focusable="true"
         android:gravity="center"
         android:text="&#x25A6;\nDiscover"
-        android:textColor="#9E9E9E"
+        android:textColor="@color/bottom_nav_inactive"
         android:textSize="12sp"
         android:textStyle="bold" />
 
@@ -44,10 +46,11 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:clickable="true"
+        android:fontFamily="sans-serif-medium"
         android:focusable="true"
         android:gravity="center"
         android:text="&#x23F3;\nOrders"
-        android:textColor="#9E9E9E"
+        android:textColor="@color/bottom_nav_inactive"
         android:textSize="12sp"
         android:textStyle="bold" />
 
@@ -57,10 +60,11 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:clickable="true"
+        android:fontFamily="sans-serif-medium"
         android:focusable="true"
         android:gravity="center"
         android:text="&#x2699;\nProfile"
-        android:textColor="#9E9E9E"
+        android:textColor="@color/bottom_nav_inactive"
         android:textSize="12sp"
         android:textStyle="bold" />
 </LinearLayout>

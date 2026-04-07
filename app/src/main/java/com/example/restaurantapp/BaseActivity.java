@@ -2,9 +2,9 @@ package com.example.restaurantapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.graphics.Color;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -23,7 +23,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         TextView navSettings = findViewById(R.id.nav_settings);
         // Highlight the current section
         String type = getBottomNavType();
-        int activeColor = Color.parseColor("#726EFF"); // primary color
+        int activeColor = ContextCompat.getColor(this, R.color.bottom_nav_active);
         if ("home".equals(type)) {
             navHome.setTextColor(activeColor);
         } else if ("filters".equals(type)) {

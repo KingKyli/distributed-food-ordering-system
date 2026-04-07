@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -128,7 +129,7 @@ public class PartnerLoginActivity extends AppCompatActivity {
         btnRequestAccessCode.setOnClickListener(v -> {
             String storeName = getSelectedStoreName();
             if (storeName.isEmpty()) {
-                showStatus("Select your store first.", 0xFFD32F2F);
+                showStatus("Select your store first.", R.color.text_error);
                 return;
             }
             requestedAccessCodeStoreName = null;
@@ -141,7 +142,7 @@ public class PartnerLoginActivity extends AppCompatActivity {
                     }
                     setLoadingState(false, null);
                     if (!result.isSuccess()) {
-                        showStatus(result.getMessage(), 0xFFD32F2F);
+                        showStatus(result.getMessage(), R.color.text_error);
                         tvPasswordHint.setVisibility(View.GONE);
                         updateActionButtons(false);
                         return;
@@ -149,7 +150,7 @@ public class PartnerLoginActivity extends AppCompatActivity {
 
                     PartnerAccessCodeInfo info = result.getData();
                     requestedAccessCodeStoreName = storeName;
-                    showStatus("Access code sent successfully", 0xFF2E7D32);
+                    showStatus("Access code sent successfully", R.color.text_success);
                     etPassword.setText(info.getDemoCode());
                     etPassword.setSelection(etPassword.getText() != null ? etPassword.getText().length() : 0);
                     tvPasswordHint.setText(getString(
@@ -181,18 +182,18 @@ public class PartnerLoginActivity extends AppCompatActivity {
                     }
                     setLoadingState(false, null);
                     if (!result.isSuccess()) {
-                        showStatus(result.getMessage(), 0xFFD32F2F);
+                        showStatus(result.getMessage(), R.color.text_error);
                         return;
                     }
 
-                    showStatus("Login successful", 0xFF2E7D32);
+                    showStatus("Login successful", R.color.text_success);
                     requestedAccessCodeStoreName = null;
                     PartnerSessionStore.saveSession(PartnerLoginActivity.this, result.getData());
                     android.content.Intent intent = new android.content.Intent(PartnerLoginActivity.this, ManagerConsoleActivity.class);
                     try {
                         intent.putExtra("store_json", result.getData().toJson().toString());
                     } catch (Exception e) {
-                        showStatus("Error passing store data", 0xFFD32F2F);
+                        showStatus("Error passing store data", R.color.text_error);
                         return;
                     }
                     startActivity(intent);
@@ -290,12 +291,12 @@ public class PartnerLoginActivity extends AppCompatActivity {
 
         // Show a subtle step hint when store selected but no code yet
         if (!loading && hasStoreSelection && !codeRequested && tvStatus.getVisibility() != View.VISIBLE) {
-            showStatus("Step 1: Tap \"Send Access Code\" to receive your login code.", 0xFF1565C0);
+            showStatus("Step 1: Tap \"Send Access Code\" to receive your login code.", R.color.text_info);
         }
     }
 
-    private void showStatus(String message, int color) {
-        tvStatus.setTextColor(color);
+    private void showStatus(String message, int colorResId) {
+        tvStatus.setTextColor(ContextCompat.getColor(this, colorResId));
         tvStatus.setText(message);
         tvStatus.setVisibility(View.VISIBLE);
     }
@@ -307,7 +308,7 @@ public class PartnerLoginActivity extends AppCompatActivity {
         if (message == null || message.isEmpty()) {
             tvStatus.setVisibility(View.GONE);
         } else {
-            showStatus(message, 0xFF757575);
+            showStatus(message, R.color.text_secondary);
         }
     }
 
@@ -315,7 +316,7 @@ public class PartnerLoginActivity extends AppCompatActivity {
         progressStores.setVisibility(View.GONE);
         btnRetryStores.setVisibility(View.VISIBLE);
         updateActionButtons(false);
-        showStatus(message, 0xFFD32F2F);
+        showStatus(message, R.color.text_error);
     }
 }
 

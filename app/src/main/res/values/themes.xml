@@ -20,6 +20,10 @@
         <item name="android:colorBackground">@color/background</item>
         <item name="colorOnBackground">@color/text_primary</item>
 
+        <!-- Keep typography stable across light/dark modes -->
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+
         <!-- Error color -->
         <item name="colorError">@color/error</item>
         <item name="colorOnError">@color/white</item>
@@ -67,6 +71,16 @@
 
     <style name="TextAppearance.App.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="TextAppearance.App.BrandTitle" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:textColor">@color/primary</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.App.SectionTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="fontFamily">sans-serif-medium</item>
     </style>
 
     <!-- Primary Button -->

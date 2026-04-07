@@ -35,7 +35,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:text="Store Name"
-                    android:textColor="#FFF2F2"
+                    android:textColor="@color/text_on_primary_subtle"
                     android:textSize="15sp"
                     android:textStyle="bold" />
                 <com.google.android.material.button.MaterialButton
@@ -48,7 +48,7 @@
                     android:textColor="@color/white"
                     android:textSize="13sp"
                     app:cornerRadius="10dp"
-                    app:strokeColor="#AAFFFFFF" />
+                    app:strokeColor="@color/text_on_primary_outline" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
         <TextView

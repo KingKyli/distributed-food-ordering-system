@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -140,7 +141,8 @@ public class BasketActivity extends AppCompatActivity {
 
     private void setStatus(String message, boolean isError) {
         tvBasketStatus.setText(message);
-        tvBasketStatus.setTextColor(isError ? 0xFFFF0000 : 0xFF666666);
+        tvBasketStatus.setTextColor(ContextCompat.getColor(this,
+                isError ? R.color.text_error : R.color.text_secondary));
         tvBasketStatus.setVisibility(android.view.View.VISIBLE);
     }
 }
