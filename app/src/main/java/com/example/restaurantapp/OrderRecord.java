@@ -19,11 +19,15 @@ public final class OrderRecord {
 
     private OrderRecord() {}
 
-    public OrderRecord(String storeName, List<BasketItem> items, double total) {
-        this.timestamp = System.currentTimeMillis();
+    private OrderRecord(long timestamp, String storeName, List<String> itemSummaries, double total) {
+        this.timestamp = timestamp;
         this.storeName = storeName;
         this.total = total;
-        this.itemSummaries = new ArrayList<>();
+        this.itemSummaries = itemSummaries != null ? new ArrayList<>(itemSummaries) : new ArrayList<>();
+    }
+
+    public OrderRecord(String storeName, List<BasketItem> items, double total) {
+        this(System.currentTimeMillis(), storeName, new ArrayList<>(), total);
         if (items != null) {
             for (BasketItem item : items) {
                 itemSummaries.add(item.getQuantity() + "x " + item.getProductName());
@@ -55,16 +59,19 @@ public final class OrderRecord {
     }
 
     public static OrderRecord fromJson(JSONObject obj) throws JSONException {
-        OrderRecord r = new OrderRecord();
-        r.timestamp = obj.getLong("timestamp");
-        r.storeName = obj.getString("storeName");
-        r.total     = obj.getDouble("total");
-        r.itemSummaries = new ArrayList<>();
+        long timestamp = obj.getLong("timestamp");
+        String storeName = obj.getString("storeName");
+        double total = obj.getDouble("total");
+        List<String> itemSummaries = new ArrayList<>();
         JSONArray arr = obj.optJSONArray("items");
         if (arr != null) {
-            for (int i = 0; i < arr.length(); i++) r.itemSummaries.add(arr.getString(i));
+            for (int i = 0; i < arr.length(); i++) itemSummaries.add(arr.getString(i));
         }
-        return r;
+        return new OrderRecord(timestamp, storeName, itemSummaries, total);
+    }
+
+    public static OrderRecord fromPersisted(long timestamp, String storeName, List<String> itemSummaries, double total) {
+        return new OrderRecord(timestamp, storeName, itemSummaries, total);
     }
 }
 

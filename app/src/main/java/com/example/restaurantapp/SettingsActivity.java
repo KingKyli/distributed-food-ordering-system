@@ -7,9 +7,9 @@ import android.text.TextUtils;
 import android.view.View;
 import com.google.android.material.button.MaterialButton;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 
 public class SettingsActivity extends BaseActivity {
@@ -19,8 +19,8 @@ public class SettingsActivity extends BaseActivity {
     private static final String KEY_PORT     = "server_port";
     private static final int    DEFAULT_PORT = 8765;
 
-    private Switch switchManagerMode;
-    private Switch switchNotifications;
+    private SwitchCompat switchManagerMode;
+    private SwitchCompat switchNotifications;
     private EditText editServerIp;
     private EditText editServerPort;
     private MaterialButton btnSaveServer;

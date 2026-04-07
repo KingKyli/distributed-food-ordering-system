@@ -66,9 +66,9 @@
                 android:text="View order history"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
-                android:drawableStart="@drawable/ic_history"
+                app:drawableStartCompat="@drawable/ic_history"
                 android:drawablePadding="4dp"
-                android:drawableTint="@color/text_secondary" />
+                app:drawableTint="@color/text_secondary" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

@@ -1,16 +1,27 @@
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Simple Mock Server for testing the Restaurant App
- * Run with: java MockServer.java
- * Or compile first: javac MockServer.java && java MockServer
+ * Mock Server for testing the Restaurant App.
+ * Recommended run command: .\gradlew.bat :server:run
  */
 public class MockServer {
     private static final int PORT = 8765;
+     private static final Path DATA_DIRECTORY = Paths.get(System.getProperty("user.dir"), "server-data");
+     private static final Path DATABASE_PATH = DATA_DIRECTORY.resolve("restaurant-app.db");
+     private static final String DATABASE_URL = "jdbc:sqlite:" + DATABASE_PATH.toAbsolutePath();
     
     // Partner registry - StoreName -> Registered delivery destination
     private static final Map<String, String> PARTNER_CONTACTS = new HashMap<>() {{
@@ -44,13 +55,15 @@ public class MockServer {
     private static final Map<String, Long> ACTIVE_PARTNER_CODE_EXPIRY = Collections.synchronizedMap(new HashMap<>());
     private static final int ACCESS_CODE_EXPIRY_MINUTES = 5;
     
-    private static final List<StoreData> STORES = Collections.synchronizedList(createSeedStores());
+    private static final List<StoreData> STORES = Collections.synchronizedList(new ArrayList<>());
 
     public static void main(String[] args) {
         System.out.println("===========================================");
         System.out.println("  Mock Server for Restaurant App");
         System.out.println("===========================================");
         System.out.println("Starting server on port " + PORT + "...");
+        bootstrapStoreState();
+        Runtime.getRuntime().addShutdownHook(new Thread(MockServer::persistStoresToDatabase));
         
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             // Print all available IPs
@@ -71,7 +84,8 @@ public class MockServer {
             } catch (Exception e) {
                 // Ignore
             }
-            System.out.println("\nWaiting for connections...\n");
+            System.out.println("\nSQLite database: " + DATABASE_PATH.toAbsolutePath());
+            System.out.println("Waiting for connections...\n");
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
@@ -260,6 +274,7 @@ public class MockServer {
                 return "ERROR: Not enough inventory";
             }
             product.availableAmount -= quantity;
+            persistStoresToDatabase();
         }
 
         System.out.println("    [ORDER] Processed purchase: " + data);
@@ -287,6 +302,7 @@ public class MockServer {
                     defaultString(extractJsonString(json, "StoreLogo"), "")
             );
             STORES.add(store);
+            persistStoresToDatabase();
         }
         return "OK: Store added";
     }
@@ -298,6 +314,7 @@ public class MockServer {
             while (iterator.hasNext()) {
                 if (iterator.next().storeName.equalsIgnoreCase(storeName)) {
                     iterator.remove();
+                    persistStoresToDatabase();
                     return "OK: Store removed";
                 }
             }
@@ -327,6 +344,7 @@ public class MockServer {
                 return "ERROR: Product already exists";
             }
             store.products.add(product);
+            persistStoresToDatabase();
         }
 
         return "OK: Product added";
@@ -350,6 +368,7 @@ public class MockServer {
             while (iterator.hasNext()) {
                 if (iterator.next().productName.equalsIgnoreCase(productName)) {
                     iterator.remove();
+                    persistStoresToDatabase();
                     return "OK: Product removed";
                 }
             }
@@ -386,9 +405,138 @@ public class MockServer {
             }
             product.price = newPrice;
             product.availableAmount = newAmount;
+            persistStoresToDatabase();
         }
 
         return "OK: Product updated";
+    }
+
+    private static void bootstrapStoreState() {
+        try {
+            Files.createDirectories(DATA_DIRECTORY);
+            initializeDatabase();
+            List<StoreData> persistedStores = loadStoresFromDatabase();
+            synchronized (STORES) {
+                STORES.clear();
+                if (persistedStores.isEmpty()) {
+                    STORES.addAll(createSeedStores());
+                    persistStoresToDatabase();
+                    System.out.println("Seeded SQLite store with initial restaurant data.");
+                } else {
+                    STORES.addAll(persistedStores);
+                    System.out.println("Loaded " + STORES.size() + " stores from SQLite.");
+                }
+            }
+        } catch (IOException | SQLException e) {
+            throw new IllegalStateException("Failed to bootstrap persisted store state", e);
+        }
+    }
+
+    private static void initializeDatabase() throws SQLException {
+        try (Connection connection = DriverManager.getConnection(DATABASE_URL);
+             Statement statement = connection.createStatement()) {
+            statement.execute(
+                    "CREATE TABLE IF NOT EXISTS stores (" +
+                            "store_name TEXT PRIMARY KEY," +
+                            "latitude REAL NOT NULL," +
+                            "longitude REAL NOT NULL," +
+                            "food_category TEXT NOT NULL," +
+                            "stars INTEGER NOT NULL," +
+                            "no_of_votes INTEGER NOT NULL," +
+                            "store_logo TEXT NOT NULL)"
+            );
+            statement.execute(
+                    "CREATE TABLE IF NOT EXISTS products (" +
+                            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                            "store_name TEXT NOT NULL," +
+                            "product_name TEXT NOT NULL," +
+                            "product_type TEXT NOT NULL," +
+                            "available_amount INTEGER NOT NULL," +
+                            "price REAL NOT NULL," +
+                            "FOREIGN KEY(store_name) REFERENCES stores(store_name) ON DELETE CASCADE)"
+            );
+        }
+    }
+
+    private static List<StoreData> loadStoresFromDatabase() throws SQLException {
+        Map<String, StoreData> storesByName = new LinkedHashMap<>();
+        try (Connection connection = DriverManager.getConnection(DATABASE_URL)) {
+            try (PreparedStatement storeStatement = connection.prepareStatement(
+                    "SELECT store_name, latitude, longitude, food_category, stars, no_of_votes, store_logo FROM stores ORDER BY store_name")) {
+                ResultSet resultSet = storeStatement.executeQuery();
+                while (resultSet.next()) {
+                    StoreData store = new StoreData(
+                            resultSet.getString("store_name"),
+                            resultSet.getDouble("latitude"),
+                            resultSet.getDouble("longitude"),
+                            resultSet.getString("food_category"),
+                            resultSet.getInt("stars"),
+                            resultSet.getInt("no_of_votes"),
+                            resultSet.getString("store_logo")
+                    );
+                    storesByName.put(store.storeName, store);
+                }
+            }
+
+            try (PreparedStatement productStatement = connection.prepareStatement(
+                    "SELECT store_name, product_name, product_type, available_amount, price FROM products ORDER BY store_name, id")) {
+                ResultSet resultSet = productStatement.executeQuery();
+                while (resultSet.next()) {
+                    StoreData store = storesByName.get(resultSet.getString("store_name"));
+                    if (store != null) {
+                        store.products.add(new ProductData(
+                                resultSet.getString("product_name"),
+                                resultSet.getString("product_type"),
+                                resultSet.getInt("available_amount"),
+                                resultSet.getDouble("price")
+                        ));
+                    }
+                }
+            }
+        }
+        return new ArrayList<>(storesByName.values());
+    }
+
+    private static void persistStoresToDatabase() {
+        synchronized (STORES) {
+            try (Connection connection = DriverManager.getConnection(DATABASE_URL)) {
+                connection.setAutoCommit(false);
+                try (Statement clearStatement = connection.createStatement()) {
+                    clearStatement.executeUpdate("DELETE FROM products");
+                    clearStatement.executeUpdate("DELETE FROM stores");
+                }
+
+                try (PreparedStatement storeStatement = connection.prepareStatement(
+                        "INSERT INTO stores(store_name, latitude, longitude, food_category, stars, no_of_votes, store_logo) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                     PreparedStatement productStatement = connection.prepareStatement(
+                             "INSERT INTO products(store_name, product_name, product_type, available_amount, price) VALUES (?, ?, ?, ?, ?)") ) {
+                    for (StoreData store : STORES) {
+                        storeStatement.setString(1, store.storeName);
+                        storeStatement.setDouble(2, store.latitude);
+                        storeStatement.setDouble(3, store.longitude);
+                        storeStatement.setString(4, store.foodCategory);
+                        storeStatement.setInt(5, store.stars);
+                        storeStatement.setInt(6, store.noOfVotes);
+                        storeStatement.setString(7, store.storeLogo);
+                        storeStatement.addBatch();
+
+                        for (ProductData product : store.products) {
+                            productStatement.setString(1, store.storeName);
+                            productStatement.setString(2, product.productName);
+                            productStatement.setString(3, product.productType);
+                            productStatement.setInt(4, product.availableAmount);
+                            productStatement.setDouble(5, product.price);
+                            productStatement.addBatch();
+                        }
+                    }
+                    storeStatement.executeBatch();
+                    productStatement.executeBatch();
+                }
+                connection.commit();
+            } catch (SQLException e) {
+                throw new IllegalStateException("Failed to persist stores to SQLite", e);
+            }
+        }
     }
 
     private static List<StoreData> createSeedStores() {

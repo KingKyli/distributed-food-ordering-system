@@ -22,6 +22,14 @@
             android:background="@drawable/restaurant_card_header_background">
 
             <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.22"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                android:src="@drawable/background_image" />
+
+            <ImageView
                 android:id="@+id/ivRestaurantIcon"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
@@ -38,7 +46,7 @@
                 android:background="@drawable/chip_background_light"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="6dp"
-                android:text="Top rated"
+                android:text="Chef's pick"
                 android:textColor="@color/primary"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -63,7 +71,7 @@
                 android:background="@drawable/chip_background_neutral"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="6dp"
-                android:text="Fast delivery"
+                android:text="Premium delivery"
                 android:textColor="@color/text_primary"
                 android:textSize="12sp"
                 android:textStyle="bold" />

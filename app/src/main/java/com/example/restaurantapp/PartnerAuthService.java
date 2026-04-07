@@ -1,10 +1,19 @@
 package com.example.restaurantapp;
 
 import java.util.List;
-import java.util.Locale;
 
 public class PartnerAuthService {
-    private final RestaurantRepository restaurantRepository = new RestaurantRepository();
+    private final RestaurantRepository restaurantRepository;
+    private final ServerGateway serverGateway;
+
+    public PartnerAuthService() {
+        this(new RestaurantRepository(), new TcpServerGateway());
+    }
+
+    PartnerAuthService(RestaurantRepository restaurantRepository, ServerGateway serverGateway) {
+        this.restaurantRepository = restaurantRepository;
+        this.serverGateway = serverGateway;
+    }
 
     public AppResult<List<Store>> loadStores() {
         return restaurantRepository.searchStores("", "", "", 0, "");
@@ -18,13 +27,11 @@ public class PartnerAuthService {
             return AppResult.error("Please fill in all fields.");
         }
 
-        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
-        if (!communicatorResult.isSuccess()) {
-            return AppResult.error(communicatorResult.getMessage());
+        AppResult<String> responseResult = serverGateway.partnerLogin(normalizedStoreName, normalizedPassword);
+        if (!responseResult.isSuccess()) {
+            return AppResult.error(responseResult.getMessage());
         }
-        MasterCommunicator communicator = communicatorResult.getData();
-
-        String response = communicator.sendPartnerLoginRequestDetailed(normalizedStoreName, normalizedPassword);
+        String response = responseResult.getData();
         if (response == null || response.trim().isEmpty()) {
             return AppResult.error("Could not complete login. Please try again.");
         }
@@ -40,13 +47,11 @@ public class PartnerAuthService {
             return AppResult.error("Select your store first.");
         }
 
-        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
-        if (!communicatorResult.isSuccess()) {
-            return AppResult.error(communicatorResult.getMessage());
+        AppResult<String> responseResult = serverGateway.requestPartnerAccessCode(storeName);
+        if (!responseResult.isSuccess()) {
+            return AppResult.error(responseResult.getMessage());
         }
-        MasterCommunicator communicator = communicatorResult.getData();
-
-        String response = communicator.requestPartnerAccessCode(storeName);
+        String response = responseResult.getData();
         if (response == null || response.trim().isEmpty()) {
             return AppResult.error("Could not request an access code.");
         }

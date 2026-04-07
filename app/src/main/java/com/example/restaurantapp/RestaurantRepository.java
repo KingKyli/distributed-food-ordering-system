@@ -5,28 +5,37 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class RestaurantRepository {
 
-    public AppResult<List<Store>> searchStores(String latitude, String longitude, String cuisine, int stars, String price) {
-        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
-        if (!communicatorResult.isSuccess()) {
-            return AppResult.error(communicatorResult.getMessage());
-        }
-        MasterCommunicator communicator = communicatorResult.getData();
+    private final ServerGateway serverGateway;
 
-        String response = communicator.sendSearchRequest(
+    public RestaurantRepository() {
+        this(new TcpServerGateway());
+    }
+
+    RestaurantRepository(ServerGateway serverGateway) {
+        this.serverGateway = serverGateway;
+    }
+
+    public AppResult<List<Store>> searchStores(String latitude, String longitude, String cuisine, int stars, String price) {
+        AppResult<String> responseResult = serverGateway.search(
                 safe(latitude),
                 safe(longitude),
                 safe(cuisine),
                 stars > 0 ? String.valueOf(stars) : "",
                 safe(price)
         );
+        if (!responseResult.isSuccess()) {
+            return AppResult.error(responseResult.getMessage());
+        }
+        String response = responseResult.getData();
 
         if (response == null || response.trim().isEmpty()) {
             return AppResult.error("Could not load restaurants from the server.");
         }
-        if (response.trim().toUpperCase().startsWith("ERROR:")) {
+        if (response.trim().toUpperCase(Locale.ROOT).startsWith("ERROR:")) {
             return AppResult.error(ProtocolUtils.extractErrorMessage(response, "Server returned an error."));
         }
 

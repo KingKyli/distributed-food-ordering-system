@@ -6,20 +6,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderService {
-
-    private final Context appContext;
+    private final ServerGateway serverGateway;
+    private final OrderHistoryStore orderHistoryStore;
 
     public OrderService(Context context) {
-        this.appContext = context.getApplicationContext();
+        this(new TcpServerGateway(), new LocalOrderHistoryStore(context));
+    }
+
+    OrderService(ServerGateway serverGateway, OrderHistoryStore orderHistoryStore) {
+        this.serverGateway = serverGateway;
+        this.orderHistoryStore = orderHistoryStore;
     }
 
     public AppResult<Void> submitOrder(List<BasketItem> items) {
-        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
-        if (!communicatorResult.isSuccess()) {
-            return AppResult.error(communicatorResult.getMessage());
-        }
-        MasterCommunicator communicator = communicatorResult.getData();
-
         if (items == null || items.isEmpty()) {
             return AppResult.error("Your basket is empty.");
         }
@@ -30,7 +29,11 @@ public class OrderService {
 
         List<String> failed = new ArrayList<>();
         for (BasketItem item : items) {
-            String response = communicator.sendBuyRequestDetailed(item.getStoreName(), item.getProductName(), item.getQuantity());
+            AppResult<String> responseResult = serverGateway.buy(item.getStoreName(), item.getProductName(), item.getQuantity());
+            if (!responseResult.isSuccess()) {
+                return AppResult.error(responseResult.getMessage());
+            }
+            String response = responseResult.getData();
             if (!ProtocolUtils.isOkResponse(response)) {
                 failed.add(item.getProductName());
             }
@@ -42,7 +45,7 @@ public class OrderService {
 
         // Persist to local order history
         OrderRecord record = new OrderRecord(storeName, items, total);
-        OrderHistoryRepository.saveOrder(appContext, record);
+        orderHistoryStore.saveOrder(record);
 
         return AppResult.success(null);
     }

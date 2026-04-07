@@ -3,7 +3,17 @@ package com.example.restaurantapp;
 import java.util.List;
 
 public class ProductManagementService {
-    private final RestaurantRepository restaurantRepository = new RestaurantRepository();
+    private final RestaurantRepository restaurantRepository;
+    private final ServerGateway serverGateway;
+
+    public ProductManagementService() {
+        this(new RestaurantRepository(), new TcpServerGateway());
+    }
+
+    ProductManagementService(RestaurantRepository restaurantRepository, ServerGateway serverGateway) {
+        this.restaurantRepository = restaurantRepository;
+        this.serverGateway = serverGateway;
+    }
 
     public AppResult<Void> addProduct(String storeName, Product product) {
         if (storeName == null || storeName.trim().isEmpty()) {
@@ -12,11 +22,11 @@ public class ProductManagementService {
         if (product == null) {
             return AppResult.error("Product details are missing");
         }
-        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
-        if (!communicatorResult.isSuccess()) {
-            return AppResult.error(communicatorResult.getMessage());
+        AppResult<String> responseResult = serverGateway.addProduct(storeName, product);
+        if (!responseResult.isSuccess()) {
+            return AppResult.error(responseResult.getMessage());
         }
-        String response = communicatorResult.getData().sendAddProductRequestDetailed(storeName, product);
+        String response = responseResult.getData();
         if (ProtocolUtils.isOkResponse(response)) {
             return AppResult.success(null);
         }
@@ -24,11 +34,11 @@ public class ProductManagementService {
     }
 
     public AppResult<Void> updateProduct(String storeName, String productName, double price, int quantity) {
-        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
-        if (!communicatorResult.isSuccess()) {
-            return AppResult.error(communicatorResult.getMessage());
+        AppResult<String> responseResult = serverGateway.updateProduct(storeName, productName, price, quantity);
+        if (!responseResult.isSuccess()) {
+            return AppResult.error(responseResult.getMessage());
         }
-        String response = communicatorResult.getData().sendUpdateProductRequestDetailed(storeName, productName, price, quantity);
+        String response = responseResult.getData();
         if (ProtocolUtils.isOkResponse(response)) {
             return AppResult.success(null);
         }
@@ -36,11 +46,11 @@ public class ProductManagementService {
     }
 
     public AppResult<Void> removeProduct(String storeName, String productName) {
-        AppResult<MasterCommunicator> communicatorResult = ServerConnection.requireCommunicator();
-        if (!communicatorResult.isSuccess()) {
-            return AppResult.error(communicatorResult.getMessage());
+        AppResult<String> responseResult = serverGateway.removeProduct(storeName, productName);
+        if (!responseResult.isSuccess()) {
+            return AppResult.error(responseResult.getMessage());
         }
-        String response = communicatorResult.getData().sendRemoveProductRequestDetailed(storeName, productName);
+        String response = responseResult.getData();
         if (ProtocolUtils.isOkResponse(response)) {
             return AppResult.success(null);
         }

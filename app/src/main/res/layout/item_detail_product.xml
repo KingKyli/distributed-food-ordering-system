@@ -3,20 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
-    android:layout_marginVertical="5dp"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
     app:cardBackgroundColor="@color/card_background"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
     app:strokeColor="@color/divider"
-    app:strokeWidth="0dp">
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="14dp">
+        android:padding="18dp">
 
         <!-- Left icon -->
         <FrameLayout
@@ -96,7 +96,7 @@
                 android:contentDescription="Add to basket"
                 android:padding="10dp"
                 android:src="@drawable/ic_cart"
-                app:tint="@color/primary" />
+                app:tint="@color/secondary_dark" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

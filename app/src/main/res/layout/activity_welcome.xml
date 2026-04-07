@@ -5,127 +5,205 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
-    <!-- Brand title -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:alpha="0.28"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background_image"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/welcome_overlay_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
-        android:id="@+id/tvAppTitle"
+        android:id="@+id/tvAppEyebrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="56dp"
+        android:background="@drawable/chip_background_light"
         android:fontFamily="sans-serif-medium"
-        android:text="Foodie Express"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="8dp"
+        android:text="Curated delivery experience"
         android:textColor="@color/primary"
-        android:textSize="40sp"
+        android:textSize="12sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Hero illustration -->
-    <ImageView
-        android:id="@+id/ivChefIcon"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        android:layout_marginTop="24dp"
-        android:contentDescription="Chef hat"
-        android:src="@drawable/ic_chef_hat"
+    <TextView
+        android:id="@+id/tvAppTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        android:fontFamily="serif"
+        android:text="Foodie Express"
+        android:textColor="@color/primary"
+        android:textSize="44sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAppEyebrow" />
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="Elevated meals, fast ordering, and a cleaner partner workflow in one polished demo app."
+        android:textColor="@color/text_secondary"
+        android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAppTitle" />
 
-    <!-- Tagline -->
-    <TextView
-        android:id="@+id/tvSubtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:text="Something good is cooking"
-        android:textAppearance="@style/TextAppearance.App.SectionTitle"
-        android:textColor="@color/text_primary"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivChefIcon" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:text="Browse restaurants, order your favourites"
-        android:textColor="@color/text_secondary"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
-        android:id="@+id/tvSubtitle2" />
-
-    <!-- Connection status -->
-    <TextView
-        android:id="@+id/tvConnectionStatus"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/welcomeHeroCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:gravity="center"
-        android:text="Connecting to server..."
-        android:textColor="@color/text_secondary"
-        android:textSize="14sp"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        app:cardBackgroundColor="@color/card_background"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/divider"
+        app:strokeWidth="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvSubtitle2" />
+        app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
 
-    <ProgressBar
-        android:id="@+id/progressConnection"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:indeterminateTint="@color/primary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvConnectionStatus" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="22dp">
 
-    <!-- Retry button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnRetryConnection"
-        style="@style/Widget.Material3.Button.OutlinedButton"
+            <FrameLayout
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:background="@drawable/chip_background_light">
+
+                <ImageView
+                    android:id="@+id/ivChefIcon"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Chef hat"
+                    android:src="@drawable/ic_chef_hat"
+                    app:tint="@color/primary" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Something exceptional is cooking"
+                    android:textColor="@color/text_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSubtitle2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Browse premium restaurant cards, place orders, and review history with a more polished UI."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/statusCard"
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="18dp"
         android:layout_marginEnd="32dp"
-        android:text="Retry Connection"
-        android:textAllCaps="false"
-        android:visibility="gone"
-        app:cornerRadius="14dp"
+        app:cardBackgroundColor="@color/card_background"
+        app:cardCornerRadius="22dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/divider"
+        app:strokeWidth="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/progressConnection"
-        app:strokeColor="@color/primary" />
+        app:layout_constraintTop_toBottomOf="@id/welcomeHeroCard">
 
-    <!-- CTA buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <TextView
+                android:id="@+id/tvConnectionStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Connecting to server..."
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+            <ProgressBar
+                android:id="@+id/progressConnection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:indeterminateTint="@color/secondary" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRetryConnection"
+                style="@style/Widget.App.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="14dp"
+                android:text="Retry connection"
+                android:visibility="gone"
+                app:strokeColor="@color/secondary" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCustomerFlow"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="28dp"
         android:layout_marginEnd="32dp"
         android:enabled="false"
         android:text="Continue as Customer"
-        android:textAllCaps="false"
         android:textSize="16sp"
-        app:backgroundTint="@color/primary"
-        app:cornerRadius="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnRetryConnection" />
+        app:layout_constraintTop_toBottomOf="@id/statusCard" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnPartnerFlow"
-        style="@style/Widget.Material3.Button.OutlinedButton"
+        style="@style/Widget.App.Button.Outlined"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginStart="32dp"
@@ -133,13 +211,9 @@
         android:layout_marginEnd="32dp"
         android:enabled="false"
         android:text="Partner / Manager Login"
-        android:textAllCaps="false"
-        android:textColor="@color/primary"
         android:textSize="16sp"
-        app:cornerRadius="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnCustomerFlow"
-        app:strokeColor="@color/primary" />
+        app:layout_constraintTop_toBottomOf="@id/btnCustomerFlow" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

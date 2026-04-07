@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -301,7 +302,8 @@ public class MainActivity extends BaseActivity {
             // Cuisine/Food Category filter
             if (cuisine != null && !cuisine.isEmpty() && !cuisine.equalsIgnoreCase("All")) {
                 String storeCategory = store.getFoodCategory();
-                if (storeCategory == null || !storeCategory.toLowerCase().contains(cuisine.toLowerCase())) {
+                if (storeCategory == null
+                        || !storeCategory.toLowerCase(Locale.ROOT).contains(cuisine.toLowerCase(Locale.ROOT))) {
                     continue;
                 }
             }
@@ -367,7 +369,7 @@ public class MainActivity extends BaseActivity {
         }
         if (dollarCount == 0) {
             // Try to interpret words
-            String lower = normalized.toLowerCase();
+            String lower = normalized.toLowerCase(Locale.ROOT);
             if (lower.contains("cheap") || lower.contains("budget") || lower.equals("$")) return "$";
             if (lower.contains("expensive") || lower.contains("luxury") || lower.equals("$$$")) return "$$$";
             return "$$"; // default medium
@@ -382,7 +384,7 @@ public class MainActivity extends BaseActivity {
             return true;
         }
 
-        String normalizedQuery = query.trim().toLowerCase();
+        String normalizedQuery = query.trim().toLowerCase(Locale.ROOT);
 
         if ((normalizedQuery.contains("budget") || normalizedQuery.contains("cheap"))
                 && "$".equals(normalizePrice(store.getPriceCategory()))) {
@@ -400,20 +402,24 @@ public class MainActivity extends BaseActivity {
             return true;
         }
 
-        if (store.getStoreName() != null && store.getStoreName().toLowerCase().contains(normalizedQuery)) {
+        if (store.getStoreName() != null
+            && store.getStoreName().toLowerCase(Locale.ROOT).contains(normalizedQuery)) {
             return true;
         }
 
-        if (store.getFoodCategory() != null && store.getFoodCategory().toLowerCase().contains(normalizedQuery)) {
+        if (store.getFoodCategory() != null
+            && store.getFoodCategory().toLowerCase(Locale.ROOT).contains(normalizedQuery)) {
             return true;
         }
 
         if (store.getProducts() != null) {
             for (Product product : store.getProducts()) {
-                if (product.getProductName() != null && product.getProductName().toLowerCase().contains(normalizedQuery)) {
+                if (product.getProductName() != null
+                        && product.getProductName().toLowerCase(Locale.ROOT).contains(normalizedQuery)) {
                     return true;
                 }
-                if (product.getProductType() != null && product.getProductType().toLowerCase().contains(normalizedQuery)) {
+                if (product.getProductType() != null
+                        && product.getProductType().toLowerCase(Locale.ROOT).contains(normalizedQuery)) {
                     return true;
                 }
             }
@@ -431,13 +437,15 @@ public class MainActivity extends BaseActivity {
         if (keyword == null || keyword.trim().isEmpty()) {
             return false;
         }
-        String normalizedKeyword = keyword.trim().toLowerCase();
+        String normalizedKeyword = keyword.trim().toLowerCase(Locale.ROOT);
 
-        if (store.getFoodCategory() != null && store.getFoodCategory().toLowerCase().contains(normalizedKeyword)) {
+        if (store.getFoodCategory() != null
+            && store.getFoodCategory().toLowerCase(Locale.ROOT).contains(normalizedKeyword)) {
             return true;
         }
 
-        if (store.getStoreName() != null && store.getStoreName().toLowerCase().contains(normalizedKeyword)) {
+        if (store.getStoreName() != null
+            && store.getStoreName().toLowerCase(Locale.ROOT).contains(normalizedKeyword)) {
             return true;
         }
 
@@ -446,10 +454,12 @@ public class MainActivity extends BaseActivity {
         }
 
         for (Product product : store.getProducts()) {
-            if (product.getProductName() != null && product.getProductName().toLowerCase().contains(normalizedKeyword)) {
+            if (product.getProductName() != null
+                    && product.getProductName().toLowerCase(Locale.ROOT).contains(normalizedKeyword)) {
                 return true;
             }
-            if (product.getProductType() != null && product.getProductType().toLowerCase().contains(normalizedKeyword)) {
+            if (product.getProductType() != null
+                    && product.getProductType().toLowerCase(Locale.ROOT).contains(normalizedKeyword)) {
                 return true;
             }
         }

@@ -23,6 +23,14 @@
                 android:layout_height="220dp"
                 android:background="@drawable/restaurant_card_header_background">
 
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:alpha="0.20"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/background_image" />
+
                 <!-- Back button -->
                 <ImageButton
                     android:id="@+id/btnBack"
@@ -48,10 +56,10 @@
                         android:id="@+id/tvStoreName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="serif"
                         android:text="Store Name"
                         android:textColor="@color/white"
-                        android:textSize="26sp"
-                        android:textStyle="bold"
+                        android:textSize="28sp"
                         android:shadowColor="#66000000"
                         android:shadowDx="0"
                         android:shadowDy="1"
@@ -93,7 +101,7 @@
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="6dp"
                             android:text="$$"
-                            android:textColor="@color/white"
+                            android:textColor="@color/primary"
                             android:textSize="13sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -106,8 +114,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
-                android:paddingTop="18dp"
-                android:paddingBottom="8dp">
+                android:paddingTop="20dp"
+                android:paddingBottom="12dp">
 
                 <TextView
                     android:layout_width="wrap_content"

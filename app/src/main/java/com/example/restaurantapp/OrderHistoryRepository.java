@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,37 +17,49 @@ public final class OrderHistoryRepository {
     private OrderHistoryRepository() {}
 
     public static void saveOrder(Context context, OrderRecord record) {
-        List<OrderRecord> orders = getOrders(context);
-        orders.add(0, record); // newest first
-        if (orders.size() > MAX_ORDERS) {
-            orders = orders.subList(0, MAX_ORDERS);
-        }
-        JSONArray array = new JSONArray();
-        for (OrderRecord r : orders) {
-            try { array.put(r.toJson()); } catch (Exception ignored) {}
-        }
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                .edit().putString(KEY_ORDERS, array.toString()).apply();
+        OrderHistoryDao dao = getDao(context);
+        migrateLegacyOrdersIfNeeded(context, dao);
+        dao.insert(OrderRecordEntity.fromOrderRecord(record));
+        dao.trimToLimit(MAX_ORDERS);
     }
 
     public static List<OrderRecord> getOrders(Context context) {
-        String json = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                .getString(KEY_ORDERS, "[]");
+        OrderHistoryDao dao = getDao(context);
+        migrateLegacyOrdersIfNeeded(context, dao);
         List<OrderRecord> orders = new ArrayList<>();
-        try {
-            JSONArray array = new JSONArray(json);
-            for (int i = 0; i < array.length(); i++) {
-                try {
-                    orders.add(OrderRecord.fromJson(array.getJSONObject(i)));
-                } catch (Exception ignored) {}
-            }
-        } catch (Exception ignored) {}
+        for (OrderRecordEntity entity : dao.getRecentOrders(MAX_ORDERS)) {
+            orders.add(entity.toOrderRecord());
+        }
         return orders;
     }
 
     public static void clearAll(Context context) {
+        getDao(context).clearAll();
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit().remove(KEY_ORDERS).apply();
+    }
+
+    private static OrderHistoryDao getDao(Context context) {
+        return RestaurantAppDatabase.getInstance(context).orderHistoryDao();
+    }
+
+    private static void migrateLegacyOrdersIfNeeded(Context context, OrderHistoryDao dao) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        String json = prefs.getString(KEY_ORDERS, null);
+        if (json == null || json.trim().isEmpty()) {
+            return;
+        }
+
+        try {
+            JSONArray array = new JSONArray(json);
+            for (int index = 0; index < array.length(); index++) {
+                dao.insert(OrderRecordEntity.fromOrderRecord(OrderRecord.fromJson(array.getJSONObject(index))));
+            }
+            dao.trimToLimit(MAX_ORDERS);
+        } catch (Exception ignored) {
+        }
+
+        prefs.edit().remove(KEY_ORDERS).apply();
     }
 }
 

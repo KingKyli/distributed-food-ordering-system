@@ -1,5 +1,7 @@
 package com.example.restaurantapp;
 
+import java.util.Locale;
+
 public final class BasketItem {
     private final String storeName;
     private final String productName;
@@ -56,7 +58,7 @@ public final class BasketItem {
     }
 
     private static String normalize(String value) {
-        return value == null ? "" : value.trim().toLowerCase();
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 }
 

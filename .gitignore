@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+**/build/
+hs_err_pid*.log
+replay_pid*.log
+server-data/
+logcat_check.txt
+logcat_full.txt

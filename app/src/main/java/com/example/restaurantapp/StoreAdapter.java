@@ -101,7 +101,7 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
         holder.tvStars.setText(getStarsString(stars));
 
         if (holder.tvRating != null) {
-            holder.tvRating.setText(String.format("%.1f", stars));
+            holder.tvRating.setText(String.format(Locale.getDefault(), "%.1f", stars));
         }
 
         String priceCategory = store.getPriceCategory();

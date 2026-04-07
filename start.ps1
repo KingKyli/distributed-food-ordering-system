@@ -34,18 +34,14 @@ if ($existing) {
 # ── 2. Start MockServer in background window ─────────────────
 Write-Host "[2/4] Starting MockServer on port $ServerPort..." -ForegroundColor Yellow
 Set-Location $ProjectRoot
-if (-not (Test-Path "$ProjectRoot\MockServer.class")) {
-    Write-Host "      Compiling MockServer.java..." -ForegroundColor Gray
-    javac "$ProjectRoot\MockServer.java"
-}
-Start-Process -FilePath "java" -ArgumentList "MockServer" `
+Start-Process -FilePath "$ProjectRoot\gradlew.bat" -ArgumentList ":server:run" `
     -WorkingDirectory $ProjectRoot -WindowStyle Normal
 Start-Sleep -Seconds 2
 
 # Verify server started
 $listening = netstat -ano | Select-String ":$ServerPort "
 if ($listening) {
-    Write-Host "      MockServer is RUNNING on port $ServerPort ✓" -ForegroundColor Green
+    Write-Host "      MockServer is RUNNING on port $ServerPort with SQLite persistence ✓" -ForegroundColor Green
 } else {
     Write-Host "      ERROR: MockServer did not start!" -ForegroundColor Red
     exit 1
@@ -62,7 +58,7 @@ if (-not $devices) {
     foreach ($line in $devices) {
         $serial = ($line -split '\s+')[0]
         Write-Host "      Device: $serial" -ForegroundColor Gray
-        $result = adb -s $serial reverse tcp:$ServerPort tcp:$ServerPort 2>&1
+        adb -s $serial reverse tcp:$ServerPort tcp:$ServerPort 2>&1 | Out-Null
         Write-Host "      Port forward $serial -> 127.0.0.1:$ServerPort ✓" -ForegroundColor Green
     }
 }

@@ -3,6 +3,7 @@ package com.example.restaurantapp;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import java.util.Locale;
 import java.util.Objects;
 
 public class Product {
@@ -83,7 +84,7 @@ public class Product {
     }
 
     private static String normalize(String value) {
-        return value == null ? "" : value.trim().toLowerCase();
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 
 

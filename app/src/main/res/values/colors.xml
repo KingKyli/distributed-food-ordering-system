@@ -1,73 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary Colors - Food Red Theme -->
-    <color name="primary">#D32F2F</color>
-    <color name="primary_dark">#B71C1C</color>
-    <color name="primary_light">#EF5350</color>
-    <color name="primary_variant">#C62828</color>
+    <color name="primary">#0A1F44</color>
+    <color name="primary_dark">#06132D</color>
+    <color name="primary_light">#1F3A6D</color>
+    <color name="primary_variant">#16305B</color>
 
-    <!-- Secondary Colors - Warm Orange -->
-    <color name="secondary">#FF7043</color>
-    <color name="secondary_dark">#E64A19</color>
-    <color name="secondary_light">#FF8A65</color>
-    <color name="secondary_soft">#FFF0EB</color>
+    <color name="secondary">#C8A97E</color>
+    <color name="secondary_dark">#A58257</color>
+    <color name="secondary_light">#E2C8A4</color>
+    <color name="secondary_soft">#F2EADF</color>
 
-    <!-- Accent -->
-    <color name="accent">#FFC107</color>
-    <color name="accent_dark">#FFA000</color>
+    <color name="accent">#C8A97E</color>
+    <color name="accent_dark">#94714C</color>
 
-    <!-- Surface & Background -->
-    <color name="surface">#FFFFFF</color>
-    <color name="surface_variant">#F5F5F5</color>
-    <color name="background">#FAFAFA</color>
-    <color name="card_background">#FFFFFF</color>
-    <color name="featured_filter_selected_background">#FFF1EA</color>
-    <color name="featured_filter_default_background">#FFFFFF</color>
-    <color name="featured_filter_selected_stroke">#FF7043</color>
-    <color name="featured_filter_default_stroke">#E0E0E0</color>
+    <color name="surface">#FFFCF7</color>
+    <color name="surface_variant">#F0ECE3</color>
+    <color name="background">#F8F6F2</color>
+    <color name="card_background">#FFFDF9</color>
+    <color name="featured_filter_selected_background">#EFE4D4</color>
+    <color name="featured_filter_default_background">#FFFDF9</color>
+    <color name="featured_filter_selected_stroke">#C8A97E</color>
+    <color name="featured_filter_default_stroke">#D9D0C1</color>
 
-    <!-- Text Colors -->
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#757575</color>
-    <color name="text_hint">#9E9E9E</color>
-    <color name="text_on_primary">#FFFFFF</color>
-    <color name="text_on_primary_subtle">#FFF2F2</color>
-    <color name="text_on_primary_outline">#B3FFFFFF</color>
-    <color name="text_on_secondary">#FFFFFF</color>
-    <color name="text_success">#2E7D32</color>
-    <color name="text_error">#D32F2F</color>
-    <color name="text_warning">#F57C00</color>
-    <color name="text_info">#1565C0</color>
-    <color name="bottom_nav_inactive">#9E9E9E</color>
-    <color name="bottom_nav_active">#D32F2F</color>
+    <color name="text_primary">#1A1A1A</color>
+    <color name="text_secondary">#6B6B6B</color>
+    <color name="text_hint">#93897B</color>
+    <color name="text_on_primary">#FFFDF8</color>
+    <color name="text_on_primary_subtle">#D9E1F0</color>
+    <color name="text_on_primary_outline">#8A9AB7</color>
+    <color name="text_on_secondary">#1A1A1A</color>
+    <color name="text_success">#2F6D53</color>
+    <color name="text_error">#A13E38</color>
+    <color name="text_warning">#A06B1C</color>
+    <color name="text_info">#2F577C</color>
+    <color name="bottom_nav_inactive">#867A69</color>
+    <color name="bottom_nav_active">#0A1F44</color>
 
     <!-- Status Colors -->
-    <color name="success">#4CAF50</color>
-    <color name="success_light">#C8E6C9</color>
-    <color name="error">#F44336</color>
-    <color name="error_light">#FFCDD2</color>
-    <color name="warning">#FF9800</color>
-    <color name="warning_light">#FFE0B2</color>
-    <color name="info">#2196F3</color>
+    <color name="success">#4E8B71</color>
+    <color name="success_light">#DDEEE6</color>
+    <color name="error">#C05A52</color>
+    <color name="error_light">#F2DAD8</color>
+    <color name="warning">#C9953F</color>
+    <color name="warning_light">#F6E7C9</color>
+    <color name="info">#6D8EAF</color>
 
     <!-- Star Rating -->
-    <color name="star_filled">#FFC107</color>
-    <color name="star_empty">#E0E0E0</color>
+    <color name="star_filled">#D0A45A</color>
+    <color name="star_empty">#D8D1C6</color>
 
     <!-- Price Colors -->
-    <color name="price_cheap">#4CAF50</color>
-    <color name="price_medium">#FF9800</color>
-    <color name="price_expensive">#F44336</color>
+    <color name="price_cheap">#4E8B71</color>
+    <color name="price_medium">#B48438</color>
+    <color name="price_expensive">#B25C55</color>
 
     <!-- ── Icon / Tag backgrounds ── -->
-    <color name="chip_icon_bg">#FFF3E0</color>
+    <color name="chip_icon_bg">#EFE4D4</color>
 
     <!-- Skeleton loading placeholder -->
-    <color name="skeleton_bg">#E0E0E0</color>
+    <color name="skeleton_bg">#E5DED2</color>
 
     <!-- Dividers & Borders -->
-    <color name="divider">#E0E0E0</color>
-    <color name="border">#BDBDBD</color>
+    <color name="divider">#DED7CB</color>
+    <color name="border">#C7BEAF</color>
 
     <!-- Legacy colors for compatibility -->
     <color name="purple_200">#FFBB86FC</color>
@@ -77,11 +72,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="primary_text_color">#212121</color>
-    <color name="secondary_text_color">#757575</color>
-    <color name="status_active_background">#C8E6C9</color>
-    <color name="status_active_text">#388E3C</color>
-    <color name="disabled_text_color">#BDBDBD</color>
-    <color name="status_inactive_background">#FFCDD2</color>
-    <color name="status_inactive_text">#D32F2F</color>
+    <color name="primary_text_color">#1A1A1A</color>
+    <color name="secondary_text_color">#6B6B6B</color>
+    <color name="status_active_background">#DDEEE6</color>
+    <color name="status_active_text">#2F6D53</color>
+    <color name="disabled_text_color">#B4AA9C</color>
+    <color name="status_inactive_background">#F2DAD8</color>
+    <color name="status_inactive_text">#A13E38</color>
 </resources>

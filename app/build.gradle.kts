@@ -37,7 +37,10 @@ dependencies {
     implementation(libs.material)
     implementation(libs.constraintlayout)
     implementation(libs.cardview)
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler)
     testImplementation(libs.junit)
+    testImplementation(libs.json)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }

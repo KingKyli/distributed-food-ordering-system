@@ -110,7 +110,7 @@ public class MasterCommunicator {
 
     public boolean sendAddStoreRequest(Store store) {
         String response = sendAddStoreRequestDetailed(store);
-        return response != null && response.toLowerCase().startsWith("ok");
+        return response != null && response.toLowerCase(Locale.ROOT).startsWith("ok");
     }
 
     public String sendAddStoreRequestDetailed(Store store) {
@@ -133,7 +133,7 @@ public class MasterCommunicator {
 
     public boolean sendRemoveStoreRequest(String storeName) {
         String response = sendRemoveStoreRequestDetailed(storeName);
-        return response != null && response.toLowerCase().startsWith("ok");
+        return response != null && response.toLowerCase(Locale.ROOT).startsWith("ok");
     }
 
     public String sendRemoveStoreRequestDetailed(String storeName) {
@@ -143,7 +143,7 @@ public class MasterCommunicator {
 
     public boolean sendBuyRequest(String storeName, String productName, int quantity) {
         String response = sendBuyRequestDetailed(storeName, productName, quantity);
-        return response != null && response.toLowerCase().startsWith("success");
+        return response != null && response.toLowerCase(Locale.ROOT).startsWith("success");
     }
 
     public String sendBuyRequestDetailed(String storeName, String productName, int quantity) {
@@ -153,7 +153,7 @@ public class MasterCommunicator {
 
     public boolean sendAddProductRequest(String storeName, Product product) {
         String response = sendAddProductRequestDetailed(storeName, product);
-        return response != null && response.toLowerCase().startsWith("ok");
+        return response != null && response.toLowerCase(Locale.ROOT).startsWith("ok");
     }
 
     public String sendAddProductRequestDetailed(String storeName, Product product) {
@@ -169,7 +169,7 @@ public class MasterCommunicator {
 
     public boolean sendRemoveProductRequest(String storeName, String productName) {
         String response = sendRemoveProductRequestDetailed(storeName, productName);
-        return response != null && response.toLowerCase().startsWith("ok");
+        return response != null && response.toLowerCase(Locale.ROOT).startsWith("ok");
     }
 
     public String sendRemoveProductRequestDetailed(String storeName, String productName) {
@@ -179,7 +179,7 @@ public class MasterCommunicator {
 
     public boolean sendUpdateProductRequest(String storeName, String productName, double newPrice, int newAmount) {
         String response = sendUpdateProductRequestDetailed(storeName, productName, newPrice, newAmount);
-        return response != null && response.toLowerCase().startsWith("ok");
+        return response != null && response.toLowerCase(Locale.ROOT).startsWith("ok");
     }
 
     public String sendUpdateProductRequestDetailed(String storeName, String productName, double newPrice, int newAmount) {
