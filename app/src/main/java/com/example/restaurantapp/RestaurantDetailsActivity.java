@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -63,6 +64,12 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
             tvStoreName.setText(storeName);
             tvCategory.setText(storeJson.optString("FoodCategory", ""));
+
+            // Set hero header image from the restaurant spritesheet tiles
+            ImageView ivHero = findViewById(R.id.ivHeroImage);
+            if (ivHero != null) {
+                ivHero.setImageResource(RestaurantImageHelper.getImageRes(storeName));
+            }
 
             int stars = storeJson.optInt("Stars", 0);
             tvStars.setText("⭐".repeat(Math.max(1, stars)));

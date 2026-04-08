@@ -39,6 +39,10 @@
         <activity android:name=".RestaurantDetailsActivity" />
         <activity android:name=".PartnerLoginActivity" />
         <activity android:name=".OrderHistoryActivity" />
+        <activity android:name=".ui.components.PrimaryButtonExampleActivity"
+            android:label="Primary Button Demo" />
+        <activity android:name=".ui.components.SecondaryButtonExampleActivity"
+            android:label="Secondary Button Demo" />
 
     </application>
 </manifest>

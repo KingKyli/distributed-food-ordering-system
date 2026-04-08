@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="175dp"
+    android:height="100dp"
+    android:viewportWidth="175"
+    android:viewportHeight="100">
+
+    <!-- Foodie Express Logo - Aspect ratio 1.75:1 -->
+
+    <!-- Navy blue cloche dome top knob -->
+    <path
+        android:fillColor="#1B2D5A"
+        android:pathData="M 87.5,8 C 85,8 83,10 83,12.5 L 83,15 L 92,15 L 92,12.5 C 92,10 90,8 87.5,8 Z"/>
+
+    <!-- Main cloche dome -->
+    <path
+        android:fillColor="#1B2D5A"
+        android:pathData="M 87.5,15 C 67,15 50,25 50,37 L 125,37 C 125,25 108,15 87.5,15 Z"/>
+
+    <!-- Light blue dome highlight/shine -->
+    <path
+        android:fillColor="#5E76AB"
+        android:pathData="M 70,20 C 75,18 82,17 92,17 C 105,22 115,28 118,35 L 57,35 C 58,28 63,23 70,20 Z"/>
+
+    <!-- White dome top shine -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 60,22 Q 75,18 87.5,18 Q 100,18 108,22 C 100,20 94,19 87.5,19 C 81,19 72,20 60,22 Z"/>
+
+    <!-- Navy blue cloche base/rim -->
+    <path
+        android:fillColor="#1B2D5A"
+        android:pathData="M 45,37 L 130,37 C 133,37 135,39 135,42 L 135,47 C 135,50 133,52 130,52 L 45,52 C 42,52 40,50 40,47 L 40,42 C 40,39 42,37 45,37 Z"/>
+
+    <!-- Speed lines (left side - navy blue) -->
+    <path
+        android:fillColor="#1B2D5A"
+        android:pathData="M 15,32 L 48,32 C 50,32 51,33 50,34 C 49,35 47,36 45,36 L 12,36 C 10,36 9,35 10,34 C 11,33 13,32 15,32 Z"/>
+
+    <path
+        android:fillColor="#1B2D5A"
+        android:pathData="M 20,42 L 42,42 C 44,42 45,43 44,44 C 43,45 41,46 39,46 L 17,46 C 15,46 14,45 15,44 C 16,43 18,42 20,42 Z"/>
+
+    <path
+        android:fillColor="#1B2D5A"
+        android:pathData="M 25,52 L 38,52 C 40,52 41,53 40,54 C 39,55 37,56 35,56 L 22,56 C 20,56 19,55 20,54 C 21,53 23,52 25,52 Z"/>
+
+    <!-- Orange fork shape (right side) -->
+    <path
+        android:fillColor="#F47920"
+        android:pathData="M 130,52 L 155,45 C 157,44.5 160,44 162,43.5 L 162,48 L 155,52 C 148,56 140,60 135,62 L 130,52 Z"/>
+
+    <!-- Fork prongs - white lines -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 135,35 L 163,35 C 165,35 167,37 167,39 C 167,41 165,43 163,43 L 135,43 C 133,43 131,41 131,39 C 131,37 133,35 135,35 Z"/>
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 137,45 L 165,45 C 167,45 169,47 169,49 C 169,51 167,53 165,53 L 137,53 C 135,53 133,51 133,49 C 133,47 135,45 137,45 Z"/>
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 135,55 L 163,55 C 165,55 167,57 167,59 C 167,61 165,63 163,63 L 135,63 C 133,63 131,61 131,59 C 131,57 133,55 135,55 Z"/>
+
+    <!-- Orange swoosh/curve under the cloche -->
+    <path
+        android:fillColor="#F47920"
+        android:pathData="M 30,58 Q 60,54 87.5,56 Q 115,58 150,50 L 152,60 Q 115,68 87.5,66 Q 60,64 32,68 Z"/>
+
+    <!-- Navy blue plate/base under cloche -->
+    <path
+        android:fillColor="#1B2D5A"
+        android:pathData="M 50,65 Q 70,63 87.5,64 Q 105,63 125,65 C 128,72 120,78 87.5,78 C 55,78 47,72 50,65 Z"/>
+
+</vector>
+

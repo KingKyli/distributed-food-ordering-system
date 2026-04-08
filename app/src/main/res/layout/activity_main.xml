@@ -27,13 +27,12 @@
 
             <ImageView
                 android:id="@+id/ivBrandIcon"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@drawable/welcome_icon_circle"
+                android:layout_width="130dp"
+                android:layout_height="74dp"
+                android:adjustViewBounds="true"
                 android:contentDescription="@string/app_name"
-                android:padding="12dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_foodie_mark"
+                android:src="@drawable/foodie_express_logo_transparent"
                 app:layout_constraintBottom_toBottomOf="@id/tvTitle"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

@@ -2,7 +2,6 @@ package com.example.restaurantapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.material.button.MaterialButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.restaurantapp.ui.components.PrimaryButton;
 
 import java.util.List;
 import java.util.Locale;
@@ -21,7 +22,7 @@ public class BasketActivity extends AppCompatActivity {
     private TextView tvBasketStore;
     private TextView tvBasketTotal;
     private TextView tvBasketStatus;
-    private MaterialButton btnBuy;
+    private PrimaryButton btnBuy;
     private ProgressBar progressBasket;
     private volatile boolean activityActive;
     private OrderService orderService;
@@ -50,6 +51,7 @@ public class BasketActivity extends AppCompatActivity {
         updateSummary();
 
         btnBuy = findViewById(R.id.btnBuy);
+        btnBuy.setText("PLACE ORDER");
         btnBuy.setOnClickListener(v -> performBuy());
 
         // Order history link
@@ -76,14 +78,14 @@ public class BasketActivity extends AppCompatActivity {
             return;
         }
 
-        setPurchaseLoading(true);
+        btnBuy.setLoading(true);
         new Thread(() -> {
             AppResult<Void> result = orderService.submitOrder(basketSnapshot);
             ActivityUtils.runOnUiThreadIfAlive(this, () -> {
                 if (!activityActive) {
                     return;
                 }
-                setPurchaseLoading(false);
+                btnBuy.setLoading(false);
                 if (result.isSuccess()) {
                     Basket.getInstance().clear();
                     notifyBasketChanged();
@@ -134,10 +136,6 @@ public class BasketActivity extends AppCompatActivity {
         }
     }
 
-    private void setPurchaseLoading(boolean loading) {
-        progressBasket.setVisibility(loading ? android.view.View.VISIBLE : android.view.View.GONE);
-        btnBuy.setEnabled(!loading && !Basket.getInstance().isEmpty() && ServerConnection.isReady());
-    }
 
     private void setStatus(String message, boolean isError) {
         tvBasketStatus.setText(message);

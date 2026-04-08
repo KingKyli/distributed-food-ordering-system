@@ -13,17 +13,7 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <ImageView
-            android:id="@+id/ivAppIcon"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="18dp"
-            android:background="@drawable/welcome_icon_circle"
-            android:contentDescription="@string/app_name"
-            android:padding="18dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_foodie_mark" />
+        <!-- Logo removed - using text logo below -->
 
         <!-- Logo Section -->
         <LinearLayout
@@ -146,13 +136,12 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:background="@drawable/welcome_icon_circle"
+                        android:layout_width="80dp"
+                        android:layout_height="46dp"
+                        android:adjustViewBounds="true"
                         android:contentDescription="@string/app_name"
-                        android:padding="6dp"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/ic_foodie_mark" />
+                        android:src="@drawable/foodie_express_logo_transparent" />
 
                     <TextView
                         android:layout_width="wrap_content"

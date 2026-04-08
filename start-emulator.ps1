@@ -25,12 +25,22 @@ if ($avdList -notcontains $avdName) {
     exit 1
 }
 
-# Kill any existing emulator processes
-Write-Host "Checking for existing emulator processes..." -ForegroundColor Yellow
-Get-Process -Name "emulator*" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-Get-Process -Name "qemu-system*" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-
-Start-Sleep -Seconds 2
+# Check if emulator is already running
+Write-Host "Checking for existing emulator..." -ForegroundColor Yellow
+$existingEmulator = adb devices | Select-String "emulator-"
+if ($existingEmulator) {
+    Write-Host "Emulator is already running!" -ForegroundColor Green
+    $bootCompleted = adb shell getprop sys.boot_completed 2>$null
+    if ($bootCompleted -eq "1") {
+        Write-Host "Emulator is fully booted and ready!" -ForegroundColor Green
+        # Set up port forwarding
+        Write-Host "Setting up port forwarding for server connection..." -ForegroundColor Cyan
+        adb reverse tcp:8765 tcp:8765
+        Write-Host "Port forwarding configured: tcp:8765 -> tcp:8765" -ForegroundColor Green
+        Write-Host "`nYou can now run the app from Android Studio!" -ForegroundColor Magenta
+        exit 0
+    }
+}
 
 # Start emulator with reduced memory to avoid OOM errors
 Write-Host "Launching emulator with optimized settings..." -ForegroundColor Cyan

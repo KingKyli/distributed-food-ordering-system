@@ -4,195 +4,148 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="22dp"
-    app:cardElevation="0dp"
-    app:strokeColor="@color/divider"
-    app:strokeWidth="1dp"
+    android:layout_marginBottom="16dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
     app:cardBackgroundColor="@color/card_background">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="118dp"
-            android:background="@drawable/restaurant_card_header_background">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:alpha="0.22"
-                android:contentDescription="@null"
-                android:scaleType="centerCrop"
-                android:src="@drawable/background_image" />
-
-            <ImageView
-                android:id="@+id/ivRestaurantIcon"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_restaurant"
-                android:contentDescription="Restaurant icon"
-                app:tint="@color/white" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|start"
-                android:layout_margin="14dp"
-                android:background="@drawable/chip_background_light"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="6dp"
-                android:text="Fast delivery"
-                android:textColor="@color/primary"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <!-- Heart / Favourites button -->
-            <ImageView
-                android:id="@+id/ivHeart"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_gravity="top|end"
-                android:layout_margin="10dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="4dp"
-                android:src="@drawable/ic_heart_outline"
-                android:contentDescription="Add to favourites" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="14dp"
-                android:background="@drawable/chip_background_neutral"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="6dp"
-                android:text="Order now"
-                android:textColor="@color/text_primary"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </FrameLayout>
-
+        <!-- Badge -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:background="@drawable/chip_background_neutral"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="Fast delivery"
+                android:textColor="#475569"
+                android:textSize="12sp"
+                android:textStyle="normal" />
 
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Favorite Icon -->
+            <ImageView
+                android:id="@+id/ivHeart"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="6dp"
+                android:src="@drawable/ic_heart_outline"
+                android:contentDescription="Add to favourites"
+                app:tint="#64748B" />
+        </LinearLayout>
+
+        <!-- Content: Image + Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="14dp">
+
+            <!-- Restaurant Image (food photo from spritesheet) -->
+            <ImageView
+                android:id="@+id/ivRestaurantIcon"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_restaurant"
+                android:background="@drawable/restaurant_card_header_background"
+                android:scaleType="centerCrop"
+                android:clipToOutline="true"
+                android:contentDescription="Restaurant photo" />
+
+            <!-- Info: Name, Category, Meta -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp"
+                android:layout_gravity="center_vertical">
+
+                <!-- Restaurant Name -->
                 <TextView
                     android:id="@+id/tvRestaurantName"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Restaurant Name"
-                    android:textSize="18sp"
+                    android:text="BBQ Nation"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="@color/text_primary"
+                    android:textColor="#0F172A"
                     android:maxLines="1"
                     android:ellipsize="end" />
 
+                <!-- Category -->
                 <TextView
-                    android:id="@+id/tvPriceCategory"
+                    android:id="@+id/tvFoodCategory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/chip_background_neutral"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="6dp"
-                    android:text="$$"
-                    android:textColor="@color/price_medium"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:layout_marginStart="8dp" />
-            </LinearLayout>
+                    android:text="BBQ"
+                    android:textColor="#64748B"
+                    android:textSize="13sp"
+                    android:layout_marginTop="2dp" />
 
-            <TextView
-                android:id="@+id/tvFoodCategory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cuisine"
-                android:textColor="@color/text_secondary"
-                android:textSize="14sp"
-                android:layout_marginTop="4dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="10dp">
-
-                <TextView
-                    android:id="@+id/tvStars"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="★★★★☆"
-                    android:textColor="@color/star_filled"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
+                <!-- Meta: Rating + Time -->
                 <TextView
                     android:id="@+id/tvRating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="4.5"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginStart="6dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="• 20-30 min"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/chip_background_neutral"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="6dp"
-                    android:text="Open now"
-                    android:textColor="@color/success"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnView"
-                    style="@style/Widget.App.Button.Outlined"
-                    android:layout_width="wrap_content"
-                    android:layout_height="42dp"
-                    android:paddingHorizontal="16dp"
-                    android:text="Open"
-                    android:textSize="12sp"
-                    app:cornerRadius="21dp"
-                    app:strokeColor="@color/primary"
-                    app:strokeWidth="1dp" />
+                    android:text="⭐ 4.0 • 20-30 min"
+                    android:textColor="#64748B"
+                    android:textSize="13sp"
+                    android:layout_marginTop="4dp" />
             </LinearLayout>
         </LinearLayout>
+
+        <!-- Actions Row: Secondary + Primary Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- View Menu Button (Secondary) -->
+            <com.example.restaurantapp.ui.components.SecondaryButton
+                android:id="@+id/btnOpen"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="5dp" />
+
+            <!-- Order Now Button (Primary) -->
+            <com.example.restaurantapp.ui.components.PrimaryButton
+                android:id="@+id/btnOrder"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="5dp" />
+        </LinearLayout>
+
+        <!-- Hidden elements for backward compatibility -->
+        <TextView
+            android:id="@+id/tvPriceCategory"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvStars"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

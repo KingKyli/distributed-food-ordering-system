@@ -12,7 +12,8 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
+import com.example.restaurantapp.ui.components.PrimaryButton;
+import com.example.restaurantapp.ui.components.SecondaryButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,28 +94,29 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
         Store store = storeList.get(position);
 
         holder.tvName.setText(store.getStoreName());
-        holder.tvPrice.setText(store.getPriceCategory());
         holder.tvCategory.setText(store.getFoodCategory());
 
-        Integer starsInt = store.getStoreStars();
-        double stars = starsInt != null ? starsInt : 0;
-        holder.tvStars.setText(getStarsString(stars));
-
-        if (holder.tvRating != null) {
-            holder.tvRating.setText(String.format(Locale.getDefault(), "%.1f", stars));
+        // Dynamic restaurant photo from spritesheet tiles
+        if (holder.ivRestaurantIcon != null) {
+            int imageRes = RestaurantImageHelper.getImageRes(store.getStoreName());
+            holder.ivRestaurantIcon.setImageResource(imageRes);
+            // When a real food photo is available, show it without padding/tint;
+            // fall back to the tinted icon style if no photo exists.
+            if (RestaurantImageHelper.hasImage(store.getStoreName())) {
+                holder.ivRestaurantIcon.setPadding(0, 0, 0, 0);
+                holder.ivRestaurantIcon.clearColorFilter();
+            } else {
+                int pad = (int) (18 * context.getResources().getDisplayMetrics().density);
+                holder.ivRestaurantIcon.setPadding(pad, pad, pad, pad);
+            }
         }
 
-        String priceCategory = store.getPriceCategory();
-        if (priceCategory != null) {
-            int priceColor;
-            if (priceCategory.equals("$")) {
-                priceColor = ContextCompat.getColor(context, R.color.price_cheap);
-            } else if (priceCategory.equals("$$$")) {
-                priceColor = ContextCompat.getColor(context, R.color.price_expensive);
-            } else {
-                priceColor = ContextCompat.getColor(context, R.color.price_medium);
-            }
-            holder.tvPrice.setTextColor(priceColor);
+        // Rating: "⭐ 4.0 • 20-30 min" format
+        Integer starsInt = store.getStoreStars();
+        double stars = starsInt != null ? starsInt : 0;
+        
+        if (holder.tvRating != null) {
+            holder.tvRating.setText(String.format(Locale.getDefault(), "⭐ %.1f • 20-30 min", stars));
         }
 
         // Favourites heart
@@ -127,13 +129,27 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
             });
         }
 
-        holder.btnView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, RestaurantDetailsActivity.class);
-            org.json.JSONObject storeJson = store.toJson();
-            if (storeJson == null) return;
-            intent.putExtra("store_json", storeJson.toString());
-            context.startActivity(intent);
-        });
+        // View Menu button - navigate to details
+        if (holder.btnOpen != null) {
+            holder.btnOpen.setOnClickListener(v -> {
+                Intent intent = new Intent(context, RestaurantDetailsActivity.class);
+                org.json.JSONObject storeJson = store.toJson();
+                if (storeJson == null) return;
+                intent.putExtra("store_json", storeJson.toString());
+                context.startActivity(intent);
+            });
+        }
+
+        // Order Now button - navigate to details (same for now)
+        if (holder.btnOrder != null) {
+            holder.btnOrder.setOnClickListener(v -> {
+                Intent intent = new Intent(context, RestaurantDetailsActivity.class);
+                org.json.JSONObject storeJson = store.toJson();
+                if (storeJson == null) return;
+                intent.putExtra("store_json", storeJson.toString());
+                context.startActivity(intent);
+            });
+        }
     }
 
     @Override
@@ -142,19 +158,30 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
     }
 
     static class StoreViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvPrice, tvCategory, tvStars, tvRating;
-        MaterialButton btnView;
+        TextView tvName, tvCategory, tvRating;
+        SecondaryButton btnOpen;
+        PrimaryButton btnOrder;
         ImageView ivHeart;
+        ImageView ivRestaurantIcon;
 
         public StoreViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvName    = itemView.findViewById(R.id.tvRestaurantName);
-            tvPrice   = itemView.findViewById(R.id.tvPriceCategory);
-            tvCategory= itemView.findViewById(R.id.tvFoodCategory);
-            tvStars   = itemView.findViewById(R.id.tvStars);
-            tvRating  = itemView.findViewById(R.id.tvRating);
-            btnView   = itemView.findViewById(R.id.btnView);
-            ivHeart   = itemView.findViewById(R.id.ivHeart);
+            tvName          = itemView.findViewById(R.id.tvRestaurantName);
+            tvCategory      = itemView.findViewById(R.id.tvFoodCategory);
+            tvRating        = itemView.findViewById(R.id.tvRating);
+            btnOpen         = itemView.findViewById(R.id.btnOpen);
+            btnOrder        = itemView.findViewById(R.id.btnOrder);
+            ivHeart         = itemView.findViewById(R.id.ivHeart);
+            ivRestaurantIcon = itemView.findViewById(R.id.ivRestaurantIcon);
+            
+            // Set button text
+            if (btnOpen != null) {
+                btnOpen.setText("View Menu");
+                btnOpen.setShowIcon(true);
+            }
+            if (btnOrder != null) {
+                btnOrder.setText("Order now");
+            }
         }
     }
 

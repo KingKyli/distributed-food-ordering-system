@@ -130,7 +130,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="144dp"
                     android:layout_height="wrap_content"
                     android:text="Ready to checkout?"
                     android:textColor="@color/text_primary"
@@ -139,20 +139,17 @@
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="28dp"
                     android:layout_marginTop="4dp"
                     android:text="Review your order and place it instantly"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
+            <com.example.restaurantapp.ui.components.PrimaryButton
                 android:id="@+id/btnBuy"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:text="Place order"
-                android:textColor="@color/white"
-                app:cornerRadius="24dp" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>

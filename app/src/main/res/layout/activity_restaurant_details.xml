@@ -24,9 +24,10 @@
                 android:background="@drawable/restaurant_card_header_background">
 
                 <ImageView
+                    android:id="@+id/ivHeroImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:alpha="0.20"
+                    android:alpha="0.55"
                     android:contentDescription="@null"
                     android:scaleType="centerCrop"
                     android:src="@drawable/background_image" />
