@@ -17,5 +17,6 @@ local.properties
 hs_err_pid*.log
 replay_pid*.log
 server-data/
+server/bin/
 logcat_check.txt
 logcat_full.txt
