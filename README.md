@@ -110,7 +110,7 @@ This distinction matters in interviews: the Android client demonstrates real loc
 
 All assets are in `docs/screenshots/`.
 
-Click any screenshot to open full size.
+Click any screenshot to open full size. The gallery below reflects the latest April 2026 UI refresh.
 
 ### Customer Journey
 
@@ -128,9 +128,9 @@ Click any screenshot to open full size.
 
 ### Partner Journey
 
-| Partner Login | Manager Console |
-|---|---|
-| [![Partner Login](docs/screenshots/partner-login.png)](docs/screenshots/partner-login.png) | [![Manager Console](docs/screenshots/manager-console.png)](docs/screenshots/manager-console.png) |
+| Partner Login | Access Code Flow | Manager Console |
+|---|---|---|
+| [![Partner Login](docs/screenshots/partner-login.png)](docs/screenshots/partner-login.png) | [![Partner Access Code](docs/screenshots/partner-login-access-code.png)](docs/screenshots/partner-login-access-code.png) | [![Manager Console](docs/screenshots/manager-console.png)](docs/screenshots/manager-console.png) |
 
 | Add Product | Edit Products |
 |---|---|

@@ -2,13 +2,13 @@
     <!-- Dark theme — auto-applied when system is in dark mode -->
     <style name="Theme.RestaurantApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color stays the same in dark mode -->
-        <item name="colorPrimary">@color/primary_light</item>
-        <item name="colorPrimaryVariant">@color/primary</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
         <item name="colorOnPrimary">@color/text_on_primary</item>
 
         <!-- Secondary -->
-        <item name="colorSecondary">@color/secondary_light</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondary">@color/food_orange</item>
+        <item name="colorOnSecondary">@color/white</item>
 
         <!-- Surface / Background — dark -->
         <item name="colorSurface">@color/surface</item>
@@ -23,14 +23,14 @@
 
         <!-- Error -->
         <item name="colorError">@color/error</item>
-        <item name="colorOnError">@color/black</item>
+        <item name="colorOnError">@color/white</item>
 
         <!-- Status bar -->
-        <item name="android:statusBarColor">@color/surface</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
         <item name="android:windowLightStatusBar">false</item>
 
         <!-- Navigation bar -->
-        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:navigationBarColor">@color/background</item>
 
         <!-- Button styles (inherit from day theme) -->
         <item name="materialButtonStyle">@style/Widget.App.Button</item>

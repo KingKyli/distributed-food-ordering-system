@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="96dp"
+    android:viewportWidth="108"
+    android:viewportHeight="96">
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M8,28h22v6H8z" />
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M4,39h24v6H4z" />
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M10,50h18v6H10z" />
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M30,50c0,-18.8 15.2,-34 34,-34s34,15.2 34,34h-8c0,-14.4 -11.6,-26 -26,-26S38,35.6 38,50z" />
+    <path
+        android:fillColor="@color/secondary"
+        android:pathData="M42,24c11.4,1.6 22,9 27.8,20.7L76,42C69.9,31.4 60,25 49.4,24z" />
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M40,54h48c6.1,0 11,4.9 11,11 0,2.2 -1.8,4 -4,4H33c-2.2,0 -4,-1.8 -4,-4 0,-6.1 4.9,-11 11,-11z" />
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M48,26c3.2,-2.9 7.1,-4.8 11.3,-5.2 1.7,-0.2 2.7,1.9 1.6,3.2 -1.9,2.3 -3.6,5.3 -5,9.1 -0.8,2.2 -3.7,2.8 -5.3,1 -2,-2.4 -3.3,-4.9 -3.8,-8.1 -0.1,-0.8 0.3,-1.6 1.2,-2z" />
+    <path
+        android:fillColor="@color/food_orange"
+        android:pathData="M31,64c12,-9.2 29,-13.2 49,-12.1l-1.6,4.4h8.4c1.7,0 3.2,1.4 3.2,3.2 0,1.7 -1.4,3.2 -3.2,3.2h-10.7l-1.8,5 -8.1,-2.5 -1.8,4.8C51.8,64.5 41.8,62.8 31,64z" />
+    <path
+        android:fillColor="@color/food_orange"
+        android:pathData="M80,52.2h2.6v15.8H80z" />
+    <path
+        android:fillColor="@color/food_orange"
+        android:pathData="M84.1,52.2h2.6v15.8h-2.6z" />
+    <path
+        android:fillColor="@color/food_orange"
+        android:pathData="M88.2,52.2h2.6v15.8h-2.6z" />
+</vector>
