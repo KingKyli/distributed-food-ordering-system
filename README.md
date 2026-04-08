@@ -124,17 +124,12 @@ The backend (MockServer) persists restaurant and order data in SQLite, supports 
 - Local and backend persistence (Room, SQLite)
 - Easily configurable for emulator or physical device
 
-### For Recruiters
-- Demonstrates both mobile and backend/distributed systems engineering
+
+## General Notes
 - Real multi-role flows (not a toy demo)
 - Modern Android patterns (Room, Material, RecyclerView, etc.)
 - Protocol abstraction for future REST/gRPC migration
 - Well-tested: unit tests for business logic, protocol, and backend
-
----
-
-## Recruiter Notes
-
 - Demonstrates both mobile development and distributed systems fundamentals.
 - Shows concurrent backend design with shared state constraints.
 - Includes two real user roles (customer and business partner), not a single-screen demo.
