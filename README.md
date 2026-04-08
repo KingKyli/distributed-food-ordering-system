@@ -106,35 +106,32 @@ This distinction matters in interviews: the Android client demonstrates real loc
 - Introduce a REST or gRPC API surface if the goal shifts from transport learning to production-style service design.
 - Add protocol/integration tests around the backend command handling and automate them in CI.
 
-## Screenshots
 
-All assets are in `docs/screenshots/`.
+## How the App Works
 
-Click any screenshot to open full size. The gallery below reflects the latest April 2026 UI refresh.
+Foodie Express is a native Android application (Java) that simulates a real-world food delivery platform, communicating with a custom multi-threaded Java backend over raw TCP sockets. The system supports two user roles:
 
-### Customer Journey
+- **Customer:** Browse restaurants, filter/search, view menus, manage basket, place orders, and view order history (persisted locally with Room).
+- **Partner (Business):** Secure login, manage menu/products, and view/manage incoming orders. Partner authentication uses a code-based flow with rate limiting and validation.
 
-| Welcome | Home | Filters |
-|---|---|---|
-| [![Welcome](docs/screenshots/welcome.png)](docs/screenshots/welcome.png) | [![Home](docs/screenshots/home.png)](docs/screenshots/home.png) | [![Filters](docs/screenshots/filters.png)](docs/screenshots/filters.png) |
+The backend (MockServer) persists restaurant and order data in SQLite, supports concurrent clients, and enforces business rules and protocol validation. All communication is via a custom text-based protocol (not REST), with commands like `SEARCH`, `BUY`, `PARTNER_LOGIN`, etc.
 
-| Restaurant Details | Basket Before Order | Basket After Order |
-|---|---|---|
-| [![Restaurant Details](docs/screenshots/restaurant-details.png)](docs/screenshots/restaurant-details.png) | [![Basket Before Order](docs/screenshots/basket-before-order.png)](docs/screenshots/basket-before-order.png) | [![Basket After Order](docs/screenshots/basket-after-order.png)](docs/screenshots/basket-after-order.png) |
+### Key Features
+- End-to-end distributed flow: Android app ↔️ Java TCP server
+- Realistic product logic: basket rules, partner management, order history
+- Thread-safe backend with SQLite persistence
+- Clean separation: UI, service, repository, gateway, backend
+- Local and backend persistence (Room, SQLite)
+- Easily configurable for emulator or physical device
 
-| Order History | Settings |
-|---|---|
-| [![Order History](docs/screenshots/order-history.png)](docs/screenshots/order-history.png) | [![Settings](docs/screenshots/settings.png)](docs/screenshots/settings.png) |
+### For Recruiters
+- Demonstrates both mobile and backend/distributed systems engineering
+- Real multi-role flows (not a toy demo)
+- Modern Android patterns (Room, Material, RecyclerView, etc.)
+- Protocol abstraction for future REST/gRPC migration
+- Well-tested: unit tests for business logic, protocol, and backend
 
-### Partner Journey
-
-| Partner Login | Access Code Flow | Manager Console |
-|---|---|---|
-| [![Partner Login](docs/screenshots/partner-login.png)](docs/screenshots/partner-login.png) | [![Partner Access Code](docs/screenshots/partner-login-access-code.png)](docs/screenshots/partner-login-access-code.png) | [![Manager Console](docs/screenshots/manager-console.png)](docs/screenshots/manager-console.png) |
-
-| Add Product | Edit Products |
-|---|---|
-| [![Add Product](docs/screenshots/add-product.png)](docs/screenshots/add-product.png) | [![Edit Products](docs/screenshots/edit-products.png)](docs/screenshots/edit-products.png) |
+---
 
 ## Recruiter Notes
 
