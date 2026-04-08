@@ -10,13 +10,6 @@ application {
     mainClass.set("MockServer")
 }
 
-sourceSets {
-    named("main") {
-        java.setSrcDirs(listOf(rootProject.projectDir))
-        java.include("MockServer.java")
-    }
-}
-
 tasks.named<JavaExec>("run") {
     workingDir = rootProject.projectDir
 }
