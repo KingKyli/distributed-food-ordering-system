@@ -49,7 +49,10 @@ public class OrderServiceTest {
 
         assertFalse(result.isSuccess());
         assertEquals("Some items could not be purchased: [Fries]", result.getMessage());
-        assertTrue(orderHistoryStore.getSavedOrders().isEmpty());
+        // Rejected orders are saved as CANCELLED so they appear in Order History
+        assertEquals(1, orderHistoryStore.getSavedOrders().size());
+        assertEquals(OrderRecord.OrderStatus.CANCELLED,
+                orderHistoryStore.getSavedOrders().get(0).getStatus());
     }
 
     @Test

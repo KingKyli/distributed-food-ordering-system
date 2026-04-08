@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="6dp"
-    app:cardBackgroundColor="@color/card_background"
-    app:cardCornerRadius="20dp"
+    android:layout_marginBottom="14dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="18dp"
     app:cardElevation="0dp"
-    app:strokeColor="@color/divider"
+    app:strokeColor="#E2E8F0"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -17,7 +18,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Store name + date -->
+        <!-- Row 1: Restaurant name + Status badge -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,64 +30,105 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Store Name"
-                android:textColor="@color/text_primary"
-                android:textSize="17sp"
+                android:layout_marginEnd="10dp"
+                android:text="Burger Barn"
+                android:textColor="#0F172A"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
             <TextView
-                android:id="@+id/tvOrderDate"
+                android:id="@+id/tvOrderStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="20 Mar, 14:00"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:text="Delivered"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:background="@drawable/status_chip_delivered"
+                android:textColor="#166534" />
+
         </LinearLayout>
 
-        <!-- Item summaries -->
+        <!-- Row 2: Date + Order ID -->
+        <TextView
+            android:id="@+id/tvOrderDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Apr 8, 2026 • 19:42  •  #48291"
+            android:textColor="#64748B"
+            android:textSize="12sp"
+            android:textStyle="normal" />
+
+        <!-- Row 3: Items summary -->
         <TextView
             android:id="@+id/tvOrderItems"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="2x Margherita · 1x Coke"
-            android:textColor="@color/text_secondary"
+            android:layout_marginTop="8dp"
+            android:text="2x Classic Burger, 1x Fries, 1x Cola"
+            android:textColor="#475569"
             android:textSize="13sp"
+            android:lineSpacingExtra="2dp"
             android:maxLines="2"
             android:ellipsize="end" />
 
-        <!-- Total + reorder -->
+        <!-- Row 4: Total (left) + Reorder (right) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="14dp">
 
-            <TextView
-                android:id="@+id/tvOrderTotal"
+            <!-- Total block -->
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="&#x20AC;12.50"
-                android:textColor="@color/primary"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:orientation="vertical">
 
-            <com.google.android.material.button.MaterialButton
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TOTAL"
+                    android:textColor="#94A3B8"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.04"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:id="@+id/tvOrderTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="€24.90"
+                    android:textColor="#0F172A"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Reorder button -->
+            <TextView
                 android:id="@+id/btnReorder"
-                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
-                android:layout_height="38dp"
+                android:layout_height="40dp"
+                android:paddingHorizontal="16dp"
+                android:gravity="center"
                 android:text="Reorder"
+                android:textColor="#FFFFFF"
                 android:textSize="13sp"
-                app:cornerRadius="19dp"
-                app:strokeColor="@color/primary"
-                app:strokeWidth="1dp"
-                android:textColor="@color/primary" />
+                android:textStyle="bold"
+                android:background="@drawable/btn_reorder"
+                android:clickable="true"
+                android:focusable="true" />
+
         </LinearLayout>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
 
