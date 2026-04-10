@@ -5,6 +5,7 @@ import java.util.Random;
 
 final class PartnerAccessManager {
     private static final int ACCESS_CODE_EXPIRY_MINUTES = 5;
+    private static final long ACCESS_CODE_EXPIRY_MILLIS = ACCESS_CODE_EXPIRY_MINUTES * 60_000L;
 
     private final Map<String, String> partnerContacts;
     private final Map<String, String> activeCodes = Collections.synchronizedMap(new HashMap<>());
@@ -15,20 +16,35 @@ final class PartnerAccessManager {
         this.partnerContacts = Map.copyOf(partnerContacts);
     }
 
-    AccessCodeIssueResult requestAccessCode(String storeName) {
+    synchronized AccessCodeIssueResult requestAccessCode(String storeName) {
         String trimmedStoreName = storeName.trim();
         String deliveryDestination = partnerContacts.get(trimmedStoreName);
         if (deliveryDestination == null) {
             return AccessCodeIssueResult.storeNotFound();
         }
 
+        String existingCode = activeCodes.get(trimmedStoreName);
+        Long existingExpiry = activeCodeExpiry.get(trimmedStoreName);
+        long now = System.currentTimeMillis();
+        if (existingCode != null && existingExpiry != null) {
+            if (now <= existingExpiry) {
+                return AccessCodeIssueResult.alreadySent(
+                        maskEmail(deliveryDestination),
+                        existingCode,
+                        remainingMinutes(existingExpiry, now)
+                );
+            }
+            activeCodes.remove(trimmedStoreName);
+            activeCodeExpiry.remove(trimmedStoreName);
+        }
+
         String accessCode = generateSixDigitCode();
         activeCodes.put(trimmedStoreName, accessCode);
-        activeCodeExpiry.put(trimmedStoreName, System.currentTimeMillis() + ACCESS_CODE_EXPIRY_MINUTES * 60_000L);
+        activeCodeExpiry.put(trimmedStoreName, now + ACCESS_CODE_EXPIRY_MILLIS);
         return AccessCodeIssueResult.success(maskEmail(deliveryDestination), accessCode, ACCESS_CODE_EXPIRY_MINUTES);
     }
 
-    LoginValidationResult validateLogin(String storeName, String accessCode) {
+    synchronized LoginValidationResult validateLogin(String storeName, String accessCode) {
         String expectedCode = activeCodes.get(storeName);
         Long expiresAt = activeCodeExpiry.get(storeName);
         if (!partnerContacts.containsKey(storeName)) {
@@ -61,6 +77,12 @@ final class PartnerAccessManager {
         return String.valueOf(value);
     }
 
+    private int remainingMinutes(long expiresAt, long now) {
+        long remainingMillis = Math.max(0L, expiresAt - now);
+        long roundedUp = (remainingMillis + 60_000L - 1L) / 60_000L;
+        return (int) Math.max(1L, roundedUp);
+    }
+
     static String maskEmail(String email) {
         int atIndex = email.indexOf('@');
         if (atIndex <= 1) {
@@ -84,23 +106,29 @@ final class PartnerAccessManager {
 
     static final class AccessCodeIssueResult {
         final boolean success;
+        final boolean alreadyActive;
         final String maskedDestination;
         final String accessCode;
         final int expiresInMinutes;
 
-        private AccessCodeIssueResult(boolean success, String maskedDestination, String accessCode, int expiresInMinutes) {
+        private AccessCodeIssueResult(boolean success, boolean alreadyActive, String maskedDestination, String accessCode, int expiresInMinutes) {
             this.success = success;
+            this.alreadyActive = alreadyActive;
             this.maskedDestination = maskedDestination;
             this.accessCode = accessCode;
             this.expiresInMinutes = expiresInMinutes;
         }
 
         static AccessCodeIssueResult success(String maskedDestination, String accessCode, int expiresInMinutes) {
-            return new AccessCodeIssueResult(true, maskedDestination, accessCode, expiresInMinutes);
+            return new AccessCodeIssueResult(true, false, maskedDestination, accessCode, expiresInMinutes);
+        }
+
+        static AccessCodeIssueResult alreadySent(String maskedDestination, String accessCode, int expiresInMinutes) {
+            return new AccessCodeIssueResult(false, true, maskedDestination, accessCode, expiresInMinutes);
         }
 
         static AccessCodeIssueResult storeNotFound() {
-            return new AccessCodeIssueResult(false, null, null, 0);
+            return new AccessCodeIssueResult(false, false, null, null, 0);
         }
     }
 }

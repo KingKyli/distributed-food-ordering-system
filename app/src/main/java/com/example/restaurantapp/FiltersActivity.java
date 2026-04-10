@@ -35,6 +35,9 @@ public class FiltersActivity extends BaseActivity {
         setupBottomNav();
         SharedPreferences prefs = getSharedPreferences(PREFS_FILTERS, MODE_PRIVATE);
 
+        // Back button
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         spinnerCuisine = findViewById(R.id.spinner_cuisine);
         seekBarDistance = findViewById(R.id.seekbar_distance);
         distanceValue = findViewById(R.id.text_distance_value);

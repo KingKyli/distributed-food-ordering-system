@@ -1,141 +1,143 @@
 # Distributed Food Ordering System
 
-Android client + Java TCP backend that simulates a real food delivery platform with customer and partner workflows.
+Distributed food delivery demo with Android client and Java backend.
 
-## Why This Project Stands Out
+The repository contains two main modules:
+- `app`: native Android client (Java)
+- `server`: Java TCP backend with SQLite persistence
 
-- End-to-end distributed flow: Android app communicates with a multi-threaded socket server.
-- Real product behavior: search, filtering, basket rules, ordering, and partner-side menu management.
-- Clean separation of concerns: UI, services, repository, gateway, and communication layers.
-- Practical engineering choices: thread-safe shared state, role-based screens, and dark mode support.
-- Local persistence is backed by Room for order history instead of transient in-memory UI state.
+## What This Project Is
+
+This is an end-to-end distributed system simulation, not just a UI demo.
+
+It supports two business roles:
+- Customer: search stores, view products, buy items
+- Partner: request access code, login, manage store/products
+
+Communication is done through a custom line-based TCP protocol between app and server.
 
 ## Architecture
 
 ```text
-Android Activities
-  -> Service Layer
-    -> Repository Layer
-      -> ServerGateway abstraction
-        -> TcpServerGateway
-          -> MasterCommunicator (TCP)
-        -> MockServer (multi-threaded Java backend)
+Android UI
+  -> App Services
+    -> Repository / Gateway layer
+      -> TCP communication
+        -> MockServer
+          -> ServerCommandProcessor
+            -> StoreService (business rules)
+              -> StoreRepository (SQLite persistence)
 ```
 
-## Core Features
+## Protocol Commands
 
-- Customer flow: browse stores, filter results, inspect menus, manage basket, place orders, view history.
-- Partner flow: secure login, manager console, add/edit/remove products.
-- Protocol examples: `SEARCH`, `BUY`, `PARTNER_LOGIN`, `ADD_PRODUCT`, `UPDATE_PRODUCT`, `REMOVE_PRODUCT`.
-- Local configuration via settings for server IP/port.
+Main server commands:
+- `CLIENT_HELLO`
+- `SEARCH`
+- `BUY`
+- `REQUEST_PARTNER_ACCESS_CODE`
+- `PARTNER_LOGIN`
+- `GET_CREDENTIALS`
+- `ADD_STORE`
+- `REMOVE_STORE`
+- `ADD_PRODUCT`
+- `REMOVE_PRODUCT`
+- `UPDATE_PRODUCT`
+
+## Improvements Completed (1, 2, 3)
+
+### 1. Socket-level backend integration tests
+
+Added protocol integration tests that open a real TCP socket against a test server and verify command-response flows:
+- hello/search/buy flow
+- partner code lifecycle flow
+
+This gives better confidence than unit-only tests for protocol behavior.
+
+### 2. CI pipeline upgrade
+
+Updated GitHub Actions workflow to validate both modules:
+- backend tests: `:server:test`
+- android checks: `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`
+
+### 3. Logging and observability hardening
+
+Added a reusable server logging utility and replaced ad-hoc prints with leveled logs.
+
+Highlights:
+- central logger setup with env-based level (`SERVER_LOG_LEVEL`)
+- structured runtime logs in server startup, client handling, and command processing
+- less sensitive data in logs (access code is no longer logged)
+
+## Existing Backend Guarantees
+
+The backend now enforces:
+- strict command input validation
+- 6-digit partner access code format
+- prevention of duplicate active access code requests
+- repository validation for duplicate store names
+- repository validation for non-negative product inventory/price
+- transactional save with rollback on failure
+
+## Project Level (Current Assessment)
+
+Current level: **advanced student / junior production-ready foundation**.
+
+Why this level:
+- strong separation of concerns
+- realistic multi-role business flows
+- persistent data layer on both client and server
+- automated tests including protocol integration tests
+- CI checks in place
+
+What is still missing for full production level:
+- authentication and authorization hardening beyond demo access codes
+- API versioning / migration strategy
+- deployment automation and environment profiles
+- monitoring stack (metrics, tracing, alerting)
+- load and resilience testing
 
 ## Tech Stack
 
-- Android: Java, Material components, RecyclerView, ConstraintLayout
-- Backend: Java 11, raw TCP sockets, concurrent client handlers
-- Local persistence: Room database for order history, SharedPreferences for lightweight settings/session flags
-- Backend persistence: SQLite-backed mock server storage via the `server` Gradle module
+- Android: Java, Material Components
+- Backend: Java 11, TCP sockets, SQLite JDBC
 - Build: Gradle (Kotlin DSL)
+- Testing: JUnit 5
+- CI: GitHub Actions
 
-## Run Locally
+## Quick Start
 
-### 1) Start backend
+1. Start backend
 
 ```powershell
-cd C:\Users\anezi\distributed-food-ordering-system
 .\gradlew.bat :server:run
 ```
 
-### 2) Build Android app
+2. Build Android app
 
 ```powershell
-.\gradlew.bat assembleDebug
+.\gradlew.bat :app:assembleDebug
 ```
 
-### 2b) Run quality checks
+3. Run backend tests
 
 ```powershell
-.\gradlew.bat testDebugUnitTest lintDebug
+.\gradlew.bat :server:test
 ```
 
-### 3) Connect app to backend
+4. Run CI-equivalent local checks
 
-- Emulator: set server to `10.0.2.2:8765`
-- Physical device (USB):
+```powershell
+.\gradlew.bat :server:test :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
+```
+
+5. Connect app to backend
+
+- Android emulator: `10.0.2.2:8765`
+- Physical device over USB:
 
 ```powershell
 adb reverse tcp:8765 tcp:8765
 ```
 
-Then in app `Settings`, use `127.0.0.1:8765` for USB reverse mode.
-
-## Persistence
-
-- Orders are now stored locally in a Room database.
-- Legacy order history stored in SharedPreferences is migrated automatically on first read/write.
-- Backend restaurant and inventory data are persisted in SQLite and reloaded on server restart.
-
-This distinction matters in interviews: the Android client demonstrates real local database usage, and the backend now persists state in SQLite while still remaining a deliberately simple mock server rather than a full production service.
-
-## Testing
-
-- Unit tests cover basket logic, protocol helpers, repository parsing, partner auth flow, product management flow, and order submission edge cases.
-- Service tests run through injected fakes rather than a live socket, so failure cases are deterministic and fast.
-- Recommended verification command:
-
-```powershell
-.\gradlew.bat clean testDebugUnitTest assembleDebug lintDebug
-```
-
-## Design Tradeoffs
-
-### Why TCP and not REST?
-
-- This project deliberately uses raw TCP as a learning-oriented transport choice.
-- It gives full control over the request/response protocol and makes connection handling, message formats, and transport failures explicit.
-- The app is no longer tightly coupled to TCP at the service boundary because communication now goes through a `ServerGateway` abstraction. That makes a future REST migration incremental instead of a full rewrite.
-
-### How is concurrency handled?
-
-- The mock backend uses a thread-per-client model.
-- Shared collections are synchronized where writes matter, so concurrent partner/customer actions do not corrupt shared state.
-- On Android, long-running work such as purchases and order-history loading is executed off the main thread to avoid blocking the UI.
-
-### What would be improved next?
-
-- Introduce a REST or gRPC API surface if the goal shifts from transport learning to production-style service design.
-- Add protocol/integration tests around the backend command handling and automate them in CI.
-
-
-## How the App Works
-
-Foodie Express is a native Android application (Java) that simulates a real-world food delivery platform, communicating with a custom multi-threaded Java backend over raw TCP sockets. The system supports two user roles:
-
-- **Customer:** Browse restaurants, filter/search, view menus, manage basket, place orders, and view order history (persisted locally with Room).
-- **Partner (Business):** Secure login, manage menu/products, and view/manage incoming orders. Partner authentication uses a code-based flow with rate limiting and validation.
-
-The backend (MockServer) persists restaurant and order data in SQLite, supports concurrent clients, and enforces business rules and protocol validation. All communication is via a custom text-based protocol (not REST), with commands like `SEARCH`, `BUY`, `PARTNER_LOGIN`, etc.
-
-### Key Features
-- End-to-end distributed flow: Android app ↔️ Java TCP server
-- Realistic product logic: basket rules, partner management, order history
-- Thread-safe backend with SQLite persistence
-- Clean separation: UI, service, repository, gateway, backend
-- Local and backend persistence (Room, SQLite)
-- Easily configurable for emulator or physical device
-
-
-## General Notes
-- Real multi-role flows (not a toy demo)
-- Modern Android patterns (Room, Material, RecyclerView, etc.)
-- Protocol abstraction for future REST/gRPC migration
-- Well-tested: unit tests for business logic, protocol, and backend
-- Demonstrates both mobile development and distributed systems fundamentals.
-- Shows concurrent backend design with shared state constraints.
-- Includes two real user roles (customer and business partner), not a single-screen demo.
-- Demonstrates practical refactoring: transport abstraction, local database persistence, and service-level testability were added without changing the user-facing flows.
-
-## Next Improvements
-
-- Add protocol integration tests for server command handling.
-- Add CI pipeline for build/test checks.
+Use `127.0.0.1:8765` in app settings when using `adb reverse`.

@@ -8,6 +8,8 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Mock Server for testing the Restaurant App.
@@ -17,6 +19,7 @@ public class MockServer {
     private static final int PORT = 8765;
     private static final Path DATA_DIRECTORY = Paths.get(System.getProperty("user.dir"), "server-data");
     private static final Path DATABASE_PATH = DATA_DIRECTORY.resolve("restaurant-app.db");
+    private static final Logger LOGGER = ServerLog.getLogger(MockServer.class);
 
     private static final Map<String, String> PARTNER_CONTACTS = createPartnerContacts();
     private static final PartnerAccessManager PARTNER_ACCESS_MANAGER = new PartnerAccessManager(PARTNER_CONTACTS);
@@ -29,17 +32,17 @@ public class MockServer {
     );
 
     public static void main(String[] args) {
-        System.out.println("===========================================");
-        System.out.println("  Mock Server for Restaurant App");
-        System.out.println("===========================================");
-        System.out.println("Starting server on port " + PORT + "...");
+        LOGGER.info("===========================================");
+        LOGGER.info("  Mock Server for Restaurant App");
+        LOGGER.info("===========================================");
+        LOGGER.info("Starting server on port " + PORT + "...");
         bootstrapStoreState();
         Runtime.getRuntime().addShutdownHook(new Thread(MockServer::persistStoresToDatabase));
         
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             // Print all available IPs
-            System.out.println("\nServer is running! Connect using one of these addresses:");
-            System.out.println("  - From Android Emulator: 10.0.2.2:" + PORT);
+            LOGGER.info("Server is running. Connect using one of these addresses:");
+            LOGGER.info("From Android Emulator: 10.0.2.2:" + PORT);
             try {
                 Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
                 while (interfaces.hasMoreElements()) {
@@ -48,24 +51,23 @@ public class MockServer {
                     while (addresses.hasMoreElements()) {
                         InetAddress addr = addresses.nextElement();
                         if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
-                            System.out.println("  - From physical device: " + addr.getHostAddress() + ":" + PORT);
+                            LOGGER.info("From physical device: " + addr.getHostAddress() + ":" + PORT);
                         }
                     }
                 }
             } catch (Exception e) {
-                // Ignore
+                LOGGER.log(Level.FINE, "Unable to enumerate network interfaces", e);
             }
-            System.out.println("\nSQLite database: " + DATABASE_PATH.toAbsolutePath());
-            System.out.println("Waiting for connections...\n");
+            LOGGER.info("SQLite database: " + DATABASE_PATH.toAbsolutePath());
+            LOGGER.info("Waiting for connections...");
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("[+] Client connected: " + clientSocket.getInetAddress());
+                LOGGER.info("Client connected: " + clientSocket.getInetAddress());
                 new Thread(() -> handleClient(clientSocket)).start();
             }
         } catch (IOException e) {
-            System.err.println("Server error: " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Server error", e);
         }
     }
 
@@ -76,13 +78,13 @@ public class MockServer {
         ) {
             String line;
             while ((line = in.readLine()) != null) {
-                System.out.println("  <- Received: " + line);
+                LOGGER.fine("Received command: " + line);
                 String response = COMMAND_PROCESSOR.processCommand(line);
-                System.out.println("  -> Sending: " + (response.length() > 100 ? response.substring(0, 100) + "..." : response));
+                LOGGER.fine("Sending response: " + (response.length() > 100 ? response.substring(0, 100) + "..." : response));
                 out.println(response);
             }
         } catch (IOException e) {
-            System.out.println("[-] Client disconnected: " + e.getMessage());
+            LOGGER.fine("Client disconnected: " + e.getMessage());
         }
     }
 
@@ -92,7 +94,7 @@ public class MockServer {
             STORES.clear();
             STORES.addAll(loadedStores);
         }
-        System.out.println("Loaded " + STORES.size() + " stores from SQLite.");
+        LOGGER.info("Loaded " + STORES.size() + " stores from SQLite.");
     }
 
     private static void persistStoresToDatabase() {

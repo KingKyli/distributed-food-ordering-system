@@ -1,8 +1,10 @@
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.logging.Logger;
 
 final class ServerCommandProcessor {
+    private static final Logger LOGGER = ServerLog.getLogger(ServerCommandProcessor.class);
     private final PartnerAccessManager partnerAccessManager;
     private final StoreService storeService;
 
@@ -12,10 +14,11 @@ final class ServerCommandProcessor {
     }
 
     String processCommand(String command) {
-        if (command == null || command.isEmpty()) {
+        if (command == null || command.trim().isEmpty()) {
             return "ERROR: Empty command";
         }
 
+        command = command.trim();
         String[] parts = command.split(":", 2);
         String cmd = parts[0].toUpperCase();
 
@@ -54,37 +57,52 @@ final class ServerCommandProcessor {
         }
         String storeName = credentials[0].trim();
         String accessCode = credentials[1].trim();
+        if (storeName.isEmpty()) {
+            return "ERROR: Store name is required";
+        }
+        if (accessCode.isEmpty()) {
+            return "ERROR: Access code is required";
+        }
+        if (!accessCode.matches("\\d{6}")) {
+            return "ERROR: Access code must be 6 digits";
+        }
 
         PartnerAccessManager.LoginValidationResult validationResult = partnerAccessManager.validateLogin(storeName, accessCode);
         if (validationResult == PartnerAccessManager.LoginValidationResult.STORE_NOT_FOUND) {
-            System.out.println("    [LOGIN] Failed - Store not found: " + storeName);
+            LOGGER.warning("[LOGIN] Failed - Store not found: " + storeName);
             return "ERROR: Store not found";
         }
         if (validationResult == PartnerAccessManager.LoginValidationResult.NO_ACTIVE_CODE) {
-            System.out.println("    [LOGIN] Failed - No active access code for: " + storeName);
+            LOGGER.warning("[LOGIN] Failed - No active access code for: " + storeName);
             return "ERROR: Request a new access code first";
         }
         if (validationResult == PartnerAccessManager.LoginValidationResult.EXPIRED_CODE) {
-            System.out.println("    [LOGIN] Failed - Expired access code for: " + storeName);
+            LOGGER.warning("[LOGIN] Failed - Expired access code for: " + storeName);
             return "ERROR: Access code expired. Request a new one";
         }
         if (validationResult == PartnerAccessManager.LoginValidationResult.SUCCESS) {
-            System.out.println("    [LOGIN] Success for store: " + storeName);
+            LOGGER.info("[LOGIN] Success for store: " + storeName);
             return "OK: Login successful";
         }
 
-        System.out.println("    [LOGIN] Failed - Invalid access code for: " + storeName);
+        LOGGER.warning("[LOGIN] Failed - Invalid access code for: " + storeName);
         return "ERROR: Invalid access code";
     }
 
     private String handleRequestPartnerAccessCode(String storeName) {
         String trimmedStoreName = storeName.trim();
+        if (trimmedStoreName.isEmpty()) {
+            return "ERROR: Store name is required";
+        }
         PartnerAccessManager.AccessCodeIssueResult result = partnerAccessManager.requestAccessCode(trimmedStoreName);
+        if (result.alreadyActive) {
+            return "ERROR: Access code already sent. Check " + result.maskedDestination + " (expires in " + result.expiresInMinutes + " minutes)";
+        }
         if (!result.success) {
             return "ERROR: Store not found";
         }
 
-        System.out.println("    [ACCESS_CODE] Generated code for " + trimmedStoreName + " sent to " + result.maskedDestination + ": " + result.accessCode);
+        LOGGER.info("[ACCESS_CODE] Generated code for " + trimmedStoreName + " sent to " + result.maskedDestination);
         return "CODE_SENT:" + result.maskedDestination + ":" + result.accessCode + ":" + result.expiresInMinutes;
     }
 
@@ -92,7 +110,7 @@ final class ServerCommandProcessor {
         String trimmedStoreName = storeName.trim();
         String maskedDestination = partnerAccessManager.getMaskedDestination(trimmedStoreName);
         if (maskedDestination != null) {
-            System.out.println("    [CREDENTIALS] Returning delivery destination for: " + trimmedStoreName);
+            LOGGER.fine("[CREDENTIALS] Returning destination for: " + trimmedStoreName);
             return "DESTINATION:" + maskedDestination;
         }
         return "ERROR: Store not found";
@@ -106,6 +124,12 @@ final class ServerCommandProcessor {
 
         String storeName = parts[0].trim();
         String productName = parts[1].trim();
+        if (storeName.isEmpty()) {
+            return "ERROR: Store name is required";
+        }
+        if (productName.isEmpty()) {
+            return "ERROR: Product name is required";
+        }
         int quantity;
         try {
             quantity = Integer.parseInt(parts[2].trim());
@@ -124,7 +148,7 @@ final class ServerCommandProcessor {
             case INSUFFICIENT_INVENTORY:
                 return "ERROR: Not enough inventory";
             case SUCCESS:
-                System.out.println("    [ORDER] Processed purchase: " + data);
+                LOGGER.info("[ORDER] Processed purchase for store=" + storeName + ", product=" + productName + ", quantity=" + quantity);
                 return "SUCCESS: Order placed successfully";
             default:
                 return "ERROR: Unable to process order";
@@ -153,7 +177,11 @@ final class ServerCommandProcessor {
     }
 
     private String handleRemoveStore(String storeName) {
-        if (storeService.removeStore(storeName.trim()) == StoreService.MutationResult.SUCCESS) {
+        String trimmedStoreName = storeName.trim();
+        if (trimmedStoreName.isEmpty()) {
+            return "ERROR: Store name is required";
+        }
+        if (storeService.removeStore(trimmedStoreName) == StoreService.MutationResult.SUCCESS) {
             return "OK: Store removed";
         }
         return "ERROR: Store not found";
@@ -209,12 +237,21 @@ final class ServerCommandProcessor {
 
         String storeName = parts[0].trim();
         String productName = parts[1].trim();
+        if (storeName.isEmpty()) {
+            return "ERROR: Store name is required";
+        }
+        if (productName.isEmpty()) {
+            return "ERROR: Product name is required";
+        }
         double newPrice;
         int newAmount;
         try {
             newPrice = Double.parseDouble(parts[2].trim());
             newAmount = Integer.parseInt(parts[3].trim());
         } catch (NumberFormatException e) {
+            return "ERROR: Invalid update values";
+        }
+        if (newPrice < 0 || newAmount < 0) {
             return "ERROR: Invalid update values";
         }
 
@@ -234,6 +271,9 @@ final class ServerCommandProcessor {
         Integer amount = extractJsonInt(json, "AvailableAmount");
         Double price = extractJsonDoubleObject(json, "Price");
         if (name == null || type == null || amount == null || price == null) {
+            return null;
+        }
+        if (name.trim().isEmpty() || type.trim().isEmpty() || amount < 0 || price < 0) {
             return null;
         }
         return new ProductData(name, type, amount, price);

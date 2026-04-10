@@ -66,6 +66,14 @@
     <!-- Skeleton loading placeholder -->
     <color name="skeleton_bg">#E2E8F0</color>
 
+    <!-- Stat card accent colors -->
+    <color name="stat_orange">#F97316</color>
+    <color name="stat_orange_bg">#FFF0E6</color>
+    <color name="stat_gold">#F5B800</color>
+    <color name="stat_gold_bg">#FFF9E0</color>
+    <color name="stat_purple">#9B59B6</color>
+    <color name="stat_purple_bg">#F3E9F8</color>
+
     <!-- Dividers & Borders -->
     <color name="divider">#E2E8F0</color>
     <color name="border">#CBD5E1</color>
@@ -85,4 +93,18 @@
     <color name="disabled_text_color">#CBD5E1</color>
     <color name="status_inactive_background">#FEE2E2</color>
     <color name="status_inactive_text">#DC2626</color>
+
+    <!-- Compatibility aliases used by older layout and drawable resources -->
+    <color name="bg">#F8FAFC</color>
+    <color name="navy">#0F172A</color>
+    <color name="primaryPressed">#EA580C</color>
+    <color name="surfaceAlt">#F1F5F9</color>
+    <color name="line">#E2E8F0</color>
+    <color name="lineStrong">#CBD5E1</color>
+    <color name="text">#0F172A</color>
+    <color name="textSoft">#64748B</color>
+    <color name="textMuted">#94A3B8</color>
+    <color name="successBg">#DCFCE7</color>
+    <color name="warningBg">#FEF3C7</color>
+    <color name="dangerBg">#FEE2E2</color>
 </resources>

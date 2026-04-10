@@ -34,6 +34,25 @@ Code expires in %3$d minutes.</string>
     <string name="home_popular_title">Popular near you</string>
     <string name="home_popular_subtitle">Rated stores and quick meal options</string>
     <string name="home_no_restaurants_content_description">No restaurants</string>
+    <!-- Filters screen -->
+    <string name="filters_title">Filters</string>
+    <string name="filters_subtitle">Customize your restaurant search</string>
+    <string name="filters_back_content_description">Back</string>
+    <string name="filters_label_cuisine">Cuisine</string>
+    <string name="filters_label_price">Price Range</string>
+    <string name="filters_price_cheap">$</string>
+    <string name="filters_price_medium">$$</string>
+    <string name="filters_price_expensive">$$$</string>
+    <string name="filters_label_distance">Maximum Distance</string>
+    <string name="filters_distance_default">0 km</string>
+    <string name="filters_label_location">Location Coordinates</string>
+    <string name="filters_location_subtitle">Optional — used to filter by proximity</string>
+    <string name="filters_hint_latitude">Latitude</string>
+    <string name="filters_hint_longitude">Longitude</string>
+    <string name="filters_label_stars">Minimum Stars</string>
+    <string name="filters_open_now">Open now</string>
+    <string name="filters_apply_button">Apply Filters</string>
+
     <string-array name="cuisine_options">
         <item>Any</item>
         <item>Greek</item>

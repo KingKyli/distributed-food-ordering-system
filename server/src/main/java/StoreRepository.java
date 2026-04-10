@@ -8,9 +8,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 final class StoreRepository {
     private final Path dataDirectory;
@@ -76,42 +79,72 @@ final class StoreRepository {
     }
 
     void saveStores(List<StoreData> stores) {
+        validateStores(stores);
+
+        try {
+            Files.createDirectories(dataDirectory);
+            initializeDatabase();
+        } catch (IOException | SQLException e) {
+            throw new IllegalStateException("Failed to prepare SQLite persistence", e);
+        }
+
         try (Connection connection = DriverManager.getConnection(databaseUrl)) {
             connection.setAutoCommit(false);
-            try (Statement clearStatement = connection.createStatement()) {
-                clearStatement.executeUpdate("DELETE FROM products");
-                clearStatement.executeUpdate("DELETE FROM stores");
-            }
-
-            try (PreparedStatement storeStatement = connection.prepareStatement(
-                    "INSERT INTO stores(store_name, latitude, longitude, food_category, stars, no_of_votes, store_logo) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                 PreparedStatement productStatement = connection.prepareStatement(
-                         "INSERT INTO products(store_name, product_name, product_type, available_amount, price) VALUES (?, ?, ?, ?, ?)") ) {
-                for (StoreData store : stores) {
-                    storeStatement.setString(1, store.storeName);
-                    storeStatement.setDouble(2, store.latitude);
-                    storeStatement.setDouble(3, store.longitude);
-                    storeStatement.setString(4, store.foodCategory);
-                    storeStatement.setInt(5, store.stars);
-                    storeStatement.setInt(6, store.noOfVotes);
-                    storeStatement.setString(7, store.storeLogo);
-                    storeStatement.addBatch();
-
-                    for (ProductData product : store.products) {
-                        productStatement.setString(1, store.storeName);
-                        productStatement.setString(2, product.productName);
-                        productStatement.setString(3, product.productType);
-                        productStatement.setInt(4, product.availableAmount);
-                        productStatement.setDouble(5, product.price);
-                        productStatement.addBatch();
-                    }
+            try {
+                try (Statement clearStatement = connection.createStatement()) {
+                    clearStatement.executeUpdate("DELETE FROM products");
+                    clearStatement.executeUpdate("DELETE FROM stores");
                 }
-                storeStatement.executeBatch();
-                productStatement.executeBatch();
+
+                try (PreparedStatement storeStatement = connection.prepareStatement(
+                        "INSERT INTO stores(store_name, latitude, longitude, food_category, stars, no_of_votes, store_logo) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                     PreparedStatement productStatement = connection.prepareStatement(
+                             "INSERT INTO products(store_name, product_name, product_type, available_amount, price) VALUES (?, ?, ?, ?, ?)") ) {
+                    for (StoreData store : stores) {
+                        storeStatement.setString(1, store.storeName);
+                        storeStatement.setDouble(2, store.latitude);
+                        storeStatement.setDouble(3, store.longitude);
+                        storeStatement.setString(4, store.foodCategory);
+                        storeStatement.setInt(5, store.stars);
+                        storeStatement.setInt(6, store.noOfVotes);
+                        storeStatement.setString(7, store.storeLogo);
+                        storeStatement.addBatch();
+
+                        for (ProductData product : store.products) {
+                            productStatement.setString(1, store.storeName);
+                            productStatement.setString(2, product.productName);
+                            productStatement.setString(3, product.productType);
+                            productStatement.setInt(4, product.availableAmount);
+                            productStatement.setDouble(5, product.price);
+                            productStatement.addBatch();
+                        }
+                    }
+                    storeStatement.executeBatch();
+                    productStatement.executeBatch();
+                }
+                connection.commit();
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
             }
-            connection.commit();
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to persist stores to SQLite", e);
+        }
+    }
+
+    private void validateStores(List<StoreData> stores) {
+        Set<String> seenStoreNames = new HashSet<>();
+        for (StoreData store : stores) {
+            String normalizedName = store.storeName.toLowerCase(Locale.ROOT);
+            if (!seenStoreNames.add(normalizedName)) {
+                throw new IllegalArgumentException("Duplicate store names are not allowed: " + store.storeName);
+            }
+
+            for (ProductData product : store.products) {
+                if (product.availableAmount < 0 || product.price < 0) {
+                    throw new IllegalArgumentException("Product inventory and price must not be negative");
+                }
+            }
         }
     }
 

@@ -1,0 +1,24 @@
+<resources>
+    <dimen name="space_4">4dp</dimen>
+    <dimen name="space_8">8dp</dimen>
+    <dimen name="space_12">12dp</dimen>
+    <dimen name="space_14">14dp</dimen>
+    <dimen name="space_16">16dp</dimen>
+    <dimen name="space_20">20dp</dimen>
+    <dimen name="space_24">24dp</dimen>
+    <dimen name="space_32">32dp</dimen>
+
+    <dimen name="radius_8">8dp</dimen>
+    <dimen name="radius_12">12dp</dimen>
+    <dimen name="radius_16">16dp</dimen>
+    <dimen name="radius_20">20dp</dimen>
+    <dimen name="radius_24">24dp</dimen>
+    <dimen name="radius_pill">999dp</dimen>
+
+    <dimen name="button_height">48dp</dimen>
+    <dimen name="chip_height">36dp</dimen>
+    <dimen name="input_height">48dp</dimen>
+    <dimen name="icon_button">40dp</dimen>
+    <dimen name="restaurant_image">72dp</dimen>
+</resources>
+

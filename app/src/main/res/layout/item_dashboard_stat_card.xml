@@ -1,73 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_horizontal"
-    android:minHeight="185dp"
-    android:orientation="vertical"
-    android:paddingBottom="18dp"
-    android:paddingEnd="12dp"
-    android:paddingStart="12dp"
-    android:paddingTop="18dp">
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="2dp"
+    app:strokeColor="@color/stat_orange">
 
-    <!-- Accent icon circle -->
-    <FrameLayout
-        android:id="@+id/iconWrap"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginBottom="14dp"
-        android:layout_marginTop="4dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="16dp">
+
+        <FrameLayout
+            android:id="@+id/iconWrap"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_stat_circle">
+
+            <TextView
+                android:id="@+id/tvIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="📦"
+                android:textSize="26sp" />
+
+        </FrameLayout>
 
         <TextView
-            android:id="@+id/tvIcon"
+            android:id="@+id/tvValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="●"
-            android:textSize="28sp" />
+            android:text="0"
+            android:textColor="@color/text_primary"
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
-    </FrameLayout>
+        <TextView
+            android:id="@+id/tvLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Label"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp" />
 
-    <!-- Big number -->
-    <TextView
-        android:id="@+id/tvValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0"
-        android:textColor="#0F172A"
-        android:textSize="26sp"
-        android:textStyle="bold" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/divider" />
 
-    <!-- Label -->
-    <TextView
-        android:id="@+id/tvLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="Label"
-        android:textColor="#64748B"
-        android:textSize="14sp" />
+        <TextView
+            android:id="@+id/tvFooterValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="€0.00"
+            android:textColor="@color/text_primary"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
-    <!-- Divider (shown only when footerValue is set) -->
-    <View
-        android:id="@+id/statDivider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="12dp"
-        android:layout_marginTop="16dp"
-        android:background="#E2E8F0"
-        android:visibility="gone" />
+    </LinearLayout>
 
-    <!-- Footer metric (shown only when set) -->
-    <TextView
-        android:id="@+id/tvFooterValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textColor="#0F172A"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        android:visibility="gone" />
-
-</LinearLayout>
-
+</com.google.android.material.card.MaterialCardView>

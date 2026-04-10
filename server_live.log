@@ -1,0 +1,30 @@
+> Task :server:compileJava UP-TO-DATE
+> Task :server:processResources NO-SOURCE
+> Task :server:classes UP-TO-DATE
+
+> Task :server:run
+??? 09, 2026 4:42:50 ?.?. MockServer main
+INFO: ===========================================
+??? 09, 2026 4:42:50 ?.?. MockServer main
+INFO:   Mock Server for Restaurant App
+??? 09, 2026 4:42:50 ?.?. MockServer main
+INFO: ===========================================
+??? 09, 2026 4:42:50 ?.?. MockServer main
+INFO: Starting server on port 8765...
+??? 09, 2026 4:42:50 ?.?. MockServer bootstrapStoreState
+INFO: Loaded 25 stores from SQLite.
+??? 09, 2026 4:42:50 ?.?. MockServer main
+SEVERE: Server error
+java.net.BindException: Address already in use: bind
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:565)
+	at java.base/sun.nio.ch.Net.bind(Net.java:554)
+	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:636)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:389)
+	at java.base/java.net.ServerSocket.<init>(ServerSocket.java:276)
+	at java.base/java.net.ServerSocket.<init>(ServerSocket.java:170)
+	at MockServer.main(MockServer.java:42)
+
+
+BUILD SUCCESSFUL in 4s
+2 actionable tasks: 1 executed, 1 up-to-date

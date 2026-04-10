@@ -1,4 +1,4 @@
-name: Android CI
+name: Android and Backend CI
 
 on:
   push:
@@ -25,6 +25,10 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Gradle tests + lint
+      - name: Validate backend module
         run: |
-          ./gradlew --no-daemon testDebugUnitTest lintDebug
+          ./gradlew --no-daemon :server:test
+
+      - name: Validate android module
+        run: |
+          ./gradlew --no-daemon :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
