@@ -79,6 +79,11 @@ public class MockServer {
             String line;
             while ((line = in.readLine()) != null) {
                 LOGGER.fine("Received command: " + line);
+                if (line.equals("CLIENT_HELLO")) {
+                    out.println("SERVER_HELLO");
+                    LOGGER.fine("Handshake complete");
+                    continue;
+                }
                 String response = COMMAND_PROCESSOR.processCommand(line);
                 LOGGER.fine("Sending response: " + (response.length() > 100 ? response.substring(0, 100) + "..." : response));
                 out.println(response);

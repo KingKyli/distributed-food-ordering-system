@@ -3,9 +3,10 @@ package com.example.restaurantapp;
 import org.json.JSONObject;
 import org.json.JSONException;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Locale;
@@ -16,7 +17,7 @@ public class MasterCommunicator {
     private String masterIp;
     private int masterPort;
     private Socket socket;
-    private PrintWriter out;
+    private BufferedWriter out;
     private BufferedReader in;
 
     public MasterCommunicator(String masterIp, int masterPort) {
@@ -30,13 +31,19 @@ public class MasterCommunicator {
             close();
             this.socket = new Socket();
             this.socket.connect(new InetSocketAddress(masterIp, masterPort), 5000);
-            this.socket.setSoTimeout(5000);
-            this.out = new PrintWriter(socket.getOutputStream(), true);
-            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out.println("CLIENT_HELLO");
+            this.socket.setSoTimeout(10000);
+            this.out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
+            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+            out.write("CLIENT_HELLO");
+            out.newLine();
             out.flush();
-            // Read and discard the SERVER_HELLO response
+            // Read and verify the SERVER_HELLO response
             String response = in.readLine();
+            if (response == null) {
+                Log.e("MasterCommunicator", "Server closed connection during handshake");
+                close();
+                return false;
+            }
             Log.d("MasterCommunicator", "Server responded: " + response);
             Log.d("MasterCommunicator", "Connected to server at " + masterIp + ":" + masterPort);
             return true;
@@ -75,17 +82,20 @@ public class MasterCommunicator {
             }
             Log.d("MasterCommunicator", "Reconnected successfully");
         }
-        
+
         try {
-            out.println(request);
+            out.write(request);
+            out.newLine();
             out.flush();
             Log.d("MasterCommunicator", "Sent request to master: " + request);
             String response = in.readLine();
             if (response == null) {
-                // Connection was closed, try to reconnect and retry once
+                // Server closed connection - reconnect and retry once
                 Log.w("MasterCommunicator", "Got null response, reconnecting...");
+                close();
                 if (connect()) {
-                    out.println(request);
+                    out.write(request);
+                    out.newLine();
                     out.flush();
                     response = in.readLine();
                 }
@@ -94,15 +104,18 @@ public class MasterCommunicator {
         } catch (IOException e) {
             Log.e("MasterCommunicator", "Error communicating with Master: " + e.getMessage());
             // Try to reconnect and retry once
+            close();
             try {
                 Log.w("MasterCommunicator", "Attempting reconnect after error...");
                 if (connect()) {
-                    out.println(request);
+                    out.write(request);
+                    out.newLine();
                     out.flush();
                     return in.readLine();
                 }
             } catch (IOException e2) {
                 Log.e("MasterCommunicator", "Retry also failed: " + e2.getMessage());
+                close();
             }
             return null;
         }
